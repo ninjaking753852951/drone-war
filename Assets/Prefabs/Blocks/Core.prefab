@@ -96,6 +96,8 @@ GameObject:
   - component: {fileID: 7129650495770854223}
   - component: {fileID: 6863999966246792501}
   - component: {fileID: 2587839525892796549}
+  - component: {fileID: 3188130482216549444}
+  - component: {fileID: 8163985959737980395}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -154,7 +156,7 @@ Rigidbody:
   m_GameObject: {fileID: 2498757360320358193}
   serializedVersion: 4
   m_Mass: 1000
-  m_Drag: 0
+  m_Drag: 0.3
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
@@ -167,8 +169,8 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -184,39 +186,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d4c2cefcc056d6488d39956af105f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetDestination: {fileID: 0}
   currentSteer: 0
-  motorTorque: 4000
   steerMultiplier: 0.5
-  topSpeed: 999
-  targetvelocityDebug: 0
-  brakingDistance: 10
-  wheelBrakingCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.5
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  safeTurnAngleMultiplier: 0.9
+  motorTorque: 0
+  comHeight: 0
+  trackWidth: 0
+  wheelBase: 0
+  mass: 100
   outline: {fileID: 0}
-  selectionWidth: 3
+  selectionWidth: 4
+  healthMultiplier: 10
+  curHealth: 0
+  maxHealth: 0
+  coreBlocks:
+  - {fileID: 7477153313750559185}
+  - {fileID: 4817536295136154598}
+  - {fileID: 2503077712160491368}
+  - {fileID: 4972858966128822518}
+  - {fileID: 5738559115302630519}
+  - {fileID: 1156924774422680647}
+  curTeam: 0
+  avoidanceRange: 30
+  avoidanceFalloff: 0.6
+  baseAvoidanceWeight: 1
+  isStaleThreshold: 0.1
+  bonusAvoidanceWeight: 0.5
+  bonusAvoidanceDurationMultiplier: 3
+  reverseDuration: 2
+  avoidAngle: 10
+  droneAheadDistance: 0
+  motors: []
+  rb: {fileID: 0}
+  boundingSphereRadius: 0
+  velocity: 0
 --- !u!114 &2587839525892796549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,14 +232,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5a0dc556c27724497346fa5c290f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanBoxSize: 1.1
+  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  mass: 25
+  cost: 25
   connectionPoint: {fileID: 0}
   onInit:
+    m_PersistentCalls:
+      m_Calls: []
+  postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
   blockIdentity:
     isCore: 0
     prefab: {fileID: 0}
+    category: 0
+  controller: {fileID: 0}
+--- !u!114 &3188130482216549444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2498757360320358193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4610beff73524e85971b3a53c111b1e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 0}
+--- !u!114 &8163985959737980395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2498757360320358193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90546477db8c4be4b87861c3bc2c854c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeWindow: 3
+  sampleRate: 0.1
+  totalDistance: 0
 --- !u!1 &3170781993727125655
 GameObject:
   m_ObjectHideFlags: 0

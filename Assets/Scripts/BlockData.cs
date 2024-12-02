@@ -4,4 +4,5 @@ public class BlockData
 {
     public bool isCore;
     public GameObject prefab;
+    public BuildingManagerUI.PlaceableCategories category;
 }

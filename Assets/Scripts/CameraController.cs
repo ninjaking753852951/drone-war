@@ -21,6 +21,7 @@ public class CameraController : MonoBehaviour
     public CinemachineVirtualCamera vCam;
     CinemachineTransposer bodyTransposer;
     public float zoomSpeed = 10;
+    public float zoomExponential = 0.001f;
     float zoom = 10;
     
     
@@ -35,6 +36,19 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         bodyTransposer = vCam.GetCinemachineComponent<CinemachineTransposer>();
+
+        if (GameManager.Instance.currentGameMode == GameMode.Build)
+        {
+            moveTarget.position = BuildingManager.Instance.spawnPoint;
+        }
+        
+        if (GameManager.Instance.currentGameMode == GameMode.Battle)
+        {
+            Vector3 spawnPos = FindObjectOfType<PlayerDroneSpawner>().spawnPoint.position;
+            spawnPos.y = 0;
+            moveTarget.position = spawnPos;
+        }
+        
         // Initialize yaw and pitch with the current rotations
     }
 
@@ -42,7 +56,7 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         
-        if(Input.GetMouseButton(2) ||  BuildingManager.Instance.isBuilding && Input.GetMouseButton(1))
+        if(Input.GetMouseButton(2) || GameManager.Instance.currentGameMode == GameMode.Build && Input.GetMouseButton(1))
             HandleRotation();
         else
         {
@@ -57,7 +71,7 @@ public class CameraController : MonoBehaviour
         
         moveTarget.Translate(moveDir * Time.deltaTime * curMoveSpeed);
 
-        zoom -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed;
+        zoom -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed * (1 + zoom * zoomExponential);
         zoom = Mathf.Max(zoom, 1);
 
         bodyTransposer.m_FollowOffset = new Vector3(0, 0, -zoom);
