@@ -141,7 +141,6 @@ public class CaptureNearestObjective : IDroneOrder
         }
 
         Transform closestTarget = Utils.ClosestTo(targetObjectives, logicController.transform.position);
-        Debug.Log(closestTarget.transform.position);
         
         logicController.controller.SetDestination(closestTarget.position);
     }

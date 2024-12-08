@@ -12,6 +12,7 @@ public class TurretRangeIndicator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        lineRend.gameObject.SetActive(true);
         Select(false);
     }
 

@@ -9,6 +9,7 @@ public class DroneBlock : MonoBehaviour
 
     public Vector3 scanBoxSize = new Vector3(1.1f,1.1f,1.1f);
     public float mass = 25;
+    public float health = 10;
     public float cost = 25;
     
     public Transform connectionPoint;
@@ -43,6 +44,7 @@ public class DroneBlock : MonoBehaviour
         
 
         controller = transform.root.GetComponent<DroneController>();
+        controller.curHealth += health;
         if (rb != null)
         {
             rb.mass = mass;

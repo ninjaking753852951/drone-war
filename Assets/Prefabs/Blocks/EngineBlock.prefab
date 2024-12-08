@@ -888,6 +888,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   mass: 100
+  health: 10
   cost: 200
   connectionPoint: {fileID: 0}
   onInit:
@@ -925,7 +926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ca760ab9dc77a047a99bec74c548b7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  torque: 2000
+  torque: 3000
 --- !u!1 &8934892095162715147
 GameObject:
   m_ObjectHideFlags: 0

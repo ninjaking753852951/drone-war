@@ -59,4 +59,17 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
 
         return targetPlaceables;
     }
+
+    public BlockData BlockData(int id)
+    {
+        if (id < Instance.blocks.Count && id >= 0)
+        {
+            return blocks[id];
+        }
+        else
+        {
+            Debug.LogWarning("Block not found in block library");
+            return null;
+        }
+    }
 }

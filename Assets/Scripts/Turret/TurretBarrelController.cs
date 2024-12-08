@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,11 +31,33 @@ public class TurretBarrelController : MonoBehaviour
 
 
 
-    public void Fire(TurretCoreController turret)
+    /*public void Fire(TurretCoreController turret)
     {
 
-        GameObject projectileClone = Instantiate(turret.projectilePrefab, shootPoint.position, Quaternion.LookRotation(shootPoint.up));
+        GameObject projectileClone = Instantiate(turret.projectilePrefab, shootPoint.position, shootPoint.rotation);
 
+        Projectile projectile = projectileClone.GetComponent<Projectile>();
+        
+        switch (projectile)
+        {
+
+            case Bullet bullet:
+                bullet.Init(turret);
+                //ProjectileInit(turret, projectileClone);
+                break;
+            case TurretCoreController.TurretType.Missile:
+                ProjectileInit(turret, projectileClone);
+                break;
+            case TurretCoreController.TurretType.Laser:
+                LaserInit(turret, projectileClone);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }*/
+
+    void ProjectileInit(TurretCoreController turret ,GameObject projectileClone)
+    {
         Rigidbody rb = projectileClone.GetComponent<Rigidbody>();
 
         float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
@@ -42,12 +65,20 @@ public class TurretBarrelController : MonoBehaviour
         turret.rb.AddForceAtPosition(Vector3.up * projectileMass * turret.shootVelocity * turret.recoilMultiplier, shootPoint.position);
         
         rb.AddForce(projectileClone.transform.forward * turret.shootVelocity, ForceMode.VelocityChange);
-        
-        
+
         Projectile projectile = projectileClone.GetComponent<Projectile>();
         if (projectile != null)
         {
-            projectile.Init(turret.controller,  turret.drag, turret.missileAcceleration);
+            projectile.Init(turret);
+        }
+    }
+
+    void LaserInit(TurretCoreController turret ,GameObject projectileClone)
+    {
+        Projectile laserBeam = projectileClone.GetComponent<Projectile>();
+        if (laserBeam != null)
+        {
+            laserBeam.Init(turret);
         }
     }
 

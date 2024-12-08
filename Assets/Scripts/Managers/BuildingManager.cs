@@ -31,11 +31,14 @@ public class BuildingManager : Singleton<BuildingManager>
         public BlockData block;
         public MachineSaveLoadManager.SubAssemblySaveData subAssembly;
 
+        public Sprite thumbnail;
+
         public Placeable(BlockData block, MachineSaveLoadManager.SubAssemblySaveData subAssembly = null)
         {
             isSubAssembly = block == null;
             this.block = block;
             this.subAssembly = subAssembly;
+            thumbnail = GenerateThumbnail();
         }
 
         public string PlaceableName()
@@ -47,6 +50,18 @@ public class BuildingManager : Singleton<BuildingManager>
             else
             {
                 return block.prefab.name;
+            }
+        }
+        
+        public float Cost()
+        {
+            if (isSubAssembly)
+            {
+                return 0;
+            }
+            else
+            {
+                return block.prefab.GetComponent<DroneBlock>().cost;
             }
         }
 
@@ -79,8 +94,42 @@ public class BuildingManager : Singleton<BuildingManager>
             {
                 GameObject blockClone = Instantiate(block.prefab, pos, rot);
                 blockClone.GetComponent<DroneBlock>().blockIdentity = block;
+                
                 return blockClone;
             } 
+        }
+
+        Sprite GenerateThumbnail()
+        {
+            Vector3 posOffset = Vector3.down *1000;
+            float boundsPadding = 0.1f;
+            
+            
+            Camera thumbnailCamera = ThumbnailGenerator.instance.cam;
+
+            GameObject obj = Spawn(posOffset, Quaternion.Euler(-35,35,0));
+            Bounds bounds = Utils.CalculateBounds(obj);
+            thumbnailCamera.transform.position = bounds.center + Vector3.back * 10; // Adjust distance
+            thumbnailCamera.orthographicSize = Mathf.Max(bounds.extents.x, bounds.extents.y) +boundsPadding;
+
+            RenderTexture renderTexture = thumbnailCamera.targetTexture;
+            RenderTexture.active = renderTexture;
+            thumbnailCamera.Render();
+            
+            Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGBA32, false);
+            texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            texture.Apply();
+
+            texture = Utils.MakeColorTransparent(texture, Color.white);
+
+            
+            RenderTexture.active = null;
+            
+            obj.SetActive(false);
+            Destroy(obj);
+            
+            Sprite thumbnailSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            return thumbnailSprite;
         }
     }
     
@@ -226,6 +275,25 @@ public class BuildingManager : Singleton<BuildingManager>
     {
         buildingBlockIndicator.transform.position = hit.collider.transform.position + hit.normal * 1f;
 
+        Vector3 forward = Vector3.Cross(hit.normal, Vector3.up);
+        if (forward.sqrMagnitude < 0.001f)
+        {
+            forward = Vector3.Cross(hit.normal, Vector3.right);
+        }
+
+        Quaternion alignToNormal = Quaternion.LookRotation(forward, hit.normal);
+
+        float localYRotation = rotationAngles[indicatorRotDirIndex];
+        Quaternion localRotation = Quaternion.Euler(0, localYRotation, 0);
+
+        buildingBlockIndicator.transform.rotation = alignToNormal * localRotation;
+    }
+
+    
+    /*void UpdateIndicatorPosition(RaycastHit hit)
+    {
+        buildingBlockIndicator.transform.position = hit.collider.transform.position + hit.normal * 1f;
+
         Vector3 forwardVector = Vector3.forward;
         float dot = Vector3.Dot(forwardVector, hit.normal);
         if (dot == 1 || dot == -1)
@@ -233,46 +301,33 @@ public class BuildingManager : Singleton<BuildingManager>
         
         buildingBlockIndicator.transform.rotation = Quaternion.LookRotation(forwardVector,hit.normal)
                                                     * Quaternion.Euler(new Vector3(0,rotationAngles[indicatorRotDirIndex],0));
-    }
+    }*/
 
     void EnterBuildMode(bool loadSessionSave = false)
     {
+        
+        
         GameManager.Instance.EnterBuildMode();
+        //AllPlaceables();
         
-        List<DroneController> activeDrones = FindObjectsOfType<DroneController>().ToList();
+        Utils.DestroyAllDrones();
+        MachineSaveLoadManager.instance.LoadAndSpawnMachine(MachineSaveLoadManager.instance.curSlot);// corresponds to active game save slot;
 
-        foreach (var drone in activeDrones)
-        {
-            Destroy(drone.gameObject);
-        }
-        activeDrones.Clear();
-        
-        if (loadSessionSave)
-        {
-            LoadAndSpawnMachine(-1);// corresponds to active game save slot
-        }
-        else
-        {
-            Placeable core = new Placeable(BlockLibraryManager.Instance.coreBlock);
-            core.Spawn(spawnPoint, quaternion.identity);
-            FindDroneController();
-        }
-        
         SetNewCurrentBlock(new Placeable(BlockLibraryManager.Instance.blocks[0]));
         
     }
-
-    void LoadAndSpawnMachine(int slot)
+    
+    public void SpawnDefaultMachine()
     {
-        Utils.DestroyAllDrones();
-        MachineSaveLoadManager.MachineSaveData machineSaveData = MachineSaveLoadManager.Instance.LoadMachine(slot);
-        MachineSaveLoadManager.Instance.SpawnMachine(machineSaveData);
-        FindDroneController();
+        Placeable core = new Placeable(BlockLibraryManager.Instance.coreBlock);
+        core.Spawn(spawnPoint, quaternion.identity);
     }
     
     void ExitBuildMode()
     {
-        MachineSaveLoadManager.Instance.SaveMachine(-1);
+        
+        //MachineSaveLoadManager.instance.LoadAndSpawnMachine(MachineSaveLoadManager.instance.curSlot, true);
+        MachineSaveLoadManager.Instance.SaveMachine(MachineSaveLoadManager.instance.curSlot);
         GameManager.Instance.ExitBuildMode();
         buildingBlockIndicator.SetActive(false);
         DeployMachine();
@@ -336,34 +391,39 @@ public class BuildingManager : Singleton<BuildingManager>
 
     void OnGUI()
     {
-        
         return;
-        
-        if(GameManager.Instance.currentGameMode != GameMode.Build)
-            return;
-        
-        List<BlockData> blocks = BlockLibraryManager.Instance.placeableBlocks;
-
-        
-        if (blocks.Count > 0)
+        if (allPlaceables != null)
         {
-            string curSelectedBlockName = "Sub Assembly";
-            if (curPlaceable != null)
-                curSelectedBlockName = curPlaceable.PlaceableName();
-            GUI.Label(new Rect(Screen.width - 200, 10, 190, 30), "Selected Block: " +curSelectedBlockName);
-            for (int i = 0; i < blocks.Count; i++)
+            // Set initial position for displaying thumbnails
+            float startX = 10; // Starting X position
+            float startY = 10; // Starting Y position
+            float thumbnailSize = 100; // Size of each thumbnail
+            float padding = 10; // Space between thumbnails
+
+            foreach (var placeable in allPlaceables)
             {
-                if (GUI.Button(new Rect(Screen.width - 200, 50 + i * 30, 190, 30), blocks[i].prefab.name))
+                Sprite thumbnail = placeable.thumbnail;
+
+                if (thumbnail != null)
                 {
-                    SetNewCurrentBlock(new Placeable(blocks[i]));
+                    // Convert Sprite to Texture for GUI
+                    Texture2D texture = thumbnail.texture;
+
+                    // Draw thumbnail on the GUI
+                    GUI.DrawTexture(new Rect(startX, startY, thumbnailSize, thumbnailSize), texture);
+
+                    // Update X position for next thumbnail
+                    startX += thumbnailSize + padding;
+
+                    // If it exceeds the screen width, move to the next row
+                    if (startX + thumbnailSize > Screen.width)
+                    {
+                        startX = 10;
+                        startY += thumbnailSize + padding;
+                    }
                 }
-            }
-            
-            //TODO STICK WITH ONGUI FOR NOW. UPON CLICKING THE SUB ASSEMBLY BUTTON OPEN UP A MENU FULL OF ALL THE SUB ASSEMBLIES 
-            if (GUI.Button(new Rect(Screen.width - 200, 50 + blocks.Count * 30, 190, 30), "Sub Assembly"))
-            {
-                SetNewCurrentBlock(new Placeable(null, MachineSaveLoadManager.instance.LoadSubAssembly(0)));
             }
         }
     }
+
 }

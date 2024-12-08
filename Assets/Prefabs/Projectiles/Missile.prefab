@@ -5505,7 +5505,7 @@ GameObject:
   m_Component:
   - component: {fileID: 30206515435786369}
   - component: {fileID: 2212337487876808071}
-  - component: {fileID: 293343037009820290}
+  - component: {fileID: 2927762205647023847}
   m_Layer: 0
   m_Name: Missile
   m_TagString: Untagged
@@ -5558,7 +5558,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &293343037009820290
+--- !u!114 &2927762205647023847
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5567,12 +5567,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7256020650716156835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da81997227cbb6545bddbf1617b37f82, type: 3}
+  m_Script: {fileID: 11500000, guid: 548755c0611749bf913357841efc3903, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageMultiplier: 0.5
-  originTeam: 0
-  originRoot: {fileID: 0}
-  body: {fileID: 30206515435786369}
-  isMissile: 1
-  missileMultiplier: 1
+  body: {fileID: 6337551880990119019}
+  impactEffect: {fileID: 6705187020762197101, guid: 1424ef05d7fc4fa4cb909a83c016d856,
+    type: 3}
+  explosionRadius: 5

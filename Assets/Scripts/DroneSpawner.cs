@@ -42,6 +42,9 @@ public abstract class DroneSpawner : MonoBehaviour
         }
         
         MachineSaveLoadManager.MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(id);
+        if(machineData == null)
+            return;
+        
         float machineCost = machineData.totalCost;
 
         if (MatchManager.Instance.Team(teamID).CanAfford(machineCost))
@@ -52,8 +55,7 @@ public abstract class DroneSpawner : MonoBehaviour
         {
             return;
         }
-        
-        controller = MachineSaveLoadManager.Instance.SpawnMachine(machineData, scanPos);
+        controller = machineData.Spawn(scanPos);
         controller.curTeam = teamID;
 
         StartCoroutine(SpawnMachineCoroutine());

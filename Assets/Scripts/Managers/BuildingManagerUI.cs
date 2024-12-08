@@ -14,7 +14,9 @@ public class BuildingManagerUI : MonoBehaviour
     public GameObject menuGameObject;
 
     public Transform categoryParent;
-    public GameObject buttonPrefab;
+    [FormerlySerializedAs("buttonPrefab")]
+    public GameObject categoryButtonPrefab;
+    public GameObject itemButtonPrefab;
     public Transform placeableParent;
 
     public TextMeshProUGUI machineCost;
@@ -33,7 +35,7 @@ public class BuildingManagerUI : MonoBehaviour
     {
         foreach (var t in placeableCategories)
         {
-            GameObject categoryButtonClone = Instantiate(buttonPrefab, categoryParent);
+            GameObject categoryButtonClone = Instantiate(categoryButtonPrefab, categoryParent);
             categoryButtonClone.GetComponentInChildren<TextMeshProUGUI>().text = t.ToString();
             categoryButtonClone.GetComponentInChildren<Button>().onClick.AddListener(() => ShowCategory(t));
         }
@@ -53,7 +55,7 @@ public class BuildingManagerUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        machineCost.text = "Machine Cost: $" + builder.totalCost;
+        machineCost.text = "$" + builder.totalCost;
     }
 
     void SetActiveBuildMenu( bool active)
@@ -68,12 +70,13 @@ public class BuildingManagerUI : MonoBehaviour
         List<BuildingManager.Placeable> placeables =
             builder.PlaceablesInCategory(categoryIndex);
         
-        Debug.Log(placeables.Count);
         
         foreach (var placeable in placeables)
         {
-            GameObject categoryButtonClone = Instantiate(buttonPrefab, placeableParent);
-            categoryButtonClone.GetComponentInChildren<TextMeshProUGUI>().text = placeable.PlaceableName();
+            GameObject categoryButtonClone = Instantiate(itemButtonPrefab, placeableParent);
+            //Debug.Log(categoryButtonClone.transform.FindChildWithTag("ItemIcon"));
+            categoryButtonClone.transform.FindChildWithTag("UIIcon").GetComponent<Image>().sprite = placeable.thumbnail;
+            categoryButtonClone.GetComponentInChildren<TextMeshProUGUI>().text = "$"+placeable.Cost();
             categoryButtonClone.GetComponentInChildren<Button>().onClick.AddListener(() => builder.SetNewCurrentBlock(placeable));
         }
     }

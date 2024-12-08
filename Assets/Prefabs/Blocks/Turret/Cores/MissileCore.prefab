@@ -260,8 +260,8 @@ GameObject:
   - component: {fileID: 802008970095206029}
   - component: {fileID: 1635076216353542512}
   - component: {fileID: 8037801357792849474}
-  - component: {fileID: 1402693391416586318}
   - component: {fileID: 161399211327900245}
+  - component: {fileID: 4074943280571985229}
   m_Layer: 0
   m_Name: MissileCore
   m_TagString: Untagged
@@ -309,7 +309,7 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1402693391416586318}
+      - m_Target: {fileID: 4074943280571985229}
         m_TargetAssemblyTypeName: TurretCoreController, Assembly-CSharp
         m_MethodName: Deploy
         m_Mode: 6
@@ -347,33 +347,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1402693391416586318
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089627516061476954}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b009e9b0408b4d244b9e8438eace60cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  missileAcceleration: 15
-  fireRate: 0.5
-  recoilMultiplier: 15
-  projectilePrefab: {fileID: 7256020650716156835, guid: 5058fb0daf3bd0940be6303acbc36653,
-    type: 3}
-  target: {fileID: 0}
-  shootVelocity: 15
-  mainBarrel: {fileID: 0}
-  mount: {fileID: 0}
-  controller: {fileID: 0}
-  rb: {fileID: 0}
-  turretUpdateRate: 5
-  turretType: 1
-  drag: -0.3
-  timeStep: 0.02
 --- !u!114 &161399211327900245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -388,6 +361,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRend: {fileID: 7825413251897764613}
   resolution: 60
+--- !u!114 &4074943280571985229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089627516061476954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cf9f1c728494e8fb70d1b2cebb7b21e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fireRate: 0.5
+  recoilMultiplier: 1
+  projectilePrefab: {fileID: 7256020650716156835, guid: 5058fb0daf3bd0940be6303acbc36653,
+    type: 3}
+  target: {fileID: 0}
+  shootVelocity: 15
+  mainBarrel: {fileID: 0}
+  mount: {fileID: 0}
+  controller: {fileID: 0}
+  rb: {fileID: 0}
+  turretUpdateRate: 5
+  shootHeightOffset: 0
+  missileAcceleration: 10
+  missileExplosionRadiusMultiplier: 1
+  missileDamage: 1000
+  simulationSafetyLimit: 500
+  simulationStepSize: 0.1
 --- !u!1 &1337651016156115548
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,7 +887,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7401576685564597357
 Transform:
   m_ObjectHideFlags: 0

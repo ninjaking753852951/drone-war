@@ -123,12 +123,24 @@ public static class Utils
         }
     }
     
-    public static void DestroyAllDrones()
+    /*public static void DestroyAllDrones()
     {
         List<DroneBlock> machineBlocks = GameObject.FindObjectsByType<DroneBlock>(FindObjectsSortMode.None).ToList();
         foreach (DroneBlock machineBlock in machineBlocks)
         {
             GameObject.Destroy(machineBlock.gameObject);
+        }
+    }*/
+    
+        
+    public static void DestroyAllDrones()
+    {
+        HashSet<DroneBlock> machineBlocks = GameObject.FindObjectsByType<DroneBlock>(FindObjectsSortMode.None).ToHashSet();
+        foreach (DroneBlock machineBlock in machineBlocks)
+        {
+            if(machineBlock != null)
+                if(machineBlock.gameObject != null)
+                    GameObject.DestroyImmediate(machineBlock.gameObject);
         }
     }
     
@@ -216,6 +228,64 @@ public static class Utils
         corners[7] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
     }
     
+    public static Bounds CalculateBounds(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+            return new Bounds(obj.transform.position, Vector3.zero);
+
+        Bounds bounds = renderers[0].bounds;
+        foreach (var renderer in renderers)
+        {
+            bounds.Encapsulate(renderer.bounds);
+        }
+        return bounds;
+    }
+    
+    public static Texture2D MakeColorTransparent(Texture2D texture, Color colorToMakeTransparent, float tolerance = 0f)
+    {
+        // Create a copy of the texture to modify
+        Texture2D newTexture = new Texture2D(texture.width, texture.height, texture.format, false);
+        newTexture.filterMode = texture.filterMode;
+
+        // Get the pixels from the original texture
+        Color[] pixels = texture.GetPixels();
+
+        colorToMakeTransparent = pixels[0];
+
+        // Iterate through all pixels
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            if (IsColorMatch(pixels[i], colorToMakeTransparent, tolerance))
+            {
+                // Match found: Make the pixel transparent
+                pixels[i] = new Color(pixels[i].r, pixels[i].g, pixels[i].b, 0f);
+            }
+        }
+
+        // Set the modified pixels back to the new texture
+        newTexture.SetPixels(pixels);
+        newTexture.Apply();
+
+        return newTexture;
+    }
+    
+    private static bool IsColorMatch(Color color1, Color color2, float tolerance)
+    {
+        return Mathf.Abs(color1.r - color2.r) <= tolerance &&
+               Mathf.Abs(color1.g - color2.g) <= tolerance &&
+               Mathf.Abs(color1.b - color2.b) <= tolerance &&
+               Mathf.Abs(color1.a - color2.a) <= tolerance;
+    }
+    
+    public static void ClearRenderTexture(RenderTexture renderTexture)
+    {
+        RenderTexture.active = renderTexture;
+        GL.Clear(true, true, new Color(0, 0, 0, 0)); // Clear with transparent
+        RenderTexture.active = null;
+    }
+
+    
 }
 
 public static class GameObjectExtensions
@@ -238,4 +308,23 @@ public static class GameObjectExtensions
     }
     
     
+}
+
+public static class TransformExtensions
+{
+    public static Transform FindChildWithTag(this Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+                return child;
+
+            // Recursively search in the child's hierarchy
+            Transform found = child.FindChildWithTag(tag);
+            if (found != null)
+                return found;
+        }
+
+        return null; // No child with the tag was found
+    }
 }

@@ -55,11 +55,19 @@ public class GameManager : PersistentSingleton<GameManager>
         // Define button dimensions
         float buttonWidth = 50;
         float buttonHeight = 20;
-        float padding = 2;
+        float padding = 10; // Spacing between buttons
+
+        // Calculate total width of the button group (two buttons + padding)
+        float totalWidth = (2 * buttonWidth) + padding;
 
         // Calculate positions for the buttons
-        Rect buildButtonRect = new Rect(padding, padding, buttonWidth, buttonHeight);
-        Rect battleButtonRect = new Rect(padding + buttonWidth + padding, padding, buttonWidth, buttonHeight);
+        float screenWidth = Screen.width;
+        float startX = (screenWidth - totalWidth) / 2; // Center the buttons horizontally
+        float startY = 10; // Distance from the top of the screen
+
+        // Button positions
+        Rect buildButtonRect = new Rect(startX, startY, buttonWidth, buttonHeight);
+        Rect battleButtonRect = new Rect(startX + buttonWidth + padding, startY, buttonWidth, buttonHeight);
 
         // "Build" button
         if (GUI.Button(buildButtonRect, "Build", buttonStyle))
@@ -75,6 +83,7 @@ public class GameManager : PersistentSingleton<GameManager>
             ReloadScene();
         }
     }
+
 }
 
 public enum GameMode

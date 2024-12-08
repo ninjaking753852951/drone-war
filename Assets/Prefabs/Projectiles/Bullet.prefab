@@ -28,8 +28,8 @@ Transform:
   m_GameObject: {fileID: 1304278249708095282}
   serializedVersion: 2
   m_LocalRotation: {x: 0.70710576, y: -0, z: -0, w: 0.70710784}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.1, z: 0.2}
+  m_LocalPosition: {x: 0.000000010932, y: 0, z: 0.036681}
+  m_LocalScale: {x: 0.053276002, y: 0.026638001, z: 0.053276002}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6337551880990119019}
@@ -194,7 +194,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 94865f55c73753d4985b0d0e81ee47c4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -219,22 +219,22 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.6865817
+    widthMultiplier: 0.1978785
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
         value: 0
-        inSlope: 7.114664
-        outSlope: 7.114664
+        inSlope: 40.28045
+        outSlope: 40.28045
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.15029123
+        outWeight: 0.103597336
       - serializedVersion: 3
-        time: 0.37408623
-        value: 0.985314
+        time: 0.063366026
+        value: 0.99493015
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -244,19 +244,19 @@ TrailRenderer:
       - serializedVersion: 3
         time: 1
         value: 0
-        inSlope: -4.089674
-        outSlope: -4.089674
+        inSlope: -0.79895097
+        outSlope: -0.79895097
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.06804734
+        inWeight: 0.1541906
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.8851009, b: 0, a: 0.48235294}
-      key1: {r: 1, g: 0.8862745, b: 0, a: 0.48235294}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
@@ -376,8 +376,8 @@ Transform:
   m_GameObject: {fileID: 6741560296931384409}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.099999905}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalPosition: {x: 0.000000010932, y: 0, z: 0.063319}
+  m_LocalScale: {x: 0.053276002, y: 0.053276002, z: 0.053276002}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6337551880990119019}
@@ -463,9 +463,9 @@ GameObject:
   m_Component:
   - component: {fileID: 30206515435786369}
   - component: {fileID: 2212337487876808071}
-  - component: {fileID: 293343037009820290}
+  - component: {fileID: 5698604189571977806}
   m_Layer: 0
-  m_Name: Projectile
+  m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -515,7 +515,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &293343037009820290
+--- !u!114 &5698604189571977806
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -524,10 +524,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7256020650716156835}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da81997227cbb6545bddbf1617b37f82, type: 3}
+  m_Script: {fileID: 11500000, guid: 8112a1614c75447789c9a3fe2b04cb44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageMultiplier: 0.5
-  originTeam: 0
-  originRoot: {fileID: 0}
   body: {fileID: 6337551880990119019}

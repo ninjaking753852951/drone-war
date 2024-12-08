@@ -135,7 +135,7 @@ public class DroneController : MonoBehaviour
         rb.isKinematic = !deploy;
         rb.useGravity = deploy;
         rb.mass = mass;
-        curHealth = mass * healthMultiplier;
+        curHealth *= healthMultiplier;
         maxHealth = curHealth;
 
         boundingSphereRadius = Utils.CalculateBoundingSphereRadius(rb);

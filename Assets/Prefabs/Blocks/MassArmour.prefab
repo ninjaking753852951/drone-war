@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 2963837011756668196}
   - component: {fileID: 1226114971926973888}
   m_Layer: 0
-  m_Name: Armour
+  m_Name: MassArmour
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,7 +237,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   mass: 100
-  cost: 50
+  health: 100
+  cost: 20
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:

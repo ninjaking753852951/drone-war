@@ -6,14 +6,8 @@ using ImprovedTimers;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class TurretCoreController : MonoBehaviour
+public abstract class TurretCoreController : MonoBehaviour
 {
-    //public bool isMissile;
-    [Header("Missile Settings")]
-    public float missileAcceleration = 1;
-
-    [Header("Laser Settings")] 
-    public float laserRange = 30;
     public float fireRate = 10;
     public float recoilMultiplier = 1;
     
@@ -40,16 +34,13 @@ public class TurretCoreController : MonoBehaviour
     TurretRangeIndicator rangeIndicator;
 
     float maxRange;
-
-    public TurretType turretType;
     
-    public enum TurretType
-    {
-        Ballistic, Missile, Laser
-    }
+
+    public float shootHeightOffset = 0f;
 
     public void Deploy(bool deploy)
     {
+        Debug.Log("Deploying");
         turretUpdateTimer = new CountdownTimer(1 / turretUpdateRate);
         turretUpdateTimer.Start();
         
@@ -72,7 +63,7 @@ public class TurretCoreController : MonoBehaviour
         mainBarrel = Utils.FurthestFrom(Utils.GetTransformsFromComponents(barrels), transform.position)
             .GetComponent<TurretBarrelController>();
 
-        maxRange = mount.CalculateMaxRange(this);
+        maxRange = MaxRange();
     }
 
     void Awake()
@@ -85,7 +76,6 @@ public class TurretCoreController : MonoBehaviour
     {
         fireTimer = new CountdownTimer(1 / fireRate);
         fireTimer.Start();
-        
     }
 
     // Update is called once per frame
@@ -95,7 +85,7 @@ public class TurretCoreController : MonoBehaviour
             return;
         
         if(rangeIndicator != null)
-            rangeIndicator.DrawRange(RangeCalculation());
+            rangeIndicator.DrawRange(maxRange);
 
         List<Transform> targets = FindEnemies();
         if (targets == null || targets.Count == 0 || mount == null)
@@ -106,8 +96,8 @@ public class TurretCoreController : MonoBehaviour
             AimTurret();
 
 
-        targetInRange = Vector3.Distance(target.position, mount.aimPoint.position) < RangeCalculation();
-        //Debug.Log(fireTimer);
+        targetInRange = Vector3.Distance(target.position, mount.aimPoint.position) < maxRange;
+
         
         if(ReadyToFire())
             Fire();
@@ -140,15 +130,15 @@ public class TurretCoreController : MonoBehaviour
             }
         }
 
-        TargetFlasher targetFlasher = FindObjectOfType<TargetFlasher>();
+        List<IDamageable> damageables = DamageableManager.Instance.FetchDamageables();
 
-        if (targetFlasher != null)
+        foreach (IDamageable damageable in damageables)
         {
-            List<Transform> targetflashers = new List<Transform>();
-            targetflashers.Add(targetFlasher.transform);
-            return targetflashers;
+            if (damageable.Team() != curTeam)
+            {
+                validTargets.Add(damageable.Transform());
+            }
         }
-
         
         return validTargets;
     }
@@ -158,42 +148,23 @@ public class TurretCoreController : MonoBehaviour
         fireTimer.Reset(1/fireRate);
         fireTimer.Start();
         
-        mainBarrel.Fire(this);
-    }
-
-
-    public float drag = 0.3f;         // Unity-style drag coefficient
-    public float timeStep = 0.02f;    // Unity's fixed delta time
-
-    public float RangeCalculation()
-    {
-        return maxRange;
+        Shoot();
         
-        float g = 9.81f; // Gravity (m/s^2)
-
-        // Initial conditions
-        Vector2 velocity = new Vector2(shootVelocity * Mathf.Cos(45f * Mathf.Deg2Rad),
-            shootVelocity * Mathf.Sin(45f * Mathf.Deg2Rad));
-        Vector2 position = Vector2.zero;
-
-        while (position.y >= 0) // Simulate until the projectile hits the ground
-        {
-            // Apply gravity
-            Vector2 acceleration = new Vector2(0, -g);
-
-            // Update velocity with drag applied
-            velocity += acceleration * timeStep;
-            velocity *= (1 - drag * timeStep);
-
-            // Update position
-            position += velocity * timeStep;
-        }
-
-        return position.x; // Return horizontal range
+        //mainBarrel.Fire(this);
     }
+
+    public abstract void Shoot();
+
+    public abstract float MaxRange();
+
+    public abstract float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1);
+
+    public abstract float EstimateTimeOfFlight(float initialVelocity, float distance);
 
     bool ReadyToFire()
     {
         return mount.ReadyToFire() && fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange;
     }
+
+
 }

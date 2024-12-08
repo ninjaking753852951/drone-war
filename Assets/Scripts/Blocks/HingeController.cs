@@ -157,11 +157,11 @@ public class HingeController : MonoBehaviour
         float dotProduct = Vector3.Dot(directionToWheelBody.normalized, origin.right);
 
         // If the dot product is positive, b is on the right side of a
-        float dir = dotProduct < 0 ? 1 : -1;
+        float dir = dotProduct < 0 ? -1 : -1;
         
         dotProduct = Vector3.Dot(directionToWheelBody.normalized, origin.forward);
         
-        return dotProduct > 0 ? dir * 1 :dir * -1;
+        return dotProduct < 0 ? dir * -1 :dir * 1;
         
     }
 }

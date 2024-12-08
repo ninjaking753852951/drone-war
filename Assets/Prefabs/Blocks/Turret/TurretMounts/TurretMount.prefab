@@ -517,7 +517,7 @@ Transform:
   m_GameObject: {fileID: 3431592304728513276}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 2, z: -27}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -606,10 +606,8 @@ MonoBehaviour:
   aimForce: 2000
   maxTurnSpeed: 60
   nearTargetSmoothing: 1
-  usePredictiveAiming: 0
-  simulationStepSize: 0.1
-  simulationSafetyLimit: 500
-  debugPitch: 0
+  yawRb: {fileID: 0}
+  pitchRb: {fileID: 0}
 --- !u!1 &5325834903372410067
 GameObject:
   m_ObjectHideFlags: 0

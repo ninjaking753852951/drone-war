@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Mathematics;
+using Random = UnityEngine.Random;
 
 public class AIDroneSpawner : DroneSpawner
 {
     public float spawnRate;
+
+    public int2 spawnSlots;
     
     // Start is called before the first frame update
     void Start()
@@ -23,6 +26,6 @@ public class AIDroneSpawner : DroneSpawner
 
     void SpawnRandomMachine()
     {
-        SpawnMachine(Random.Range(1,4));
+        SpawnMachine(Random.Range(spawnSlots.x,spawnSlots.y +1));
     }
 }

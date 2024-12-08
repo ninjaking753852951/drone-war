@@ -1,18 +1,30 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
-public class TargetFlasher : MonoBehaviour
+public class TargetFlasher : MonoBehaviour, IDamageable
 {
     public Renderer rend;
     private Color originalColor;
 
     void Start()
     {
+        RegisterDamageable();
+        
+        if(GameManager.Instance.currentGameMode == GameMode.Battle)
+            Destroy(gameObject);
+        
         // Store the original color of the material
         if (rend != null)
         {
             originalColor = rend.material.color;
         }
+        
+    }
+
+    void OnDisable()
+    {
+        DeregisterDamageable();
     }
 
     void OnTriggerEnter(Collider other)
@@ -38,5 +50,26 @@ public class TargetFlasher : MonoBehaviour
             // Reset material color to the original
             rend.material.color = originalColor;
         }
+    }
+    public void DealDamage()
+    {
+        
+    }
+    public int Team()
+    {
+        return -1;
+    }
+    public Transform Transform()
+    {
+        return transform;
+    }
+    public void RegisterDamageable()
+    {
+        DamageableManager.Instance.RegisterDamageable(this);
+    }
+    public void DeregisterDamageable()
+    {
+        if(DamageableManager.Instance != null)
+            DamageableManager.Instance.DeregisterDamageable(this);
     }
 }

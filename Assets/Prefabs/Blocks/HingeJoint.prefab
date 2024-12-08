@@ -226,7 +226,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0.5, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 3.2812815, y: 4.3610415, z: -3.500001}
+  m_ConnectedAnchor: {x: 0, y: 0.5, z: 0}
   serializedVersion: 2
   m_UseSpring: 1
   m_Spring:
@@ -311,6 +311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   mass: 50
+  health: 10
   cost: 25
   connectionPoint: {fileID: 5500065594034086193}
   onInit:
