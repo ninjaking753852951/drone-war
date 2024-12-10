@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Misc;
 using UnityEngine;
 
 public class TargetFlasher : MonoBehaviour, IDamageable
@@ -71,5 +72,9 @@ public class TargetFlasher : MonoBehaviour, IDamageable
     {
         if(DamageableManager.Instance != null)
             DamageableManager.Instance.DeregisterDamageable(this);
+    }
+    public TargetTypes TargetType()
+    {
+        return TargetTypes.Debug;
     }
 }

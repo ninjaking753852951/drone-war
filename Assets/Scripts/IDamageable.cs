@@ -1,3 +1,4 @@
+using Misc;
 using UnityEngine;
 public interface IDamageable
 {
@@ -9,4 +10,6 @@ public interface IDamageable
 
         public void RegisterDamageable();
         public void DeregisterDamageable();
+
+        public TargetTypes TargetType();
 }

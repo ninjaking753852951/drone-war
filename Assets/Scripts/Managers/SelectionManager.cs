@@ -99,11 +99,11 @@ public class SelectionManager : Singleton<SelectionManager>
                 yPos += 15;
                 GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "HP: " + selectedDrones[i].curHealth);
                 yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Mass: " + selectedDrones[i].mass);
+                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Mass: " + selectedDrones[i].movementController.mass);
                 yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Torque: " + selectedDrones[i].motorTorque);
+                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Torque: " + selectedDrones[i].movementController.motorTorque);
                 yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Velocity: " + Mathf.Round(selectedDrones[i].velocity *10)/10 + " m/s");
+                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Velocity: " + Mathf.Round(selectedDrones[i].movementController.velocity *10)/10 + " m/s");
             }
         }
         

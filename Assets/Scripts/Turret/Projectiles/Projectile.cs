@@ -11,8 +11,11 @@ public abstract class Projectile : MonoBehaviour
     public Transform body;
 
     protected TurretCoreController turret;
-    
 
+    protected void Start()
+    {
+        GameManager.Instance.onEnterBuildMode.AddListener(() => Destroy(gameObject));
+    }
 
     void OnTriggerEnter(Collider other)
     {

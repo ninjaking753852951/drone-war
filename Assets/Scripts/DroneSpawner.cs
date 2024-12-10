@@ -13,7 +13,7 @@ public abstract class DroneSpawner : MonoBehaviour
     public int teamID;
     
 
-    protected void SpawnMachine(int id)
+    public void SpawnMachine(int id)
     {
         bool isClear = false;
         int safety = 100;

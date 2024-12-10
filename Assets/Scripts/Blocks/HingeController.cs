@@ -61,7 +61,7 @@ public class HingeController : MonoBehaviour
 
         float curTurnSpeed = maxTurnSpeed *
                              turnSpeedCurve.Evaluate(1 - Mathf.InverseLerp(minSpeedAttenuate, maxSpeedAttenuate,
-                                 controller.velocity));
+                                 controller.movementController.velocity));
         
         
         
@@ -87,12 +87,18 @@ public class HingeController : MonoBehaviour
     
     public void SetSteerRot(float steer)
     {
-        targetSteer = Mathf.Clamp(steer, -turnLimit, turnLimit);
+        
 
         /*float safeTurnAngle = CalculateSafeTurnAngle(controller.velocity, controller.comHeight + 10);*/
-        float safeTurnAngle = CalculateMaxSteeringAngle(controller.trackWidth, 9.81f, controller.wheelBase, controller.comHeight, controller.velocity);
+        //float safeTurnAngle = CalculateMaxSteeringAngle(controller.movementController.trackWidth, 9.81f, controller.movementController.wheelBase, controller.movementController.comHeight, controller.movementController.velocity);
 
+        float safeTurnAngle = controller.movementController.CalculateMaxSafeSteeringAngle();
+
+        targetSteer = steer;
         
+        targetSteer = Mathf.Clamp(targetSteer, -turnLimit, turnLimit);
+        
+        targetSteer = Mathf.Clamp(targetSteer, -safeTurnAngle, safeTurnAngle);
         
         //Debug.Log(safeTurnAngle);
         

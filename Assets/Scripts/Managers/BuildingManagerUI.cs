@@ -21,8 +21,8 @@ public class BuildingManagerUI : MonoBehaviour
 
     public TextMeshProUGUI machineCost;
     
-    public enum PlaceableCategories {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies}
-    PlaceableCategories[] placeableCategories = { PlaceableCategories.Basic,PlaceableCategories.TurretMounts,
+    public enum PlaceableCategories {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power}
+    PlaceableCategories[] placeableCategories = { PlaceableCategories.Basic, PlaceableCategories.Power,PlaceableCategories.TurretMounts,
         PlaceableCategories.TurretBarrels, PlaceableCategories.TurretCores, PlaceableCategories.SubAssemblies, PlaceableCategories.TurretModules };
     
     void Awake()

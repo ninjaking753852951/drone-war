@@ -135,6 +135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   mass: 25
+  health: 10
   cost: 50
   connectionPoint: {fileID: 3016860299580033687}
   onInit:
@@ -209,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireRate: 0.5
   recoilMultiplier: 1
+  energyCost: 2.5
   projectilePrefab: {fileID: 2508981756439933117, guid: 8564b73c06d572f4ca4452c40a0bceb9,
     type: 3}
   target: {fileID: 0}
@@ -218,6 +220,7 @@ MonoBehaviour:
   controller: {fileID: 0}
   rb: {fileID: 0}
   turretUpdateRate: 60
+  targetTypes: 0000000001000000
   shootHeightOffset: 0
   laserLifetime: 0.5
   laserDamage: 1000

@@ -6,6 +6,7 @@ public class MotorBlock : MonoBehaviour
 {
 
     public float torque;
+    public float energyCost;
 
     DroneController controller;
     
@@ -13,8 +14,8 @@ public class MotorBlock : MonoBehaviour
     {
         controller = transform.root.GetComponent<DroneController>();
         
-        controller.motors.Add(this);
-        controller.motorTorque += torque;
+        controller.movementController.motorTorque += torque;
+        controller.movementController.movementEnergyCost += energyCost;
     }
     
     // Start is called before the first frame update

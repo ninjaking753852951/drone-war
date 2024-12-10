@@ -132,6 +132,17 @@ public static class Utils
         }
     }*/
     
+    public static List<DroneController> DronesFromTeam(List<DroneController> drones, int teamID)
+    {
+        List<DroneController> dronesFromTeam = new List<DroneController>();
+
+        foreach (DroneController drone in drones)
+        {
+            if(drone.curTeam == teamID)
+                dronesFromTeam.Add(drone);
+        }
+        return dronesFromTeam;
+    }
         
     public static void DestroyAllDrones()
     {

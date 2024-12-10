@@ -10,6 +10,8 @@ public class BallisticCore : TurretCoreController
 
     public float accuracyTolerance = 0.5f;
 
+    public GameObject shootEffect;
+    public float damageMultiplier;
 
     public float drag = 0.3f;         // Unity-style drag coefficient
 
@@ -22,9 +24,12 @@ public class BallisticCore : TurretCoreController
         float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
         
         mount.pitchRb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
+        mount.pitchRb.AddForce(mainBarrel.shootPoint.forward * projectileMass * shootVelocity * recoilMultiplier * -1);
         
         rb.AddForce(projectileClone.transform.forward * shootVelocity + Random.insideUnitSphere * deviance, ForceMode.VelocityChange);
 
+        Instantiate(shootEffect, mainBarrel.shootPoint);
+        
         Bullet projectile = projectileClone.GetComponent<Bullet>();
         if (projectile != null)
         {
@@ -35,7 +40,7 @@ public class BallisticCore : TurretCoreController
     public override float MaxRange()
     {
         float maxDistAngle = 45;
-        return SimulateBallisticArc(shootVelocity, maxDistAngle, drag, 0);
+        return SimulateBallisticArcTargetY(shootVelocity, maxDistAngle, drag, 0);
     }
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
@@ -86,8 +91,8 @@ public class BallisticCore : TurretCoreController
             safety--;
             
             float theta = (angleLimits.x + angleLimits.y) / 2;
-            float xDist = SimulateBallisticArc(v0, theta, drag, targetPos.y);
-            float distanceError = Mathf.Abs(xDist - targetPos.x);
+            float yDist = SimulateBallisticArc(v0, theta, drag, targetPos.x);
+            float distanceError = Mathf.Abs(yDist - targetPos.y);
 
             if (distanceError < closestDistance)
             {
@@ -95,7 +100,7 @@ public class BallisticCore : TurretCoreController
                 bestAngle = theta;
             }
 
-            if (xDist > targetPos.x)
+            if (yDist > targetPos.y)
                 angleLimits.x = theta;
             else
                 angleLimits.y = theta;
@@ -108,7 +113,7 @@ public class BallisticCore : TurretCoreController
         
     }
 
-    float SimulateBallisticArc(float initialVelocity, float angle, float drag, float targetHeight)
+    float SimulateBallisticArc(float initialVelocity, float angle, float drag, float targetDist)
     {
         float xDist = 0;
         float yDist = 0;
@@ -121,7 +126,7 @@ public class BallisticCore : TurretCoreController
         int safety = simulationSafetyLimit;
         while (safety > 0)
         {
-            if(yDist < targetHeight && velocity.y < 0 || velocity.magnitude < initialVelocity/2)
+            if(xDist > targetDist|| velocity.magnitude < initialVelocity/2)
                 break;
 
             /*bool goingDownwards = velocity.y < 0;
@@ -140,8 +145,49 @@ public class BallisticCore : TurretCoreController
             Vector3 velocityRay = mount.yawRb.transform.rotation* new Vector3(0, velocity.y, velocity.x);
             Debug.DrawLine( rayPos, rayPos + velocityRay * simulationStepSize, Color.gray,0.2f);
                 
+   
             
-            Debug.Log("CALCULATE");
+            safety--;
+            if(safety <= 0)
+                Debug.Log("HIT SAFETY LIMIT FOR SIMULATION");
+                
+        }
+
+        return yDist;
+    }
+    
+    float SimulateBallisticArcTargetY(float initialVelocity, float angle, float drag, float targetDist)
+    {
+        float xDist = 0;
+        float yDist = 0;
+        
+        
+        
+        Vector2 velocity =
+            new Vector2(initialVelocity * Mathf.Cos(angle * Mathf.Deg2Rad), initialVelocity * Mathf.Sin(angle * Mathf.Deg2Rad));
+
+        int safety = simulationSafetyLimit;
+        while (safety > 0)
+        {
+            if(yDist < targetDist|| velocity.magnitude < initialVelocity/2)
+                break;
+
+            /*bool goingDownwards = velocity.y < 0;
+            bool targetIsAbove = targetHeight - yDist > 0;
+
+            if(goingDownwards && targetIsAbove || !goingDownwards && !targetIsAbove)
+                break;*/
+            
+            yDist += velocity.y * simulationStepSize;
+            xDist += velocity.x * simulationStepSize;
+
+            velocity *= (1- drag* simulationStepSize);
+            velocity += Vector2.up * simulationStepSize * Physics.gravity.y;
+
+            Vector3 rayPos = transform.position + mount.yawRb.transform.rotation * new Vector3(0, yDist, xDist);
+            Vector3 velocityRay = mount.yawRb.transform.rotation* new Vector3(0, velocity.y, velocity.x);
+            Debug.DrawLine( rayPos, rayPos + velocityRay * simulationStepSize, Color.gray,0.2f);
+                
             
             safety--;
             if(safety <= 0)

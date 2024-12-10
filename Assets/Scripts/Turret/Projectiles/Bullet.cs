@@ -8,7 +8,7 @@ public class Bullet : Projectile
     
     void Update()
     {
-        if(body != null)
+        if(body != null && rb !=null && rb.velocity != Vector3.zero)
             body.rotation = Quaternion.LookRotation(rb.velocity);
     }
     
@@ -27,7 +27,7 @@ public class Bullet : Projectile
         if (droneBlock != null)
         {
             if(droneBlock.controller != null && droneBlock.controller.curTeam != originTeam)
-                droneBlock.TakeDamage(Mathf.Pow(rb.velocity.magnitude, 2)* rb.mass);
+                droneBlock.TakeDamage(Mathf.Pow(rb.velocity.magnitude, 2)* rb.mass * turret.damageMultiplier);
         }
         
         Destroy(gameObject);   

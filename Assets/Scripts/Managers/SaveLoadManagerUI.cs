@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class SaveLoadManagerUI : MonoBehaviour
@@ -14,14 +15,14 @@ public class SaveLoadManagerUI : MonoBehaviour
 
     List<MachineSelectionButton> machineSelectionButtons = new List<MachineSelectionButton>();
 
-    class MachineSelectionButton
+    public class MachineSelectionButton
     {
         GameObject obj;
         int slot;
         
         Image selectionImage;
         
-        public MachineSelectionButton(int slot, MachineSaveLoadManager.MachineSaveData machineData, SaveLoadManagerUI saveLoadUI)
+        public MachineSelectionButton(int slot, MachineSaveLoadManager.MachineSaveData machineData, SaveLoadManagerUI saveLoadUI, UnityAction call)
         {
             obj = Instantiate(saveLoadUI.machineButtonPrefab, saveLoadUI.machineSelectParent);
             
@@ -32,7 +33,7 @@ public class SaveLoadManagerUI : MonoBehaviour
             
             selectionImage = obj.transform.FindChildWithTag("UISelection").GetComponent<Image>();
             obj.GetComponentInChildren<TextMeshProUGUI>().text = "Machine Spawn " + slot;
-            obj.GetComponentInChildren<Button>().onClick.AddListener(() => saveLoadUI.SwitchMachineButton(slot));
+            obj.GetComponentInChildren<Button>().onClick.AddListener(call);
 
             Update(saveLoadUI);
         }
@@ -60,8 +61,9 @@ public class SaveLoadManagerUI : MonoBehaviour
     {
         for (int i = 1; i < 10; i++)
         {
+            int slot = i;
             MachineSaveLoadManager.MachineSaveData machineData = saveLoad.LoadMachine(i);
-            machineSelectionButtons.Add(new MachineSelectionButton(i, machineData, this));
+            machineSelectionButtons.Add(new MachineSelectionButton(slot, machineData, this, () => SwitchMachineButton(slot)));
         }
     }
     

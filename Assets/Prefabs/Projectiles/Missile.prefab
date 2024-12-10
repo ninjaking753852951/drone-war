@@ -5574,3 +5574,5 @@ MonoBehaviour:
   impactEffect: {fileID: 6705187020762197101, guid: 1424ef05d7fc4fa4cb909a83c016d856,
     type: 3}
   explosionRadius: 5
+  trackingUpdateFrequency: 5
+  trackingAngularSpeed: 90

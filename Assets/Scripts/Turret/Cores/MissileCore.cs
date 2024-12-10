@@ -10,7 +10,7 @@ public class MissileCore : TurretCoreController
 
     public int simulationSafetyLimit = 500;
     public float simulationStepSize = 0.1f;
-
+    
 
     public override void Shoot()
     {

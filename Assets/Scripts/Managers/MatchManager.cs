@@ -11,6 +11,8 @@ public class MatchManager : Singleton<MatchManager>
     public List<TeamData> teams = new List<TeamData>();
 
     public int winner =-1;
+
+    public readonly int playerID = 0;
     
     TeamData playerData;
     
@@ -21,6 +23,8 @@ public class MatchManager : Singleton<MatchManager>
         public bool isAI;
         public float budget;
 
+        public float incomeMultiplier = 1;
+        
         public void DeductMoney(float amount)
         {
             budget -= amount;
@@ -57,7 +61,7 @@ public class MatchManager : Singleton<MatchManager>
         return null;
     }
 
-    float PlayerBudget()
+    public float PlayerBudget()
     {
         return playerData.budget;
     }
@@ -91,7 +95,7 @@ public class MatchManager : Singleton<MatchManager>
             if (objective.currentOwner.HasValue)
             {
                 heldObjectives[objective.currentOwner.Value]++;
-                Team(objective.currentOwner.Value).AddMoney(objective.income);
+                Team(objective.currentOwner.Value).AddMoney(objective.income * Team(objective.currentOwner.Value).incomeMultiplier);
             }
         }
 
@@ -122,30 +126,15 @@ public class MatchManager : Singleton<MatchManager>
 
     void OnGUI()
     {
+        
+        
         if (GameManager.Instance.currentGameMode != GameMode.Battle)
             return;
 
         // Get the screen width and height
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
-
-        // Define the style for the budget text
-        GUIStyle budgetStyle = new GUIStyle
-        {
-            fontSize = 18,
-            normal = { textColor = Color.white },
-            alignment = TextAnchor.MiddleCenter
-        };
-
-        // Define the budget text
-        string budgetText = $"Player Budget: ${PlayerBudget():0}";
-
-        // Calculate the position and size of the budget text box
-        Rect budgetRect = new Rect(screenWidth / 2 - 150, screenHeight - 50, 300, 30);
-
-        // Display the budget text
-        GUI.Label(budgetRect, budgetText, budgetStyle);
-
+        
         // Define the style for the winner text
         GUIStyle winnerStyle = new GUIStyle
         {

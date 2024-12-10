@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityUtils;
 
-public class HealthBarManager : Singleton<HealthBarManager>
+public class ProgressBarManager : Singleton<ProgressBarManager>
 {
     public Camera mainCamera; // Reference to the main camera
     public Canvas canvas; // Reference to the UI Canvas
@@ -17,19 +17,22 @@ public class HealthBarManager : Singleton<HealthBarManager>
         public Transform target;
         public GameObject obj;
         Slider slider; 
-        public DroneController controller;
+        public IProgressBar controller;
+        public ProgressBarSettings settings;
 
-        public HealthBars(DroneController controller, GameObject obj)
+        public HealthBars(IProgressBar controller, GameObject obj)
         {
-            this.target = controller.transform;
+            this.target = controller.ProgressBarWorldTarget();
             this.slider = obj.GetComponentInChildren<Slider>();
+            obj.transform.FindChildWithTag("UIIcon").GetComponent<Image>().color = controller.ProgressBarSettings().colour;
             this.obj = obj;
             this.controller = controller;
+            settings = this.controller.ProgressBarSettings();
         }
 
         public void UpdateFill()
         {
-            slider.value = controller.curHealth / controller.maxHealth;
+            slider.value = controller.ProgressBarFill();
         }
     }
     
@@ -43,13 +46,13 @@ public class HealthBarManager : Singleton<HealthBarManager>
         }
     }
 
-    public void RegisterHealthBar(DroneController drone)
+    public void RegisterHealthBar(IProgressBar drone)
     {
         GameObject healthBar = Instantiate(healthBarPrefab, canvas.transform);
         healthBars.Add(new HealthBars(drone, healthBar));
     }
 
-    public void UnregisterHealthBar(DroneController worldObject)
+    public void UnregisterHealthBar(IProgressBar worldObject)
     {
         foreach (var healthBar in healthBars)
         {
@@ -66,16 +69,17 @@ public class HealthBarManager : Singleton<HealthBarManager>
     {
         foreach (var healthbar in healthBars)
         {
-            if (healthbar.controller == null)
+            if (healthbar.controller.IsDestroyed())
             {
                 UnregisterHealthBar(healthbar.controller);
                 break;
             }
-            Vector3 pos = healthbar.controller.transform.position;
-            pos.y += 5;
+            Vector3 pos = healthbar.controller.ProgressBarWorldTarget().position;
+            pos.y += healthbar.settings.worldOffsetHeight;
             if (healthbar.obj != null)
             {
                 Vector3 screenPosition = mainCamera.WorldToScreenPoint(pos);
+                screenPosition.y += healthbar.settings.screenOffsetHeight;
                 healthbar.obj.transform.position = screenPosition;
                // Debug.Log("HEALTHBAR");
             }

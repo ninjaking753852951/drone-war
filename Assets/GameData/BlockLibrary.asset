@@ -89,6 +89,13 @@ MonoBehaviour:
       type: 3}
     category: 0
   - isCore: 0
-    prefab: {fileID: 3587343873945772984, guid: 670f55f8b2b7e8a4987fc0d7a4ae9034,
-      type: 3}
+    prefab: {fileID: 815193987416364843, guid: d35ebb3404aa9f34f9f0ec2060035a96, type: 3}
     category: 0
+  - isCore: 0
+    prefab: {fileID: 3587343873945772984, guid: a820385a99a4fb241b37c6e7177ba803,
+      type: 3}
+    category: 6
+  - isCore: 0
+    prefab: {fileID: 3587343873945772984, guid: 5c70085d071b45541a57e24d7e0ebf04,
+      type: 3}
+    category: 6

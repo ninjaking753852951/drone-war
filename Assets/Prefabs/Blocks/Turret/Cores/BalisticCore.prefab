@@ -210,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireRate: 2
   recoilMultiplier: 50
+  energyCost: 0.25
   projectilePrefab: {fileID: 7256020650716156835, guid: 9985a4eb551ecb34ba1ee4ff270feb04,
     type: 3}
   target: {fileID: 0}
@@ -219,11 +220,15 @@ MonoBehaviour:
   controller: {fileID: 0}
   rb: {fileID: 0}
   turretUpdateRate: 10
+  targetTypes: 00000000
   shootHeightOffset: 0
-  simulationSafetyLimit: 100
+  simulationSafetyLimit: 50
   simulationStepSize: 0.1
   deviance: 2
   accuracyTolerance: 0.25
+  shootEffect: {fileID: 6054484378182993739, guid: c97c15f19c1cc8e41b74b7276964cc42,
+    type: 3}
+  damageMultiplier: 0.1
   drag: 0.3
 --- !u!1 &3255132468474217410
 GameObject:

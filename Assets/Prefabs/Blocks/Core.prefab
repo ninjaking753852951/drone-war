@@ -186,17 +186,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d4c2cefcc056d6488d39956af105f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentSteer: 0
-  steerMultiplier: 0.5
-  safeTurnAngleMultiplier: 0.9
-  motorTorque: 0
-  comHeight: 0
-  trackWidth: 0
-  wheelBase: 0
-  mass: 100
+  movementController:
+    safeTurnAngleMultiplier: 0.9
+    steerMultiplier: 0.5
+    motorTorque: 0
+    mass: 100
+    trackWidth: 0
+    wheelBase: 0
+    comHeight: 0
+    avoidanceRange: 30
+    avoidanceFalloff: 0.6
+    baseAvoidanceWeight: 1
+    bonusAvoidanceWeight: 0.5
+    reverseDuration: 2
+    droneAheadDistance: 0
+    currentSteer: 0
+    droneAhead: 0
+    velocity: 0
+    _currentMovementState: 0
   outline: {fileID: 0}
   selectionWidth: 4
-  healthMultiplier: 10
+  healthMultiplier: 100
   curHealth: 0
   maxHealth: 0
   coreBlocks:
@@ -207,19 +217,21 @@ MonoBehaviour:
   - {fileID: 5738559115302630519}
   - {fileID: 1156924774422680647}
   curTeam: 0
-  avoidanceRange: 30
-  avoidanceFalloff: 0.6
-  baseAvoidanceWeight: 1
-  isStaleThreshold: 0.1
-  bonusAvoidanceWeight: 0.5
-  bonusAvoidanceDurationMultiplier: 3
-  reverseDuration: 2
-  avoidAngle: 10
-  droneAheadDistance: 0
-  motors: []
+  energy:
+    energy: 2.5
+    maxEnergy: 0.5
+    energyRegenRate: 0.1
+    energyBarSettings:
+      worldOffsetHeight: 5
+      screenOffsetHeight: -10
+      colour: {r: 0.28773582, g: 0.8273331, b: 1, a: 1}
+  targetDestination: {x: 0, y: 0, z: 0}
   rb: {fileID: 0}
   boundingSphereRadius: 0
-  velocity: 0
+  healthBarSettings:
+    worldOffsetHeight: 5
+    screenOffsetHeight: 0
+    colour: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &2587839525892796549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,6 +246,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   mass: 25
+  health: 10
   cost: 25
   connectionPoint: {fileID: 0}
   onInit:
@@ -260,6 +273,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
+  debugOrderCount: 0
+  targetObjectives2: []
+  isSatisfied: 0
 --- !u!114 &8163985959737980395
 MonoBehaviour:
   m_ObjectHideFlags: 0

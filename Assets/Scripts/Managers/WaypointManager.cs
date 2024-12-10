@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,67 +7,95 @@ using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class WaypointManager : MonoBehaviour
+public class WaypointManager : UnityUtils.Singleton<WaypointManager>
 {
 
     public GameObject waypointPrefab;
 
-    public List<Waypoint> waypoints = new List<Waypoint>();
+    List<Waypoint> waypoints = new List<Waypoint>();
 
-    ISpreadPattern spreadPattern = new CircleSpreadPattern();
+    public ISpreadPattern spreadPattern = new CircleSpreadPattern();
     
-    [System.Serializable]
-    public class Waypoint
+    class Waypoint
     {
         public GameObject waypointMarker;
-        public List<DroneController> followers;
-        public Waypoint(GameObject waypointMarker, List<DroneController> followers)
+        List<DroneController> followers;
+        
+        public Waypoint(WaypointManager waypointManager, Vector3 pos, List<DroneController> followers)
         {
-            this.waypointMarker = waypointMarker;
-            this.followers = followers;
+            waypointMarker = Instantiate(waypointManager.waypointPrefab, pos, quaternion.identity);
+            RegisterFollower(followers);
         }
-        public Waypoint(GameObject waypointMarker, DroneController follower)
+        public Waypoint(WaypointManager waypointManager, Vector3 pos, DroneController follower)
         {
-            this.waypointMarker = waypointMarker;
-            List<DroneController> _followers = new List<DroneController>();
-            _followers.Add(follower);
-            this.followers = _followers;
+            waypointMarker = Instantiate(waypointManager.waypointPrefab, pos, quaternion.identity);
+            RegisterFollower(follower);
+        }
+
+        void RegisterFollower(DroneController follower)
+        {
+            followers ??= new List<DroneController>();
+            
+            followers.Add(follower);
+            follower.SetDestination(waypointMarker.transform.position);
+        }
+
+        void RegisterFollower(List<DroneController> followers)
+        {
+            foreach (DroneController follower in followers)
+            {
+                RegisterFollower(follower);
+            }
+        }
+        
+        public bool DeregisterFollower(DroneController follower)
+        {
+            followers.Remove(follower);
+            
+            if(followers.Count == 0 && waypointMarker != null)
+                Destroy(waypointMarker);
+            
+            return followers.Count == 0;
+        }
+
+        public bool DeregisterFollower(List<DroneController> followers)
+        {
+            bool isEmpty = false;
+            for (int i = followers.Count - 1; i >= 0; i--)
+            {
+                DroneController follower = followers[i];
+                isEmpty = isEmpty || DeregisterFollower(follower);
+            }
+            return isEmpty;
         }
     }
-    
 
-    protected Waypoint CreateWaypoint(Vector3 pos)
+    void Start()
+    {
+        GameManager.Instance.onEnterBuildMode.AddListener(ClearWaypoints);
+    }
+
+    void ClearWaypoints()
+    {
+        if(waypoints == null)
+            return;
+        
+        foreach (Waypoint waypoint in waypoints)
+        {
+            if(waypoint.waypointMarker != null)
+                Destroy(waypoint.waypointMarker);
+        }
+        waypoints.Clear();
+    }
+
+    protected void CreateSpreadWaypoints(Vector3 pos, List<DroneController> drones, float spreadMultiplier)
     {
         if(pos == Vector3.zero)
             Debug.LogWarning("Waypoint created at null position (zero)");
-
-        List<DroneController> drones = SelectionManager.Instance.selectedDrones.ToList();
-     
-        RemoveDronesFromWayPoints(drones);
         
-        GameObject waypointClone = Instantiate(waypointPrefab, pos, quaternion.identity);
-
-        foreach (var drone in drones)
-        {
-            drone.SetDestination(waypointClone.transform);
-        }
-
-
-        Waypoint waypoint = new Waypoint(waypointClone, drones);
+        if(drones.Count == 0)
+            return;
         
-        waypoints.Add(waypoint);
-
-        return new Waypoint(waypointClone, drones);
-
-    }
-    
-    protected void CreateSpreadWaypoints(Vector3 pos, float spreadMultiplier)
-    {
-        if(pos == Vector3.zero)
-            Debug.LogWarning("Waypoint created at null position (zero)");
-
-        List<DroneController> drones = SelectionManager.Instance.selectedDrones.ToList();
-     
         RemoveDronesFromWayPoints(drones);
         float spread = FindBiggestRadius(drones) * 2;// ASSUMING WORST CASE SCENARIO THE TWO BIGGEST ARE NEXT TO EACHOTHER
 
@@ -74,18 +103,18 @@ public class WaypointManager : MonoBehaviour
 
         for (var i = 0; i < drones.Count; i++)
         {
-            var drone = drones[i];
-            Vector2 randomOffset = Random.insideUnitCircle * spreadMultiplier;
-            GameObject waypointClone = Instantiate(waypointPrefab, pos + posOffsets[i],
-                quaternion.identity);
-            drone.SetDestination(waypointClone.transform);
-            Waypoint waypoint = new Waypoint(waypointClone, drones);
-
+            Waypoint waypoint = new Waypoint(this, pos + posOffsets[i], drones[i]);
             waypoints.Add(waypoint);
         }
     }
 
-    float FindBiggestRadius(List<DroneController> drones)
+    public void CreateAndAssignToWaypoint(Vector3 pos, DroneController controller)
+    {
+        RemoveDroneFromWayPoints(controller);
+        waypoints.Add(new Waypoint(this, pos, controller));
+    }
+
+    protected float FindBiggestRadius(List<DroneController> drones)
     {
         float biggestRadius = 0;
         
@@ -99,28 +128,22 @@ public class WaypointManager : MonoBehaviour
 
     void RemoveDronesFromWayPoints(List<DroneController> dronesToRemove)
     {
+        foreach (DroneController drone in dronesToRemove)
+        {
+            RemoveDroneFromWayPoints(drone);
+        }
+    }
+    
+    void RemoveDroneFromWayPoints(DroneController droneToRemove)
+    {
         // Iterate backwards to allow safe removal of waypoints from the list
         for (int i = waypoints.Count - 1; i >= 0; i--)
         {
             Waypoint waypoint = waypoints[i];
-            
-            if(waypoint == null)
-                continue;
 
-            // Remove each drone in dronesToRemove from the waypoint's followers
-            for (int j = waypoint.followers.Count - 1; j >= 0; j--)
+            if (waypoint == null || waypoint.DeregisterFollower(droneToRemove))
             {
-                DroneController drone = waypoint.followers[j];
-
-                if (dronesToRemove.Contains(drone))
-                    waypoint.followers.Remove(drone);
-            }
-
-            // If there are no followers left, destroy the waypoint and remove it from the list
-            if (waypoint.followers.Count == 0)
-            {
-                Destroy(waypoint.waypointMarker); // Destroy the waypoint GameObject
-                waypoints.RemoveAt(i); // Remove the waypoint from the list
+                waypoints.RemoveAt(i);
             }
         }
     }
@@ -128,7 +151,7 @@ public class WaypointManager : MonoBehaviour
 }
 
 
-interface ISpreadPattern
+public interface ISpreadPattern
 {
     public List<Vector3> GenerateSpread(float points, float spread);
 }

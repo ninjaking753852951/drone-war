@@ -51,7 +51,7 @@ public class DroneBlock : MonoBehaviour
         }
         else
         {
-            controller.mass += mass;
+            controller.movementController.mass += mass;
         }
 
         

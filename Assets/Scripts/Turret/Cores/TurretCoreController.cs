@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ImprovedTimers;
+using Misc;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -10,6 +11,7 @@ public abstract class TurretCoreController : MonoBehaviour
 {
     public float fireRate = 10;
     public float recoilMultiplier = 1;
+    public float energyCost;
     
     public GameObject projectilePrefab;
     public Transform target;
@@ -34,6 +36,8 @@ public abstract class TurretCoreController : MonoBehaviour
     TurretRangeIndicator rangeIndicator;
 
     float maxRange;
+
+    public List<TargetTypes> targetTypes;
     
 
     public float shootHeightOffset = 0f;
@@ -136,7 +140,8 @@ public abstract class TurretCoreController : MonoBehaviour
         {
             if (damageable.Team() != curTeam)
             {
-                validTargets.Add(damageable.Transform());
+                if(targetTypes.Contains(damageable.TargetType()))
+                    validTargets.Add(damageable.Transform());
             }
         }
         
@@ -147,6 +152,8 @@ public abstract class TurretCoreController : MonoBehaviour
     {
         fireTimer.Reset(1/fireRate);
         fireTimer.Start();
+
+        controller.energy.DeductEnergy(energyCost);
         
         Shoot();
         
@@ -161,9 +168,9 @@ public abstract class TurretCoreController : MonoBehaviour
 
     public abstract float EstimateTimeOfFlight(float initialVelocity, float distance);
 
-    bool ReadyToFire()
+    protected virtual bool ReadyToFire()
     {
-        return mount.ReadyToFire() && fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange;
+        return mount.ReadyToFire() && fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost);
     }
 
 
