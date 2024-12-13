@@ -11,7 +11,9 @@ public abstract class DroneSpawner : MonoBehaviour
 
     public float scanRadius;
 
-    public int teamID;
+    //public int teamID;
+    public MatchManager.TeamData teamData;
+    
     
 
     public void SpawnMachine(int id)
@@ -30,15 +32,15 @@ public abstract class DroneSpawner : MonoBehaviour
         
         float machineCost = machineData.totalCost;
 
-        if (MatchManager.Instance.Team(teamID).CanAfford(machineCost))
+        if (teamData.CanAfford(machineCost))
         {
-            MatchManager.Instance.Team(teamID).DeductMoney(machineCost);
+            teamData.DeductMoney(machineCost);
         }
         else
         {
             return;
         }
-        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID);
+        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:MatchManager.Instance.TeamID(teamData));
 
         StartCoroutine(SpawnMachineCoroutine());
     }

@@ -126,6 +126,7 @@ public class CommandManager : NetworkBehaviour
     void ProcessSpawnMachineCommand(Command command)
     {
         DroneSpawner spawner = FindObjectsOfType<DroneSpawner>().FirstOrDefault(d => d.teamID == (int)command.source);
+        //DroneSpawner spawner = MatchManager.Instance.TeamSpawner((int)command.source);
         spawner.SpawnMachine(command.spawnSlot);
     }
 

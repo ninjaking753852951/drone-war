@@ -66,6 +66,16 @@ public class MatchManager : Singleton<MatchManager>
         return playerData.budget;
     }
 
+    public int TeamID(TeamData team)
+    {
+        return 0;
+    }
+
+    public DroneSpawner TeamSpawner(int teamID)
+    {
+        return null;
+    }
+
     void Awake()
     {
         playerData = PlayerData();
