@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ public class ProgressBarManager : Singleton<ProgressBarManager>
         public IProgressBar controller;
         public ProgressBarSettings settings;
 
+        public float fill;
+
         public HealthBars(IProgressBar controller, GameObject obj)
         {
             this.target = controller.ProgressBarWorldTarget();
@@ -32,7 +35,11 @@ public class ProgressBarManager : Singleton<ProgressBarManager>
 
         public void UpdateFill()
         {
-            slider.value = controller.ProgressBarFill();
+            float newFill = controller.ProgressBarFill();
+            if(!float.IsNaN(newFill))
+                fill = newFill;
+            
+            slider.value = Mathf.Clamp01(fill);
         }
     }
     

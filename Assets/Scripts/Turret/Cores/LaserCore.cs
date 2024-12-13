@@ -9,7 +9,8 @@ public class LaserCore : TurretCoreController
 
     public override void Shoot()
     {
-        GameObject projectileClone = Instantiate(projectilePrefab, mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation);
+        //GameObject projectileClone = Instantiate(projectilePrefab, mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation);
+        GameObject projectileClone = SpawnProjectile();
         
         LaserBeam laserBeam = projectileClone.GetComponent<LaserBeam>();
         if (laserBeam != null)

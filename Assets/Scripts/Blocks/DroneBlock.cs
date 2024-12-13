@@ -8,6 +8,8 @@ public class DroneBlock : MonoBehaviour
 {
 
     public Vector3 scanBoxSize = new Vector3(1.1f,1.1f,1.1f);
+    public Vector3 scanBoxOffset = Vector3.zero;
+    public Vector3 gridSize = Vector3.one;
     public float mass = 25;
     public float health = 10;
     public float cost = 25;
@@ -84,7 +86,7 @@ public class DroneBlock : MonoBehaviour
         Vector3 halfExtents = scanBoxSize / 2f;
     
         // Perform an overlap box check to find all colliders within the box
-        Collider[] colliders = Physics.OverlapBox(transform.position, halfExtents, transform.rotation);
+        Collider[] colliders = Physics.OverlapBox(transform.position + transform.rotation * scanBoxOffset, halfExtents, transform.rotation);
 
         // Loop through each collider and check if it has a DroneBlock component
         foreach (Collider collider in colliders)
@@ -109,12 +111,12 @@ public class DroneBlock : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Vector3 halfExtents = scanBoxSize / 2f;
-        Gizmos.DrawWireCube(transform.position, halfExtents * 2f);
+        Gizmos.DrawWireCube(transform.position+ transform.rotation * scanBoxOffset, halfExtents * 2f);
     }
 
     public void TakeDamage(float damage)
     {
-        Debug.Log(gameObject.name + " Took " + damage + " Damage at position " + transform.position);
+        //Debug.Log(gameObject.name + " Took " + damage + " Damage at position " + transform.position);
         if(controller!= null)
             controller.TakeDamage(damage);
     }

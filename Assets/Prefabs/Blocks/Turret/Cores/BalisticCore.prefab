@@ -92,6 +92,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 802008970095206029}
+  - component: {fileID: -1613672840585738377}
   - component: {fileID: 1635076216353542512}
   - component: {fileID: 8037801357792849474}
   - component: {fileID: 161399211327900245}
@@ -121,6 +122,27 @@ Transform:
   - {fileID: 3775675597398097998}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-1613672840585738377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089627516061476954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2225487486
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &1635076216353542512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -134,10 +156,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  gridSize: {x: 1, y: 1, z: 1}
   mass: 25
   health: 10
   cost: 50
-  connectionPoint: {fileID: 3016860299580033687}
+  connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:
       m_Calls: []
@@ -209,14 +233,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 2
-  recoilMultiplier: 50
+  recoilMultiplier: 35
   energyCost: 0.25
   projectilePrefab: {fileID: 7256020650716156835, guid: 9985a4eb551ecb34ba1ee4ff270feb04,
     type: 3}
   target: {fileID: 0}
   shootVelocity: 60
   mainBarrel: {fileID: 0}
-  mount: {fileID: 0}
+  mountSingleAxis: []
+  pitchMount: {fileID: 0}
+  yawMount: {fileID: 0}
   controller: {fileID: 0}
   rb: {fileID: 0}
   turretUpdateRate: 10

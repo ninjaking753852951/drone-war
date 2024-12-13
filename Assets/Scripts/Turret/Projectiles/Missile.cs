@@ -25,19 +25,24 @@ public class Missile : Projectile, IDamageable
     Rigidbody rb;
     FrequencyTimer trackingTimer;
 
-    void Start()
+    protected override void Start()
     {
-        RegisterDamageable();
+        base.Start();
+        
+        rb = GetComponent<Rigidbody>();
     }
     
     void OnDisable()
     {
+        if(trackingTimer != null)
+            trackingTimer.Dispose();
         DeregisterDamageable();
     }
 
     void OnDestroy()
     {
-        trackingTimer.Dispose();
+        if(trackingTimer != null)
+            trackingTimer.Dispose();
     }
 
     void FixedUpdate()
@@ -63,6 +68,9 @@ public class Missile : Projectile, IDamageable
         trackingTimer = new FrequencyTimer(trackingUpdateFrequency);
         trackingTimer.Start();
         trackingTimer.OnTick += UpdateTrajectory;
+        hasDetonated = false;
+        
+        RegisterDamageable();
     }
 
     protected override void Hit(Collider other)
@@ -71,7 +79,8 @@ public class Missile : Projectile, IDamageable
             return;
         hasDetonated = true;
         Detonate();
-        Destroy(gameObject);   
+        
+        Deactivate();
     }
 
     float ExplosionRadius()

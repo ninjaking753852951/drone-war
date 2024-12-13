@@ -4,6 +4,10 @@ public class Bullet : Projectile
     
     protected Rigidbody rb;
 
+    public GameObject impactEffect;
+
+    public VFXData vfxImpactEffect;
+    
     new BallisticCore turret;
     
     void Update()
@@ -22,7 +26,10 @@ public class Bullet : Projectile
     
     protected override void Hit(Collider other)
     {
-
+        
+        //SpawnImpactEffect(transform.position, Quaternion.LookRotation(rb.velocity * -1));
+        VFXManager.instance.Spawn(vfxImpactEffect, transform.position, Quaternion.LookRotation(rb.velocity * -1), true);
+        
         DroneBlock droneBlock = other.gameObject.GetFirstComponentInHierarchy<DroneBlock>();
         if (droneBlock != null)
         {
@@ -30,7 +37,16 @@ public class Bullet : Projectile
                 droneBlock.TakeDamage(Mathf.Pow(rb.velocity.magnitude, 2)* rb.mass * turret.damageMultiplier);
         }
         
-        Destroy(gameObject);   
+        Deactivate();
+    }
+    
+    void SpawnImpactEffect(Vector3 pos, Quaternion rot)
+    {
+        GameObject impactEffectClone = Instantiate(impactEffect, pos, rot);
+
+        ParticleSystem impactParticle = impactEffectClone.GetComponentInChildren<ParticleSystem>();
+        var mainModule = impactParticle.main;
+        Destroy(impactEffectClone, mainModule.duration);
     }
     
 }

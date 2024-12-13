@@ -9,6 +9,8 @@ public class TurretMountController : MonoBehaviour
 {
     public Transform aimPoint;
 
+    public Transform body;
+    
     public HingeJoint yawJoint;
     public HingeJoint pitchJoint;
 
@@ -48,6 +50,13 @@ public class TurretMountController : MonoBehaviour
         pitchRb.useGravity = false;
     }
 
+    public void Init()
+    {
+
+        body.transform.parent = transform.parent;
+
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -83,15 +92,11 @@ public class TurretMountController : MonoBehaviour
         yawJoint.connectedBody = Utils.FindParentRigidbody(transform, yawRb);
         InitJointMotors();
     }
-
-    public void UpdateTurretAim(TurretCoreController turret, Vector3 targetPos, Vector3 targetVelocity)
+    
+    public void UpdateTurretAngles(float yaw, float pitch)
     {
-        float interceptTime = EstimateInterceptTime(turret, targetPos, targetVelocity);
-        Vector3 predictedTargetPos = targetPos + targetVelocity * interceptTime;
-
-        UpdateYawAngle(turret, predictedTargetPos);
-        
-        targetPitchAngle = -turret.CalculateTargetPitchAngle(predictedTargetPos, interceptTime);
+        targetYawAngle = yaw;
+        targetPitchAngle = pitch;
     }
 
     void InitPitchJoint()
@@ -100,46 +105,6 @@ public class TurretMountController : MonoBehaviour
         pitchMotor.force = aimForce;
         pitchJoint.motor = pitchMotor;
         pitchJoint.useMotor = true;
-    }
-    
-    private float EstimateInterceptTime(TurretCoreController turret, Vector3 targetPos, Vector3 targetVelocity)
-    {
-        float projectileVelocity = turret.shootVelocity;
-        Vector3 turretPosition = aimPoint.position;
-
-        float time = 0f;
-        const float tolerance = 0.01f;
-        const int maxIterations = 100;
-
-        for (int i = 0; i < maxIterations; i++)
-        {
-            Vector3 predictedTargetPos = targetPos + targetVelocity * time;
-            float horizontalDistance = (predictedTargetPos - turretPosition).magnitude;
-
-            float newTime = this.turret.EstimateTimeOfFlight(projectileVelocity, horizontalDistance);
-            if (Mathf.Abs(newTime - time) < tolerance)
-                return newTime;
-
-            time = newTime;
-        }
-
-        return time;
-    }
-
-    void UpdateYawAngle(TurretCoreController turret, Vector3 targetPos)
-    {
-        // Calculate the direction from the aimPoint to the target
-        Vector3 directionToTarget = targetPos - aimPoint.position;
-        
-        // Create a horizontal direction vector by ignoring the Y component
-        Vector3 horizontalDirection = new Vector3(directionToTarget.x, 0, directionToTarget.z);
-
-        // Calculate the yaw angle (angle around the Y-axis)
-        targetYawAngle = Mathf.Atan2(horizontalDirection.x, horizontalDirection.z) * Mathf.Rad2Deg;
-
-        // account for base rotation
-        targetYawAngle = (targetYawAngle - aimPoint.rotation.eulerAngles.y) %360;
-
     }
     
     void SetPitchAngle(float targetPitchAngle)

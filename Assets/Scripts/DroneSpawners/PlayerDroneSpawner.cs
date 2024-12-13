@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -22,7 +23,7 @@ public class PlayerDroneSpawner : DroneSpawner
         GameObject obj;
         int slot;
         
-        public MachineSpawnButton(int slot, MachineSaveLoadManager.MachineSaveData machineData, PlayerDroneSpawner spawner, UnityAction call)
+        public MachineSpawnButton(int slot, MachineSaveData machineData, PlayerDroneSpawner spawner, UnityAction call)
         {
             obj = Instantiate(spawner.spawnMachineButtonPrefab, spawner.spawnMachineUIParent);
             
@@ -64,9 +65,27 @@ public class PlayerDroneSpawner : DroneSpawner
         for (int i = 1; i < 10; i++)
         {
             int slot = i;
-            MachineSaveLoadManager.MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);/*
+            MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);/*
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachine(slot)));*/
-            machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => CommandManager.Instance.AddCommand(new CommandManager.Command(slot))));
+            machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
+        }
+    }
+
+    void SpawnMachineCommand(int slot)
+    {
+        CommandManager commandManager = FindObjectOfType<CommandManager>();
+        if (commandManager != null)
+        {
+            if (GameManager.Instance.IsOnlineAndClient())
+            {
+                Debug.Log("SENDING COMMAND NET");
+                commandManager.AddCommandRPC(new CommandManager.Command(NetworkManager.Singleton.LocalClientId,slot).GenerateData());
+            }
+            else
+            {
+                Debug.Log("SENDING COMMAND LOCAL");
+                commandManager.AddCommand(new CommandManager.Command((ulong)0, slot));
+            }
         }
     }
 

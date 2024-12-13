@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.IO;
+using Interfaces;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityUtils;
 
 public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
@@ -31,65 +33,9 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
             this.blockID = blockID;
         }
     }
-
-    [System.Serializable]
-    public class MachineSaveData
-    {
-        public List<BlockSaveData> blocks = new List<BlockSaveData>();
-        public float totalCost;
-
-        public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parent = null)
-        {
-            // parent should be null for drones that are gonna deploy
-            DroneController droneController = null;
-
-            foreach (BlockSaveData blockSaveData in blocks)
-            {
-                BlockData blockData = BlockLibraryManager.Instance.BlockData(blockSaveData.blockID);
-                if (blockData == null)
-                    continue;
-
-                
-                // Apply rotation directly to each block
-                Quaternion rotation = Quaternion.Euler(eulerRot) *Quaternion.Euler(blockSaveData.eulerRot);
-                //rotation *= Quaternion.Euler(eulerRot);
-                
-                Vector3 position = (Quaternion.Euler(eulerRot) * (blockSaveData.pos + offset));
-
-                GameObject newBlock = GameObject.Instantiate(blockData.prefab, position, rotation);
-                newBlock.transform.parent = parent;
-                DroneBlock droneBlock = newBlock.GetComponent<DroneBlock>();
-                droneBlock.blockIdentity = blockData;
-
-                DroneController curDroneController = newBlock.GetComponent<DroneController>();
-                if (curDroneController != null)
-                {
-                    droneController = curDroneController;
-                }
-            }
-
-            return droneController;
-        }
-
-
-        public Sprite GenerateThumbnail()
-        {
-            Vector3 posOffset = Vector3.down * 1000; // Ensure it spawns out of view
-            GameObject machineParent = new GameObject();
-            DroneController droneController = Spawn(posOffset, new Vector3(-35, 35, 0), machineParent.transform);
-            if (droneController == null)
-            {
-                return null;
-            }
-
-            Sprite thumbnail = ThumbnailGenerator.instance.GenerateThumbnail(machineParent, 0.1f);
-
-            return thumbnail;
-        }
-    }
     
     [System.Serializable]
-    public class SubAssemblySaveData
+    public class SubAssemblySaveData : IPlaceable
     {
         public List<BlockSaveData> blocks = new List<BlockSaveData>();
         
@@ -111,6 +57,43 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
                 );
                 blocks.Add(blockSaveData);
             }
+        }
+
+        public string PlaceableName()
+        {
+            return "Sub Assembly";
+        }
+        public float Cost()
+        {
+            return 0;
+        }
+        public GameObject Spawn(Vector3 pos, Quaternion rot)
+        {
+            GameObject subAssemblyParent = new GameObject("SubAssemblyParent");
+        
+            foreach (MachineSaveLoadManager.BlockSaveData blockSaveData in blocks)
+            {
+                BlockData blockData = BlockLibraryManager.Instance.blocks[blockSaveData.blockID];
+                if (blockData != null)
+                {
+                    GameObject blockClone = blockData.Spawn(blockSaveData.pos, Quaternion.Euler(blockSaveData.eulerRot));
+                    blockClone.transform.parent = subAssemblyParent.transform;
+                }
+            }
+
+            subAssemblyParent.transform.position += pos;
+            subAssemblyParent.transform.rotation = rot;
+            return subAssemblyParent;
+        }
+        public Sprite Thumbnail()
+        {
+            Vector3 offset = Vector3.up * 1000 * -1;
+            GameObject obj = Spawn(offset, Quaternion.Euler(-35, 35, 0));
+            return ThumbnailGenerator.Instance.GenerateThumbnail(obj);
+        }
+        public BuildingManagerUI.PlaceableCategories Category()
+        {
+            return BuildingManagerUI.PlaceableCategories.SubAssemblies;
         }
     }
     
@@ -178,40 +161,16 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
         return saveData;
     }
-
-    /*GameObject SpawnSubAssembly(SubAssemblySaveData data, Vector3 pos, Quaternion rot)
-    {
-        GameObject subAssemblyParent = new GameObject("SubAssemblyParent");
-        
-        foreach (BlockSaveData blockSaveData in data.blocks)
-        {
-            if(blockSaveData.blockID >= BlockLibraryManager.Instance.blocks.Count)
-                continue;
-                
-            BlockData blockData = BlockLibraryManager.Instance.blocks[blockSaveData.blockID];
-            GameObject newBlock = Instantiate(blockData.prefab, blockSaveData.pos, Quaternion.Euler(blockSaveData.eulerRot));
-
-            newBlock.transform.parent = subAssemblyParent.transform;
-                
-            DroneBlock droneBlock = newBlock.GetComponent<DroneBlock>();
-            droneBlock.blockIdentity = blockData;
-
-        }
-
-        subAssemblyParent.transform.position += pos;
-        subAssemblyParent.transform.rotation = rot;
-
-        return subAssemblyParent;
-    }*/
     
-    public MachineSaveData LoadMachine(int slot)
+    public MachineSaveData LoadMachine(int slot, bool dontSetSlot = false)
     {
-        curSlot = slot;
+        if(!dontSetSlot)
+            curSlot = slot;
         string path = GetMachineSlotPath(slot);
 
         if (!File.Exists(path))
         {
-            Debug.LogWarning("No save data found in slot " + slot);
+            //Debug.LogWarning("No save data found in slot " + slot);
             return null;
         }
         
@@ -235,36 +194,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         
         BuildingManager.Instance.FindDroneController();
     }
-
-
-    /*public DroneController SpawnMachine(MachineSaveData saveData, Vector3 offset = default)
-    {
-        DroneController droneController = null;
-
-        if (saveData == null)
-            return null;
-        
-        foreach (BlockSaveData blockSaveData in saveData.blocks)
-        {
-            BlockData blockData = BlockLibraryManager.Instance.BlockData(blockSaveData.blockID);
-            if(blockData == null)
-                continue;
-            
-            GameObject newBlock = Instantiate(blockData.prefab,blockSaveData.pos + offset,Quaternion.Euler(blockSaveData.eulerRot));
-            DroneBlock droneBlock = newBlock.GetComponent<DroneBlock>();
-            droneBlock.blockIdentity = blockData;
-
-            DroneController curDroneController = newBlock.GetComponent<DroneController>();
-            if (curDroneController != null)
-            {
-                droneController = curDroneController;
-            }
-        }
-        
-        
-        return droneController;
-    }*/
-
+    
     string GetMachineSlotPath(int x)
     {
         if (!Directory.Exists(Path.Combine(Application.persistentDataPath, machineDirectory)))
@@ -291,42 +221,5 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         curSlot = targetSlot;
         Utils.DestroyAllDrones();
         LoadAndSpawnMachine(curSlot);
-    }
-    
-    void OnGUI()
-    {
-        return;
-        if(GameManager.Instance.currentGameMode != GameMode.Build)
-            return;
-        
-        GUILayout.BeginArea(new Rect(10, 10, 200, 300)); // Adjust area size as needed
-        GUILayout.Label("Save/Load Machine Slots");
-
-        for (int i = 1; i <= 10; i++)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"Slot {i}", GUILayout.Width(50));
-
-            if (GUILayout.Button("Save", GUILayout.Width(60)))
-            {
-                SaveMachine(i);
-            }
-
-            if (GUILayout.Button("Load", GUILayout.Width(60)))
-            {
-                SaveMachine(curSlot);
-                Utils.DestroyAllDrones();
-                LoadAndSpawnMachine(i);
-            }
-
-            GUILayout.EndHorizontal();
-        }
-        
-        if (GUILayout.Button("Save Sub-Assembly", GUILayout.Width(120)))
-        {
-            SaveSubAssembly(0);
-        }
-
-        GUILayout.EndArea();
     }
 }

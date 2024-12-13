@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -24,6 +25,18 @@ public class GameManager : PersistentSingleton<GameManager>
     void Update()
     {
         
+    }
+
+    public bool IsOnlineAndClient()
+    {
+        if (NetworkManager.Singleton.IsListening)
+        {
+            return !NetworkManager.Singleton.IsServer;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public void ExitBuildMode()

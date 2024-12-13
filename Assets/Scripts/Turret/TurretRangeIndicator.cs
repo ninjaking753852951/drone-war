@@ -8,6 +8,8 @@ public class TurretRangeIndicator : MonoBehaviour
 
     // the number of vertices in the indicator
     public float resolution = 15;
+
+    float range;
     
     // Start is called before the first frame update
     void Start()
@@ -19,11 +21,13 @@ public class TurretRangeIndicator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        DrawRange(range);
     }
 
+    public void SetRange(float range) => this.range = range;
+
     // using the line rend draw a circle with radius range around the transform
-    public void DrawRange(float range)
+    void DrawRange(float range)
     {
         // Ensure the LineRenderer is set up
         if (lineRend == null) return;

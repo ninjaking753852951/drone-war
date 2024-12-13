@@ -16,7 +16,7 @@ MonoBehaviour:
   - isCore: 0
     prefab: {fileID: 3587343873945772984, guid: a52beaddda4cad647bbe9f0ce3aa1c57,
       type: 3}
-    category: 0
+    category: 7
   - isCore: 0
     prefab: {fileID: 2583022582083879790, guid: 014d876035fabbc40b51ad67ef5e7da7,
       type: 3}
@@ -32,10 +32,6 @@ MonoBehaviour:
     prefab: {fileID: 6400315645972785715, guid: 70361853e6ac04a428bb39da32fb9491,
       type: 3}
     category: 0
-  - isCore: 0
-    prefab: {fileID: 3431592304728513276, guid: 2adfa1933ae4b05448e5e7c169cacffc,
-      type: 3}
-    category: 1
   - isCore: 0
     prefab: {fileID: 1089627516061476954, guid: d2887c020c47a55429312c52f35f49df,
       type: 3}
@@ -53,17 +49,9 @@ MonoBehaviour:
       type: 3}
     category: 2
   - isCore: 0
-    prefab: {fileID: 3431592304728513276, guid: 83adde1df98eb1d43bb6e6c04021f2ff,
-      type: 3}
-    category: 1
-  - isCore: 0
-    prefab: {fileID: 3431592304728513276, guid: 88bc516703e06724ca5b7b4946306c50,
-      type: 3}
-    category: 1
-  - isCore: 0
     prefab: {fileID: 3587343873945772984, guid: 8fcaf7658852d644599a509fcb51bc32,
       type: 3}
-    category: 0
+    category: 7
   - isCore: 0
     prefab: {fileID: 5964089242917160205, guid: 732e1a6513fc5e24386452ffab12ab70,
       type: 3}
@@ -87,7 +75,7 @@ MonoBehaviour:
   - isCore: 0
     prefab: {fileID: 3587343873945772984, guid: a15328c542f92b94bb9a797c65084071,
       type: 3}
-    category: 0
+    category: 7
   - isCore: 0
     prefab: {fileID: 815193987416364843, guid: d35ebb3404aa9f34f9f0ec2060035a96, type: 3}
     category: 0
@@ -99,3 +87,19 @@ MonoBehaviour:
     prefab: {fileID: 3587343873945772984, guid: 5c70085d071b45541a57e24d7e0ebf04,
       type: 3}
     category: 6
+  - isCore: 0
+    prefab: {fileID: 3431592304728513276, guid: 2e6d604933f3b8c4db670a5d99df4b67,
+      type: 3}
+    category: 1
+  - isCore: 0
+    prefab: {fileID: 3431592304728513276, guid: 17b60f885b73a68498bd00933acec6ae,
+      type: 3}
+    category: 1
+  - isCore: 0
+    prefab: {fileID: 3587343873945772984, guid: 9eb4ac60b696c4a4fb82e88001695b99,
+      type: 3}
+    category: 7
+  - isCore: 0
+    prefab: {fileID: 3587343873945772984, guid: fae70e3c2e9c1534983a0d54f6a34519,
+      type: 3}
+    category: 7

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public abstract class Projectile : MonoBehaviour
@@ -10,15 +11,22 @@ public abstract class Projectile : MonoBehaviour
 
     public Transform body;
 
+    public float waitForDespawnTime = 0.5f;
+    
     protected TurretCoreController turret;
 
-    protected void Start()
+    ObjectPoolManager.PooledTypes poolType;
+
+    protected virtual void Start()
     {
         GameManager.Instance.onEnterBuildMode.AddListener(() => Destroy(gameObject));
     }
 
     void OnTriggerEnter(Collider other)
     {
+        if(GameManager.Instance.IsOnlineAndClient())
+            return;
+        
         Projectile otherProjectile = other.transform.root.GetComponent<Projectile>();
         if (otherProjectile == null && other.transform.root != originRoot)
         {
@@ -31,8 +39,19 @@ public abstract class Projectile : MonoBehaviour
     public virtual void Init(TurretCoreController turret)
     {
         this.turret = turret;
-
+        poolType = this.turret.projectileType;
         originRoot = turret.controller.transform.root;
         originTeam = turret.controller.curTeam;
+    }
+    
+    protected void Deactivate()
+    {
+        gameObject.SetActive(false);
+        Invoke(nameof(ReturnToPool), waitForDespawnTime);
+    }
+
+    protected void ReturnToPool()
+    {
+        ObjectPoolManager.Instance.ReturnObject(gameObject, poolType);
     }
 }

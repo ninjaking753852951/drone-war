@@ -455,6 +455,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4863077767327487301}
+  - component: {fileID: -4071908576212951782}
   - component: {fileID: 6941449500198704135}
   - component: {fileID: 6788446946597584859}
   - component: {fileID: 697342139675738389}
@@ -483,6 +484,27 @@ Transform:
   - {fileID: 4494710208504874600}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4071908576212951782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3431592304728513276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1124857833
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &6941449500198704135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -497,6 +519,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 0.8, y: 1.1, z: 0.8}
   mass: 100
+  health: 10
   cost: 50
   connectionPoint: {fileID: 6537257219964033807}
   onInit:
@@ -563,7 +586,8 @@ MonoBehaviour:
   aimForce: 2000
   maxTurnSpeed: 60
   nearTargetSmoothing: 1
-  usePredictiveAiming: 0
+  yawRb: {fileID: 0}
+  pitchRb: {fileID: 0}
 --- !u!1 &4391613996452380876
 GameObject:
   m_ObjectHideFlags: 0

@@ -62,7 +62,6 @@ public class SelectionManager : Singleton<SelectionManager>
                 {
                     drone.Select(true);
                     selectedDrones.Add(drone);
-                    Debug.Log("Drone selected: " + drone.name);
                 }
             }
         }

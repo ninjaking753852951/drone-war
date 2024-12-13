@@ -14,14 +14,16 @@ public class MissileCore : TurretCoreController
 
     public override void Shoot()
     {
-        GameObject projectileClone = Instantiate(projectilePrefab, mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation);
+        GameObject projectileClone = SpawnProjectile();
 
         Rigidbody rb = projectileClone.GetComponent<Rigidbody>();
 
         float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
         
-        mount.pitchRb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
+        //mount.pitchRb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
         
+        //rb.ResetInertiaTensor();
+        rb.velocity = Vector3.zero;
         rb.AddForce(projectileClone.transform.forward * shootVelocity, ForceMode.VelocityChange);
 
         Missile projectile = projectileClone.GetComponent<Missile>();
@@ -126,8 +128,8 @@ public class MissileCore : TurretCoreController
             velocity += velocity.normalized * acceleration * simulationStepSize;
             velocity += Vector2.up * simulationStepSize * Physics.gravity.y;
 
-            Vector3 rayPos = transform.position + mount.yawRb.transform.rotation* new Vector3(0, yDist, xDist);
-            Vector3 velocityRay = mount.yawRb.transform.rotation* new Vector3(0, velocity.y, velocity.x);
+            Vector3 rayPos = transform.position + YawRotation()* new Vector3(0, yDist, xDist);
+            Vector3 velocityRay = YawRotation()* new Vector3(0, velocity.y, velocity.x);
             Debug.DrawLine( rayPos, rayPos + velocityRay * simulationStepSize, Color.gray,0.2f);
                 
             safety--;

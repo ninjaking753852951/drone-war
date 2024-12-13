@@ -22,6 +22,7 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
 
         blocks = library.blocks.ToList();
         
+        // maybe convert blockdata (from the library) to a factory so that block datas can be edited at runtime for thumbnails
         placeableBlocks = new List<BlockData>();
 
         foreach (BlockData block in blocks)

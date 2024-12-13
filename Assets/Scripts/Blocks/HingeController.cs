@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HingeController : MonoBehaviour
+public class HingeController : MonoBehaviour, IProxyDeploy
 {
     public HingeJoint joint;
     public Rigidbody rb;
@@ -169,5 +169,9 @@ public class HingeController : MonoBehaviour
         
         return dotProduct < 0 ? dir * -1 :dir * 1;
         
+    }
+    public void ProxyDeploy()
+    {
+        body.transform.parent = transform.parent;
     }
 }

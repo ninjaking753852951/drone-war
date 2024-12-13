@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Interfaces;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -21,8 +22,8 @@ public class BuildingManagerUI : MonoBehaviour
 
     public TextMeshProUGUI machineCost;
     
-    public enum PlaceableCategories {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power}
-    PlaceableCategories[] placeableCategories = { PlaceableCategories.Basic, PlaceableCategories.Power,PlaceableCategories.TurretMounts,
+    public enum PlaceableCategories {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power, Structure}
+    PlaceableCategories[] placeableCategories = { PlaceableCategories.Basic, PlaceableCategories.Structure, PlaceableCategories.Power,PlaceableCategories.TurretMounts,
         PlaceableCategories.TurretBarrels, PlaceableCategories.TurretCores, PlaceableCategories.SubAssemblies, PlaceableCategories.TurretModules };
     
     void Awake()
@@ -67,7 +68,7 @@ public class BuildingManagerUI : MonoBehaviour
     {
         Utils.DestroyAllChildren(placeableParent);
         
-        List<BuildingManager.Placeable> placeables =
+        List<IPlaceable> placeables =
             builder.PlaceablesInCategory(categoryIndex);
         
         
@@ -75,7 +76,7 @@ public class BuildingManagerUI : MonoBehaviour
         {
             GameObject categoryButtonClone = Instantiate(itemButtonPrefab, placeableParent);
             //Debug.Log(categoryButtonClone.transform.FindChildWithTag("ItemIcon"));
-            categoryButtonClone.transform.FindChildWithTag("UIIcon").GetComponent<Image>().sprite = placeable.thumbnail;
+            categoryButtonClone.transform.FindChildWithTag("UIIcon").GetComponent<Image>().sprite = placeable.Thumbnail();
             categoryButtonClone.GetComponentInChildren<TextMeshProUGUI>().text = "$"+placeable.Cost();
             categoryButtonClone.GetComponentInChildren<Button>().onClick.AddListener(() => builder.SetNewCurrentBlock(placeable));
         }

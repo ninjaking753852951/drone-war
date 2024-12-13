@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -29,6 +30,9 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
         public Waypoint(WaypointManager waypointManager, Vector3 pos, DroneController follower)
         {
             waypointMarker = Instantiate(waypointManager.waypointPrefab, pos, quaternion.identity);
+            if(NetworkManager.Singleton.IsServer)
+                waypointMarker.GetComponent<NetworkObject>().Spawn();
+            
             RegisterFollower(follower);
         }
 

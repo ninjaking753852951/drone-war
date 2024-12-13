@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class LaserBeam : Projectile
@@ -20,7 +21,8 @@ public class LaserBeam : Projectile
         base.Init(turret);
         core = turret;
         
-        Destroy(gameObject, turret.laserLifetime);
+        //Destroy(gameObject, turret.laserLifetime);
+        Invoke(nameof(Deactivate), turret.laserLifetime);
         
         Transform firstHit = DamageScan();
         
@@ -30,9 +32,21 @@ public class LaserBeam : Projectile
             endPoint = firstHit.transform.position;
             SpawnImpactEffect(firstHit.transform.position, Quaternion.LookRotation(transform.position - firstHit.transform.position), turret.laserLifetime);
         }
-        
+
+        if (NetworkManager.Singleton.IsServer)
+        {
+            GetComponent<LaserNetworkHelper>().InitVisualRPC(endPoint);
+        }
+        else
+        {
+            ConfigureVisuals(endPoint);   
+        }
+    }
+
+    public void ConfigureVisuals(Vector3 end)
+    {
         line.SetPosition(0, transform.position);
-        line.SetPosition(1, endPoint);
+        line.SetPosition(1, end);
     }
 
     void SpawnImpactEffect(Vector3 pos, Quaternion rot, float lifetime)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public abstract class DroneSpawner : MonoBehaviour
@@ -14,6 +15,35 @@ public abstract class DroneSpawner : MonoBehaviour
     
 
     public void SpawnMachine(int id)
+    {
+        if (NetworkManager.Singleton.IsListening)
+        {
+            if(!NetworkManager.Singleton.IsServer)
+                return;
+        }
+
+        Vector3 scanPos = SafeSpawnPosition();
+        
+        MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(id);
+        if(machineData == null)
+            return;
+        
+        float machineCost = machineData.totalCost;
+
+        if (MatchManager.Instance.Team(teamID).CanAfford(machineCost))
+        {
+            MatchManager.Instance.Team(teamID).DeductMoney(machineCost);
+        }
+        else
+        {
+            return;
+        }
+        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID);
+
+        StartCoroutine(SpawnMachineCoroutine());
+    }
+
+    Vector3 SafeSpawnPosition()
     {
         bool isClear = false;
         int safety = 100;
@@ -40,25 +70,7 @@ public abstract class DroneSpawner : MonoBehaviour
                 scanPos -= transform.forward * scanRadius * 2;
             }
         }
-        
-        MachineSaveLoadManager.MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(id);
-        if(machineData == null)
-            return;
-        
-        float machineCost = machineData.totalCost;
-
-        if (MatchManager.Instance.Team(teamID).CanAfford(machineCost))
-        {
-            MatchManager.Instance.Team(teamID).DeductMoney(machineCost);
-        }
-        else
-        {
-            return;
-        }
-        controller = machineData.Spawn(scanPos);
-        controller.curTeam = teamID;
-
-        StartCoroutine(SpawnMachineCoroutine());
+        return scanPos;
     }
 
     IEnumerator SpawnMachineCoroutine()
@@ -67,7 +79,7 @@ public abstract class DroneSpawner : MonoBehaviour
         yield return new WaitForFixedUpdate();
         
         //yield return new WaitForEndOfFrame();
-        controller.Deploy(true);
+        controller.Deploy();
         //controller.transform.root.position = spawnPoint.position + Vector3.up * 5;
     }
 }

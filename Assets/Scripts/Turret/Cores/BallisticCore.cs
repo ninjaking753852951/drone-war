@@ -17,15 +17,18 @@ public class BallisticCore : TurretCoreController
 
     public override void Shoot()
     {
-        GameObject projectileClone = Instantiate(projectilePrefab, mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation);
+        GameObject projectileClone = SpawnProjectile();
 
         Rigidbody rb = projectileClone.GetComponent<Rigidbody>();
 
-        float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
+        float projectileMass = rb.mass;
         
-        mount.pitchRb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
-        mount.pitchRb.AddForce(mainBarrel.shootPoint.forward * projectileMass * shootVelocity * recoilMultiplier * -1);
+        if(pitchMount != null)
+            pitchMount.rb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
+        if(yawMount != null)
+            controller.rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * shootVelocity * recoilMultiplier * -1);
         
+        rb.velocity = Vector3.zero;
         rb.AddForce(projectileClone.transform.forward * shootVelocity + Random.insideUnitSphere * deviance, ForceMode.VelocityChange);
 
         Instantiate(shootEffect, mainBarrel.shootPoint);
@@ -141,15 +144,15 @@ public class BallisticCore : TurretCoreController
             velocity *= (1- drag* simulationStepSize);
             velocity += Vector2.up * simulationStepSize * Physics.gravity.y;
 
-            Vector3 rayPos = transform.position + mount.yawRb.transform.rotation * new Vector3(0, yDist, xDist);
-            Vector3 velocityRay = mount.yawRb.transform.rotation* new Vector3(0, velocity.y, velocity.x);
+            Vector3 rayPos = transform.position + YawRotation() * new Vector3(0, yDist, xDist);
+            Vector3 velocityRay = YawRotation() * new Vector3(0, velocity.y, velocity.x);
             Debug.DrawLine( rayPos, rayPos + velocityRay * simulationStepSize, Color.gray,0.2f);
                 
    
             
             safety--;
-            if(safety <= 0)
-                Debug.Log("HIT SAFETY LIMIT FOR SIMULATION");
+            /*if(safety <= 0)
+                Debug.Log("HIT SAFETY LIMIT FOR SIMULATION");*/
                 
         }
 
@@ -184,8 +187,8 @@ public class BallisticCore : TurretCoreController
             velocity *= (1- drag* simulationStepSize);
             velocity += Vector2.up * simulationStepSize * Physics.gravity.y;
 
-            Vector3 rayPos = transform.position + mount.yawRb.transform.rotation * new Vector3(0, yDist, xDist);
-            Vector3 velocityRay = mount.yawRb.transform.rotation* new Vector3(0, velocity.y, velocity.x);
+            Vector3 rayPos = transform.position + YawRotation() * new Vector3(0, yDist, xDist);
+            Vector3 velocityRay = YawRotation() * new Vector3(0, velocity.y, velocity.x);
             Debug.DrawLine( rayPos, rayPos + velocityRay * simulationStepSize, Color.gray,0.2f);
                 
             

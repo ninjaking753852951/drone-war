@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 public static class Utils
 {
@@ -295,7 +296,93 @@ public static class Utils
         GL.Clear(true, true, new Color(0, 0, 0, 0)); // Clear with transparent
         RenderTexture.active = null;
     }
+    
+    public static void RemoveNetworkComponents(GameObject gameObject)
+    {
+        // Remove NetworkObject component
+        NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
+        if (networkObject != null)
+        {
+            Object.DestroyImmediate(networkObject);
+        }
 
+        // Remove all NetworkBehaviour components
+        NetworkBehaviour[] networkBehaviours = gameObject.GetComponents<NetworkBehaviour>();
+        for (int i = networkBehaviours.Length - 1; i >= 0; i--)
+        {
+            NetworkBehaviour behaviour = networkBehaviours[i];
+            Object.DestroyImmediate(behaviour);
+        }
+
+        // Recursively clean up all child objects
+        foreach (Transform child in gameObject.transform)
+        {
+            RemoveNetworkComponents(child.gameObject);
+        }
+    }
+
+    public static Vector3 SnapToGrid(Vector3 position, Vector3 cellSize, Vector3? gridCenter = null, Quaternion? gridRotation = null)
+    {
+        // Use default values if optional parameters are not provided
+        Vector3 center = gridCenter ?? Vector3.zero;
+        Quaternion rotation = gridRotation ?? Quaternion.identity;
+
+        // Transform the position to the grid's local space
+        Vector3 localPosition = Quaternion.Inverse(rotation) * (position - center);
+
+        // Snap to grid in local space
+        localPosition.x = Mathf.Round(localPosition.x / cellSize.x) * cellSize.x;
+        localPosition.y = Mathf.Round(localPosition.y / cellSize.y) * cellSize.y;
+        localPosition.z = Mathf.Round(localPosition.z / cellSize.z) * cellSize.z;
+
+        // Transform back to world space
+        return rotation * localPosition + center;
+    }
+    
+    public static void DestroyNetworkObjectWithChildren(NetworkObject parentNetworkObject)
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            Debug.LogWarning("Only the server can destroy networked objects!");
+            return;
+        }
+
+        if (parentNetworkObject == null)
+        {
+            Debug.LogWarning("The provided NetworkObject is null.");
+            return;
+        }
+
+        // Recursively despawn all children
+        DespawnChildren(parentNetworkObject.transform);
+
+        // Finally despawn the parent
+        if (parentNetworkObject.IsSpawned)
+        {
+            parentNetworkObject.Despawn(true);
+        }
+    }
+
+    private static void DespawnChildren(Transform parent)
+    {
+        foreach (Transform child in parent)
+        {
+            NetworkObject childNetworkObject = child.GetComponent<NetworkObject>();
+            if (childNetworkObject != null && childNetworkObject.IsSpawned)
+            {
+                // Recursively handle grandchildren
+                DespawnChildren(child);
+
+                // Despawn the child
+                childNetworkObject.Despawn(true);
+            }
+            else
+            {
+                // Destroy non-NetworkObject children
+                Object.Destroy(child.gameObject);
+            }
+        }
+    }
     
 }
 

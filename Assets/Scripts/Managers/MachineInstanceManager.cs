@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityUtils;
 public class MachineInstanceManager : Singleton<MachineInstanceManager>
@@ -17,6 +18,11 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
 
     public GameObject FetchGameObject(ulong id)
     {
+        if (NetworkManager.Singleton.IsListening)
+        {
+            return NetworkManager.Singleton.SpawnManager.SpawnedObjects[id].gameObject;
+        }
+        
         if (machines.TryGetValue(id, out GameObject fetch))
             return fetch;
         else
@@ -25,6 +31,15 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
     
     public ulong FetchID(GameObject obj)
     {
+        if (NetworkManager.Singleton.IsListening)
+        {
+            NetworkObject netObj = obj.GetComponent<NetworkObject>();
+            if (netObj != null)
+            {
+                return netObj.NetworkObjectId;
+            }
+        }
+        
         foreach (var pair in machines)
         {
             if (pair.Value == obj)

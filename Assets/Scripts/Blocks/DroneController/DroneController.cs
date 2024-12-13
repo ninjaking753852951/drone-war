@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 
 public class DroneController : MonoBehaviour, IProgressBar
@@ -23,78 +24,29 @@ public class DroneController : MonoBehaviour, IProgressBar
     [Header("Energy Settings")]
     public EnergyController energy;
 
-    [System.Serializable]
-    public class EnergyController : IProgressBar
-    {
-        [HideInInspector]
-        public float energy;
-        public float maxEnergy;
-        public float energyRegenRate;
-
-        public ProgressBarSettings energyBarSettings;
-        
-        DroneController controller;
-
-        public void Init(DroneController controller)
-        {
-            this.controller = controller;
-            energy = maxEnergy;
-            ProgressBarManager.Instance.RegisterHealthBar(this);
-        }
-
-        public void Update(float timeDelta)
-        {
-            energy = Mathf.MoveTowards(energy, maxEnergy, energyRegenRate * timeDelta);
-        }
-        public Transform ProgressBarWorldTarget()
-        {
-            return controller.transform;
-        }
-        public float ProgressBarFill()
-        {
-            return energy / maxEnergy;
-        }
-        public ProgressBarSettings ProgressBarSettings()
-        {
-            return energyBarSettings;
-        }
-        public bool IsDestroyed()
-        {
-            return controller == null;
-        }
-
-        public bool DeductEnergy(float amount)
-        {
-            if (energy - amount >= 0)
-            {
-                energy -= amount;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool CanAfford(float amount) => energy - amount >= 0;
-    }
-
     public Vector3 targetDestination = Vector3.zero;
 
     [HideInInspector] public Rigidbody rb;
-    [HideInInspector] public float boundingSphereRadius;
+    public float boundingSphereRadius;
 
     public ulong instanceID;
-
-    private void Awake()
+    bool isNetworkProxy;
+    
+    void Awake()
     {
         instanceID = MachineInstanceManager.Instance.Register(gameObject);
         rb = GetComponent<Rigidbody>();
         movementController.Initialize(rb, transform, this);
     }
 
-    private void Update()
+    void Start()
     {
+
+    }
+
+    void Update()
+    {
+        
         energy.Update(Time.deltaTime);
         
         if (targetDestination == Vector3.zero || movementController == null) return;
@@ -111,11 +63,46 @@ public class DroneController : MonoBehaviour, IProgressBar
         }
     }
 
-    public void Deploy(bool deploy)
+    public void ClientDeploy()
+    {
+        isNetworkProxy = true;
+        InitOutline();
+        InitRangeIndicator();
+        energy.Init(this);
+        ProgressBarManager.Instance.RegisterHealthBar(this);
+        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(rb);
+        SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
+    }
+
+    void InitOutline()
+    {
+        outline = gameObject.AddComponent<Outline>();
+        outline.OutlineWidth = selectionWidth;
+        outline.enabled = false;
+    }
+
+    void InitRangeIndicator()
+    {
+        rangeIndicators = transform.GetComponentsInChildren<TurretRangeIndicator>().ToList();
+    }
+
+    void SetCoreColour(Color teamColour)
+    {
+        foreach (var coreBlock in coreBlocks)
+        {
+            Renderer rend = coreBlock.GetComponent<Renderer>();
+            if (rend != null)
+            {
+                rend.material.color = teamColour;
+            }
+        }
+    }
+
+    public void Deploy()
     {
         GetComponent<DroneBlock>().Init();
-        rb.isKinematic = !deploy;
-        rb.useGravity = deploy;
+        rb.isKinematic = false;
+        rb.useGravity = true;
         rb.mass = movementController.mass;
         curHealth *= healthMultiplier;
         maxHealth = curHealth;
@@ -123,32 +110,16 @@ public class DroneController : MonoBehaviour, IProgressBar
         energy.Init(this);
 
         boundingSphereRadius = Utils.CalculateBoundingSphereRadius(rb);
+        
 
-        if (deploy)
-        {
-            
-            rangeIndicators = transform.GetComponentsInChildren<TurretRangeIndicator>().ToList();
+        InitOutline();
+        InitRangeIndicator();
+        
+        ProgressBarManager.Instance.RegisterHealthBar(this);
 
+        SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
 
-            outline = gameObject.AddComponent<Outline>();
-            outline.OutlineWidth = selectionWidth;
-            outline.enabled = false;
-
-            ProgressBarManager.Instance.RegisterHealthBar(this);
-
-            Color teamColour = MatchManager.Instance.Team(curTeam).colour;
-
-            foreach (var coreBlock in coreBlocks)
-            {
-                Renderer rend = coreBlock.GetComponent<Renderer>();
-                if (rend != null)
-                {
-                    rend.material.color = teamColour;
-                }
-            }
-
-            movementController.InitializeComponents();
-        }
+        movementController.InitializeComponents();
     }
 
     public void SetDestination(Vector3 destination)
@@ -162,7 +133,14 @@ public class DroneController : MonoBehaviour, IProgressBar
 
         if (curHealth <= 0)
         {
-            Destroy(gameObject);
+            if (NetworkManager.Singleton.IsListening)
+            {
+                Utils.DestroyNetworkObjectWithChildren(GetComponent<NetworkObject>());
+            }
+            else
+            {
+                Destroy(gameObject);   
+            }
         }
     }
     

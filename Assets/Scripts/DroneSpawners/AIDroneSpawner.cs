@@ -15,7 +15,7 @@ public class AIDroneSpawner : DroneSpawner
         if(GameManager.Instance.currentGameMode != GameMode.Battle)
             return;
         
-        InvokeRepeating(nameof(SpawnRandomMachine), 1, spawnRate);
+        InvokeRepeating(nameof(SpawnRandomMachine), 2, spawnRate);
     }
 
     // Update is called once per frame

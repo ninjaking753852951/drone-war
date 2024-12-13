@@ -22,7 +22,7 @@ public class SaveLoadManagerUI : MonoBehaviour
         
         Image selectionImage;
         
-        public MachineSelectionButton(int slot, MachineSaveLoadManager.MachineSaveData machineData, SaveLoadManagerUI saveLoadUI, UnityAction call)
+        public MachineSelectionButton(int slot, MachineSaveData machineData, SaveLoadManagerUI saveLoadUI, UnityAction call)
         {
             obj = Instantiate(saveLoadUI.machineButtonPrefab, saveLoadUI.machineSelectParent);
             
@@ -59,10 +59,10 @@ public class SaveLoadManagerUI : MonoBehaviour
 
     void BuildUI()
     {
-        for (int i = 1; i < 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             int slot = i;
-            MachineSaveLoadManager.MachineSaveData machineData = saveLoad.LoadMachine(i);
+            MachineSaveData machineData = saveLoad.LoadMachine(i);
             machineSelectionButtons.Add(new MachineSelectionButton(slot, machineData, this, () => SwitchMachineButton(slot)));
         }
     }

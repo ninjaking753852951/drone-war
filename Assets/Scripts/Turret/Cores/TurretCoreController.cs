@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using ImprovedTimers;
 using Misc;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityUtils;
 
-public abstract class TurretCoreController : MonoBehaviour
+public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 {
     public float fireRate = 10;
     public float recoilMultiplier = 1;
@@ -19,8 +22,15 @@ public abstract class TurretCoreController : MonoBehaviour
     [HideInInspector]
     public TurretBarrelController mainBarrel;
     List<TurretBarrelController> barrels;
-    public TurretMountController mount;
+    //public TurretMountController mount;
 
+    public List<TurretMountSingleAxis> mountSingleAxis;
+    [HideInInspector]
+    public TurretMountSingleAxis pitchMount;
+    [HideInInspector]
+    public TurretMountSingleAxis yawMount;
+    
+    
     CountdownTimer fireTimer;
     bool isDeployed = false;
     bool targetInRange;
@@ -39,12 +49,14 @@ public abstract class TurretCoreController : MonoBehaviour
 
     public List<TargetTypes> targetTypes;
     
-
     public float shootHeightOffset = 0f;
 
+    public ObjectPoolManager.PooledTypes projectileType;
+    
+    protected Quaternion YawRotation() => Quaternion.LookRotation(transform.forward.With(y: 0));
+    
     public void Deploy(bool deploy)
     {
-        Debug.Log("Deploying");
         turretUpdateTimer = new CountdownTimer(1 / turretUpdateRate);
         turretUpdateTimer.Start();
         
@@ -53,8 +65,19 @@ public abstract class TurretCoreController : MonoBehaviour
         rb = Utils.FindParentRigidbody(transform, null);
         
         isDeployed = deploy;
-        mount = GetComponentInParent<TurretMountController>();
-        mount.Deploy(this);
+        /*mount = GetComponentInParent<TurretMountController>();
+        mount.Deploy(this);*/
+
+        mountSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
+        foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
+        {
+            turretMountSingleAxis.Deploy(this);
+            if (turretMountSingleAxis.controlType == TurretMountSingleAxis.ControlType.Pitch)
+                pitchMount = turretMountSingleAxis;
+            
+            if (turretMountSingleAxis.controlType == TurretMountSingleAxis.ControlType.Yaw)
+                yawMount = turretMountSingleAxis;
+        }
         
         List<TurretModule> turretModules = GetComponentsInChildren<TurretModule>().ToList();
         foreach (var turretModule in turretModules)
@@ -68,8 +91,9 @@ public abstract class TurretCoreController : MonoBehaviour
             .GetComponent<TurretBarrelController>();
 
         maxRange = MaxRange();
+        rangeIndicator.SetRange(maxRange);
     }
-
+    
     void Awake()
     {
         rangeIndicator = GetComponent<TurretRangeIndicator>();
@@ -85,22 +109,19 @@ public abstract class TurretCoreController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!isDeployed)
+        if(!isDeployed || GameManager.Instance.IsOnlineAndClient())
             return;
-        
-        if(rangeIndicator != null)
-            rangeIndicator.DrawRange(maxRange);
 
         List<Transform> targets = FindEnemies();
-        if (targets == null || targets.Count == 0 || mount == null)
+        if (targets == null || targets.Count == 0 )
             return;
-        target = Utils.ClosestTo(targets, mount.aimPoint.position);
+        target = Utils.ClosestTo(targets, transform.position);
         
         if(turretUpdateTimer.IsFinished)
             AimTurret();
 
 
-        targetInRange = Vector3.Distance(target.position, mount.aimPoint.position) < maxRange;
+        targetInRange = Vector3.Distance(target.position, transform.position) < maxRange;
 
         
         if(ReadyToFire())
@@ -113,7 +134,44 @@ public abstract class TurretCoreController : MonoBehaviour
         turretUpdateTimer.Start();
         
         Rigidbody targetRb = target.root.GetComponent<Rigidbody>();
-        mount.UpdateTurretAim(this, target.position,targetRb.velocity);
+
+        //Estimate position accounting for velocity
+        float interceptTime = EstimateInterceptTime(target.position, targetRb.velocity);
+        Vector3 targetPosEstimate = target.position + targetRb.velocity * interceptTime;
+        
+        // Calculate Angles
+        float targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
+        float targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
+        
+        foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
+            turretMountSingleAxis.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
+        
+        //mount.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
+        //mount.UpdateTurretAim(this, target.position,targetRb.velocity);
+    }
+    
+    float EstimateInterceptTime(Vector3 targetPos, Vector3 targetVelocity)
+    {
+        float projectileVelocity = shootVelocity;
+        Vector3 turretPosition = transform.position;
+
+        float time = 0f;
+        const float tolerance = 0.01f;
+        const int maxIterations = 100;
+
+        for (int i = 0; i < maxIterations; i++)
+        {
+            Vector3 predictedTargetPos = targetPos + targetVelocity * time;
+            float horizontalDistance = (predictedTargetPos - turretPosition).magnitude;
+
+            float newTime = EstimateTimeOfFlight(projectileVelocity, horizontalDistance);
+            if (Mathf.Abs(newTime - time) < tolerance)
+                return newTime;
+
+            time = newTime;
+        }
+
+        return time;
     }
 
     List<Transform> FindEnemies()
@@ -150,6 +208,9 @@ public abstract class TurretCoreController : MonoBehaviour
 
     void Fire()
     {
+        if (NetworkManager.Singleton.IsListening && !NetworkManager.Singleton.IsServer)
+            return;
+        
         fireTimer.Reset(1/fireRate);
         fireTimer.Start();
 
@@ -160,18 +221,57 @@ public abstract class TurretCoreController : MonoBehaviour
         //mainBarrel.Fire(this);
     }
 
+    protected GameObject SpawnProjectile()
+    {
+        Vector3 spawnPos = mainBarrel.shootPoint.position;
+        
+        
+        GameObject projectileClone = ObjectPoolManager.Instance.RequestObject(projectileType, spawnPos).gameObject;
+
+        /*NetworkTransform netTransform = projectileClone.GetComponent<NetworkTransform>();
+        if (netTransform != null)
+        {
+            netTransform.Teleport(mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation, Vector3.one);
+        }*/
+        //else
+        //{
+            projectileClone.transform.position = mainBarrel.shootPoint.position;
+            projectileClone.transform.rotation = mainBarrel.shootPoint.rotation;   
+        //}
+        return projectileClone;
+    }
+    
     public abstract void Shoot();
 
     public abstract float MaxRange();
 
     public abstract float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1);
 
+    protected float CalculateTargetYawAngle(Vector3 pos)
+    {
+        Vector3 horizontalDirection = (pos - transform.position).With(y:0);
+
+        // Calculate the yaw angle (angle around the Y-axis)
+        float targetYawAngle = Mathf.Atan2(horizontalDirection.x, horizontalDirection.z) * Mathf.Rad2Deg;
+
+        return (targetYawAngle -  transform.root.rotation.eulerAngles.y) %360;
+        
+        /*
+        // account for base rotation
+        targetYawAngle = (targetYawAngle - aimPoint.rotation.eulerAngles.y) %360;*/
+    }
+
     public abstract float EstimateTimeOfFlight(float initialVelocity, float distance);
 
     protected virtual bool ReadyToFire()
     {
-        return mount.ReadyToFire() && fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost);
+        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost);
     }
 
 
+    public void ProxyDeploy()
+    {
+        maxRange = MaxRange();
+        rangeIndicator.SetRange(maxRange);
+    }
 }
