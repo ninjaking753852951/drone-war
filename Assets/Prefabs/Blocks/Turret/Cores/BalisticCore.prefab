@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2225487486
+  GlobalObjectIdHash: 2354372690
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -248,13 +248,14 @@ MonoBehaviour:
   turretUpdateRate: 10
   targetTypes: 00000000
   shootHeightOffset: 0
+  projectileType: 0
   simulationSafetyLimit: 50
   simulationStepSize: 0.1
   deviance: 2
   accuracyTolerance: 0.25
   shootEffect: {fileID: 6054484378182993739, guid: c97c15f19c1cc8e41b74b7276964cc42,
     type: 3}
-  damageMultiplier: 0.1
+  damageMultiplier: 1
   drag: 0.3
 --- !u!1 &3255132468474217410
 GameObject:

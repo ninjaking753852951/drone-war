@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -11,10 +12,22 @@ public abstract class DroneSpawner : MonoBehaviour
 
     public float scanRadius;
 
-    //public int teamID;
+    [HideInInspector]
+    public int teamID;
     public MatchManager.TeamData teamData;
-    
-    
+
+    protected virtual void Awake()
+    {
+        NetworkObject netObj = GetComponent<NetworkObject>();
+        //NetworkManager.Singleton.OnServerStarted += () => netObj.Spawn();
+    }
+
+    protected virtual void Start()
+    {
+
+        teamID = MatchManager.Instance.RegisterTeam(this);
+    }
+
 
     public void SpawnMachine(int id)
     {
@@ -40,7 +53,7 @@ public abstract class DroneSpawner : MonoBehaviour
         {
             return;
         }
-        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:MatchManager.Instance.TeamID(teamData));
+        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID);
 
         StartCoroutine(SpawnMachineCoroutine());
     }

@@ -36,7 +36,9 @@ public class Missile : Projectile, IDamageable
     {
         if(trackingTimer != null)
             trackingTimer.Dispose();
-        DeregisterDamageable();
+        
+        if(!GameManager.Instance.IsOnlineAndClient())
+            DeregisterDamageable();
     }
 
     void OnDestroy()

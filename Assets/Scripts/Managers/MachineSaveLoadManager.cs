@@ -67,7 +67,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         {
             return 0;
         }
-        public GameObject Spawn(Vector3 pos, Quaternion rot)
+        public GameObject Spawn(Vector3 pos, Quaternion rot, bool network = true)
         {
             GameObject subAssemblyParent = new GameObject("SubAssemblyParent");
         

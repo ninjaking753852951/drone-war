@@ -82,11 +82,10 @@ public class CommandManager : NetworkBehaviour
 
     public void AddCommand(Command command)
     {
-        Debug.Log("COMMAND FROM " + command.source);
         commands.Add(command);
     }
     
-    [Rpc(SendTo.Everyone, RequireOwnership = false)]
+    [Rpc(SendTo.Server, RequireOwnership = false)]
     public void AddCommandRPC(Command.Data commandData)
     {
         AddCommand(new Command(commandData));
@@ -125,8 +124,8 @@ public class CommandManager : NetworkBehaviour
 
     void ProcessSpawnMachineCommand(Command command)
     {
-        DroneSpawner spawner = FindObjectsOfType<DroneSpawner>().FirstOrDefault(d => d.teamID == (int)command.source);
-        //DroneSpawner spawner = MatchManager.Instance.TeamSpawner((int)command.source);
+        //DroneSpawner spawner = FindObjectsOfType<DroneSpawner>().FirstOrDefault(d => d.teamID == (int)command.source);
+        DroneSpawner spawner = MatchManager.Instance.TeamSpawner((int)command.source);
         spawner.SpawnMachine(command.spawnSlot);
     }
 

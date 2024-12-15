@@ -2,17 +2,30 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using UnityUtils;
+using Random = UnityEngine.Random;
 
 public class MatchManager : Singleton<MatchManager>
 {
 
-    public List<TeamData> teams = new List<TeamData>();
+    public List<DroneSpawner> teams = new List<DroneSpawner>();
+    //public List<TeamData, DroneSpawner> teams = new List<TeamData, DroneSpawner>();
 
+    public List<Transform> spawnPoints = new List<Transform>();
+
+    public GameObject playerSpawner;
+    public GameObject aiSpawner;
+    public GameObject networkSpawner;
+    
     public int winner =-1;
 
     public readonly int playerID = 0;
+
+    public MatchManagerUI ui;
+
+    public TeamData defaultTeam;
     
     TeamData playerData;
     
@@ -24,6 +37,8 @@ public class MatchManager : Singleton<MatchManager>
         public float budget;
 
         public float incomeMultiplier = 1;
+
+        public float clientID = 0;
         
         public void DeductMoney(float amount)
         {
@@ -48,50 +63,108 @@ public class MatchManager : Singleton<MatchManager>
         }
     }
 
-    TeamData PlayerData()
+    public void PlayerJoined(ulong id)
     {
-        foreach (var team in teams)
-        {
-            if (!team.isAI)
-            {
-                return team;
-            }
-        }
-
-        return null;
+        
     }
 
-    public float PlayerBudget()
+    public TeamData PlayerData()
     {
-        return playerData.budget;
-    }
-
-    public int TeamID(TeamData team)
-    {
-        return 0;
+        return playerData;
     }
 
     public DroneSpawner TeamSpawner(int teamID)
     {
-        return null;
+        
+        if (NetworkManager.Singleton.IsListening)
+        {
+            return teams.FirstOrDefault(x => x.teamID == teamID);
+        }
+        
+        return teams[teamID];
     }
 
+    public int RegisterTeam(DroneSpawner spawner)
+    {
+        if (!spawner.teamData.isAI)
+            playerData = spawner.teamData;
+
+        int curIndex = teams.Count;
+
+        spawner.transform.position = spawnPoints[curIndex].position;
+        spawner.transform.rotation = spawnPoints[curIndex].rotation;
+        
+        teams.Add(spawner);
+
+        if (NetworkManager.Singleton.IsListening)
+        {
+            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
+        }
+        
+        return curIndex;
+    }
+    
     void Awake()
     {
-        playerData = PlayerData();
+        //playerData = PlayerData();
     }
     
     // Start is called before the first frame update
     void Start()
     {
-        if(GameManager.Instance.currentGameMode == GameMode.Battle)
+        if (GameManager.Instance.currentGameMode == GameMode.Battle)
+        {
+            Instantiate(playerSpawner);
             InvokeRepeating(nameof(IncrementMoney),0,1);
+            NetworkManager.Singleton.OnClientConnectedCallback += AddNetworkPlayer;
+            NetworkManager.Singleton.OnServerStarted += StartMatch;
+            NetworkManager.Singleton.OnClientStarted += StartMatch;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    void StartMatch()
+    {
+        // on match start clear any existing players and add in new ones
+        ClearTeams();
+    }
+
+    void ClearTeams()
+    {
+        Debug.Log("ONLINE MATCH STARTED");
+        foreach (DroneSpawner team in teams)
+        {
+            Debug.Log("DESTROYING " + team.gameObject);
+            Destroy(team.gameObject);
+        }
+        teams.Clear();
+    }
+    
+    void AddAIPlayer()
+    {
+        Instantiate(aiSpawner);
+    }
+
+    void AddNetworkPlayer(ulong clientID)
+    {
+        if(!NetworkManager.Singleton.IsServer)
+            return;
+        
+        Debug.Log(clientID);
+        
+        int curIndex = teams.Count;
+        
+        GameObject networkSpawnerClone = Instantiate(networkSpawner,spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
+        NetworkObject netObj = networkSpawnerClone.GetComponent<NetworkObject>();
+        
+        NetworkDroneSpawnerHelper spawnerHelper = networkSpawnerClone.GetComponent<NetworkDroneSpawnerHelper>();
+
+        spawnerHelper.Init(clientID);
     }
 
     void IncrementMoney()
@@ -123,14 +196,14 @@ public class MatchManager : Singleton<MatchManager>
 
     public TeamData Team(int teamID)
     {
-        if (teams[teamID] != null)
+        if (teams.Count > teamID)
         {
-            return teams[teamID];
+            return teams[teamID].teamData;
         }
         else
         {
-            Debug.LogError("NO TEAM MATCHING INDEX " + teamID);
-            return null;
+            //Debug.LogError("NO TEAM MATCHING INDEX " + teamID);
+            return defaultTeam;
         }
     }
 
@@ -152,7 +225,14 @@ public class MatchManager : Singleton<MatchManager>
             normal = { textColor = Color.yellow },
             alignment = TextAnchor.MiddleCenter
         };
-
+        
+        // Add a button at the top of the screen offset by 200 pixels
+        Rect buttonRect = new Rect(screenWidth / 2 + 100, 40, 100, 30); // Centered horizontally, 200px from the top
+        if (GUI.Button(buttonRect, "Add AI Player"))
+        {
+            AddAIPlayer();
+        }
+        
         // Check if the game is over and display the winner
         if (winner != -1)
         {

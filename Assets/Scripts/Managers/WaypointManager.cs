@@ -92,7 +92,7 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
         waypoints.Clear();
     }
 
-    protected void CreateSpreadWaypoints(Vector3 pos, List<DroneController> drones, float spreadMultiplier)
+    /*protected void CreateSpreadWaypoints(Vector3 pos, List<DroneController> drones, float spreadMultiplier)
     {
         if(pos == Vector3.zero)
             Debug.LogWarning("Waypoint created at null position (zero)");
@@ -110,7 +110,7 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
             Waypoint waypoint = new Waypoint(this, pos + posOffsets[i], drones[i]);
             waypoints.Add(waypoint);
         }
-    }
+    }*/
 
     public void CreateAndAssignToWaypoint(Vector3 pos, DroneController controller)
     {

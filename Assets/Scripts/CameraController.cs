@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
+using UnityUtils;
 
-public class CameraController : MonoBehaviour
+public class CameraController : Singleton<CameraController>
 {
     public Transform yawTarget;  // Target for horizontal rotation (yaw)
     public Transform pitchTarget; // Target for vertical rotation (pitch)
@@ -42,16 +43,21 @@ public class CameraController : MonoBehaviour
             moveTarget.position = BuildingManager.Instance.spawnPoint;
         }
         
-        if (GameManager.Instance.currentGameMode == GameMode.Battle)
+        /*if (GameManager.Instance.currentGameMode == GameMode.Battle)
         {
             Vector3 spawnPos = FindObjectOfType<PlayerDroneSpawner>().spawnPoint.position;
             spawnPos.y = 0;
             moveTarget.position = spawnPos;
-        }
+        }*/
         
         // Initialize yaw and pitch with the current rotations
     }
 
+    public void TeleportCamera(Vector3 pos)
+    {
+        moveTarget.position = pos;
+    }
+    
     // Update is called once per frame
     void Update()
     {

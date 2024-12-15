@@ -25,10 +25,13 @@ public class DroneLogicController : MonoBehaviour
 
     void Start()
     {
-        if (MatchManager.Instance.Team(controller.curTeam).isAI)
+        if (GameManager.Instance.currentGameMode == GameMode.Battle)
         {
-            orders.Add(new CaptureNearestObjective());
-            //orders.Add(new WanderAround(25,5));
+            if (MatchManager.Instance.Team(controller.curTeam).isAI)
+            {
+                orders.Add(new CaptureNearestObjective());
+                //orders.Add(new WanderAround(25,5));
+            }   
         }
     }
 

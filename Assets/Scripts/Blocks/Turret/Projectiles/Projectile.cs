@@ -19,7 +19,7 @@ public abstract class Projectile : MonoBehaviour
 
     protected virtual void Start()
     {
-        GameManager.Instance.onEnterBuildMode.AddListener(() => Destroy(gameObject));
+        GameManager.Instance.onEnterBuildMode.AddListener(ReturnToPool);
     }
 
     void OnTriggerEnter(Collider other)

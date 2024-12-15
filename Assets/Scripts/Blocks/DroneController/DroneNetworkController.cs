@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 public class DroneNetworkController : NetworkBehaviour
@@ -13,6 +14,8 @@ public class DroneNetworkController : NetworkBehaviour
 
     public NetworkVariable<float> energy;
     public NetworkVariable<float> maxEnergy;
+
+    public NetworkVariable<float> boundingRadius;
     
     DroneController controller;
 
@@ -35,6 +38,8 @@ public class DroneNetworkController : NetworkBehaviour
             
             controller.energy.energy = energy.Value;
             controller.energy.maxEnergy = maxEnergy.Value;
+
+            controller.boundingSphereRadius = boundingRadius.Value;
         }
 
         if (NetworkManager.Singleton.IsServer)
@@ -44,6 +49,8 @@ public class DroneNetworkController : NetworkBehaviour
 
             energy.Value = controller.energy.energy;
             maxEnergy.Value = controller.energy.maxEnergy;
+
+            boundingRadius.Value = controller.boundingSphereRadius;
         }
     }
 
@@ -58,4 +65,11 @@ public class DroneNetworkController : NetworkBehaviour
             proxyDeploy.ProxyDeploy();
         }
     }
+    
+    /*IEnumerator DelayedProxyDeploy()
+    {
+
+        yield return new WaitForEndOfFrame();
+        ProxyDeploy();
+    }*/
 }

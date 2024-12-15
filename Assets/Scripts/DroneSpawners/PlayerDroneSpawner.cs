@@ -45,9 +45,13 @@ public class PlayerDroneSpawner : DroneSpawner
     }
     
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+        
         battleMenu.SetActive(GameManager.Instance.currentGameMode == GameMode.Battle);
+        
+        CameraController.Instance.TeleportCamera(transform.position);
         
         if (GameManager.Instance.currentGameMode == GameMode.Battle)
             BuildUI();
@@ -91,7 +95,8 @@ public class PlayerDroneSpawner : DroneSpawner
 
     void UpdateUI()
     {
-        playerBudgetText.text = "$" + MatchManager.Instance.PlayerBudget();
+        if(MatchManager.Instance.PlayerData() != null)
+            playerBudgetText.text = "$" + MatchManager.Instance.PlayerData().budget;
     }
     
 }

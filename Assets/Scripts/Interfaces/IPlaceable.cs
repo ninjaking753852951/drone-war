@@ -16,7 +16,7 @@ namespace Interfaces
 
         public float Cost();
 
-        public GameObject Spawn(Vector3 pos, Quaternion rot);
+        public GameObject Spawn(Vector3 pos, Quaternion rot, bool network = true);
 
         public Sprite Thumbnail();
 

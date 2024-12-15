@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ImprovedTimers;
 using Misc;
+using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -53,7 +54,18 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     public ObjectPoolManager.PooledTypes projectileType;
     
-    protected Quaternion YawRotation() => Quaternion.LookRotation(transform.forward.With(y: 0));
+    protected Quaternion YawRotation()
+    {
+        Vector3 dir = transform.forward.With(y: 0);
+        if (dir != Vector3.zero)
+        {
+            return           Quaternion.LookRotation(transform.forward.With(y: 0));
+        }
+        else
+        {
+            return quaternion.identity;
+        }
+    } 
     
     public void Deploy(bool deploy)
     {

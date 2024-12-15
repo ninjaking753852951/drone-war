@@ -24,6 +24,10 @@ public class SelectionManager : Singleton<SelectionManager>
         if (Input.GetMouseButtonDown(0))
         {
             Transform clickObject = Utils.CursorScan();
+            
+            if(clickObject == null)
+                return;
+            
             DroneController drone = clickObject.root.GetComponent<DroneController>();
             if (drone != null)
             {
@@ -34,7 +38,12 @@ public class SelectionManager : Singleton<SelectionManager>
                 ClearSelectedDrones();
             }
         }
-            
+
+        for (int i = selectedDrones.Count - 1; i >= 0; i--)
+        {
+            if(selectedDrones[i] == null)
+                selectedDrones.RemoveAt(i);
+        }
         
         HandleMouseInput();
     }
@@ -44,6 +53,8 @@ public class SelectionManager : Singleton<SelectionManager>
         ClearSelectedDrones();
         foreach (var hit in hits)
         {
+            if(hit == null)
+                continue;
             SelectObject(hit);
         }
     }

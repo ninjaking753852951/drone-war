@@ -35,12 +35,12 @@ public class MapObjectivePoint : MonoBehaviour
         // set indicator size correct
         indicator.transform.localScale = new Vector3(radius * 2, indicator.transform.localScale.y, radius * 2);
 
-        if (forceOwner != -1)
+        /*if (forceOwner != -1)
         {
             currentOwner = forceOwner;
             currentState = PointState.Owned;
             SetIndicatorColour(currentOwner.Value);
-        }
+        }*/
         
         pointHealth = pointMaxHealth;
         UpdatePointState();

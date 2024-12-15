@@ -26,7 +26,7 @@ public class PlayerWaypointManager : WaypointManager
             List<DroneController> playerDrones = Utils.DronesFromTeam(SelectionManager.Instance.selectedDrones.ToList(), teamID);
             int droneCount = playerDrones.Count;
             float spread = FindBiggestRadius(playerDrones) * 2;// ASSUMING WORST CASE SCENARIO THE TWO BIGGEST ARE NEXT TO EACHOTHER
-
+     
             List<Vector3> posOffsets = spreadPattern.GenerateSpread(droneCount, spread * spreadMultiplier);
             Vector3 pos = Utils.CursorScanPos();
             

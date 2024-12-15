@@ -7,7 +7,7 @@
         public List<MachineSaveLoadManager.BlockSaveData> blocks = new List<MachineSaveLoadManager.BlockSaveData>();
         public float totalCost;
 
-        public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parent = null, int teamID = 0)
+        public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parent = null, int teamID = 0, bool network = true)
         {
             // parent should be null for drones that are gonna deploy
             DroneController droneController = null;
@@ -22,7 +22,7 @@
 
                 Vector3 position = (Quaternion.Euler(eulerRot) * (blockSaveData.pos) + offset);
 
-                GameObject newBlock = blockData.Spawn(position, rotation);
+                GameObject newBlock = blockData.Spawn(position, rotation, network);
                 newBlock.transform.parent = parent;
                 
                 DroneController curDroneController = newBlock.GetComponent<DroneController>();
@@ -54,7 +54,7 @@
         {
             Vector3 posOffset = Vector3.down * 1000; // Ensure it spawns out of view
             GameObject machineParent = new GameObject();
-            DroneController droneController = Spawn(posOffset, new Vector3(-35, 35, 0), machineParent.transform);
+            DroneController droneController = Spawn(posOffset, new Vector3(-35, 35, 0), machineParent.transform, network: false);
             if (droneController == null)
             {
                 return null;

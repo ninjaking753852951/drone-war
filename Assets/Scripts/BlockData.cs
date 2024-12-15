@@ -15,12 +15,12 @@ public class BlockData : IPlaceable
     {
         return prefab.GetComponent<DroneBlock>().cost;
     }
-    public GameObject Spawn(Vector3 pos, Quaternion rot)
+    public GameObject Spawn(Vector3 pos, Quaternion rot, bool network = true)
     {
         GameObject blockClone = GameObject.Instantiate(prefab, pos, rot);
         blockClone.GetComponent<DroneBlock>().blockIdentity = this;
         
-        if (NetworkManager.Singleton.IsListening)
+        if (NetworkManager.Singleton.IsListening && network)
         {
             NetworkObject netObj = blockClone.GetComponent<NetworkObject>();
                     

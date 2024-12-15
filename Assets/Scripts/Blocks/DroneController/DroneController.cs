@@ -70,7 +70,6 @@ public class DroneController : MonoBehaviour, IProgressBar
         InitRangeIndicator();
         energy.Init(this);
         ProgressBarManager.Instance.RegisterHealthBar(this);
-        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(rb);
         SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
     }
 
