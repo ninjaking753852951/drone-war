@@ -27,12 +27,17 @@ public class NetworkDroneSpawner : DroneSpawner
             obj = Instantiate(spawner.spawnMachineButtonPrefab, spawner.spawnMachineUIParent);
             
             this.slot = slot;
-            
-            if(machineData != null)
+
+            string cost = "N/A";
+
+            if (machineData != null)
+            {
+                cost = "$" + machineData.totalCost;
                 obj.transform.FindChildWithTag("UIIcon").GetComponent<Image>().sprite = machineData.GenerateThumbnail();
+                obj.GetComponentInChildren<Button>().onClick.AddListener(call);
+            }
             
-            obj.GetComponentInChildren<TextMeshProUGUI>().text = slot+".";
-            obj.GetComponentInChildren<Button>().onClick.AddListener(call);
+            obj.GetComponentInChildren<TextMeshProUGUI>().text =cost;
 
             //Update(saveLoadUI);
         }

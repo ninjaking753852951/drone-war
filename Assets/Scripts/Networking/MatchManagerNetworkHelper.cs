@@ -11,11 +11,20 @@ public class MatchManagerNetworkHelper : NetworkHelperBase
     void Awake()
     {
         match = GetComponent<MatchManager>();
+        winner.OnValueChanged += EndMatch;
     }
 
     void Update()
     {
         SyncValue(winner, ref match.winner);
+    }
+
+    void EndMatch(int previousValue, int newValue)
+    {
+        if (newValue != -1)
+        {
+            match.ClearTeams();   
+        }
     }
     // Currently unnecessary
 

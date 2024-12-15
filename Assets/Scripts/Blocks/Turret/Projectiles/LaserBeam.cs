@@ -7,7 +7,7 @@ public class LaserBeam : Projectile
 {
     public LineRenderer line;
 
-    public GameObject impactEffect;
+    public VFXData impactEffect;
 
     LaserCore core;
 
@@ -51,13 +51,14 @@ public class LaserBeam : Projectile
 
     void SpawnImpactEffect(Vector3 pos, Quaternion rot, float lifetime)
     {
-        GameObject impactEffectClone = Instantiate(impactEffect, pos, rot);
+        VFXManager.instance.Spawn(impactEffect, pos, rot);
+        //GameObject impactEffectClone = Instantiate(impactEffect, pos, rot);
 
-        ParticleSystem impactParticle = impactEffectClone.GetComponentInChildren<ParticleSystem>();
+        /*ParticleSystem impactParticle = impactEffectClone.GetComponentInChildren<ParticleSystem>();
         var mainModule = impactParticle.main;
         mainModule.duration = lifetime;
         impactParticle.Play();
-        Destroy(impactEffectClone, lifetime *2);
+        Destroy(impactEffectClone, lifetime *2);*/
     }
 
     Transform DamageScan()

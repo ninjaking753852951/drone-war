@@ -5577,7 +5577,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 206182217
+  GlobalObjectIdHash: 3061903889
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -5658,8 +5658,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   body: {fileID: 6337551880990119019}
   waitForDespawnTime: 0.5
-  impactEffect: {fileID: 6705187020762197101, guid: 1424ef05d7fc4fa4cb909a83c016d856,
-    type: 3}
+  impactEffect: {fileID: 11400000, guid: 166ddd4aaaf3df44f8c4606cd6f5924e, type: 2}
   explosionRadius: 5
   trackingUpdateFrequency: 5
   trackingAngularSpeed: 30

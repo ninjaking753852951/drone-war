@@ -97,18 +97,18 @@ public class MatchManager : Singleton<MatchManager>
 
     public int RegisterTeam(DroneSpawner spawner)
     {
-        if (GameManager.Instance.IsOnlineAndClient())
-            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
-        
         if (!spawner.teamData.isAI)
             playerData = spawner.teamData;
 
         int curIndex = teams.Count;
 
+        teams.Add(spawner);
+        if (GameManager.Instance.IsOnlineAndClient())
+            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
+        
         spawner.transform.position = spawnPoints[curIndex].position;
         spawner.transform.rotation = spawnPoints[curIndex].rotation;
         
-        teams.Add(spawner);
 
         if (NetworkManager.Singleton.IsListening)
         {
@@ -159,10 +159,13 @@ public class MatchManager : Singleton<MatchManager>
         Utils.DestroyAllDrones();
     }
 
-    void ClearTeams()
+    public void ClearTeams()
     {
         foreach (DroneSpawner team in teams)
         {
+            if(team == null)
+                continue;
+            
             Debug.Log("DESTROYING " + team.gameObject);
 
             if (NetworkManager.Singleton.IsListening)
@@ -200,7 +203,7 @@ public class MatchManager : Singleton<MatchManager>
         
         Debug.Log(clientID);
         
-        int curIndex = teams.Count;
+        int curIndex = (int)clientID;
         
         GameObject networkSpawnerClone = Instantiate(networkSpawner,spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
         NetworkObject netObj = networkSpawnerClone.GetComponent<NetworkObject>();

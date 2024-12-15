@@ -9,7 +9,7 @@ public class Missile : Projectile, IDamageable
 {
         
     
-    public GameObject impactEffect;
+    public VFXData impactEffect;
     public float explosionRadius;
 
     public int trackingUpdateFrequency = 5;
@@ -219,7 +219,7 @@ public class Missile : Projectile, IDamageable
     
     void Detonate()
     {
-        Instantiate(impactEffect, transform.position, Quaternion.identity);
+        VFXManager.instance.Spawn(impactEffect, transform.position,quaternion.identity);
         
         Collider[] hits = Physics.OverlapSphere(transform.position, ExplosionRadius());
         

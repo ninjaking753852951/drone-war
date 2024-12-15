@@ -103,8 +103,7 @@ MonoBehaviour:
   body: {fileID: 0}
   waitForDespawnTime: 0.5
   line: {fileID: 2176775526671929740}
-  impactEffect: {fileID: 8513118475990446182, guid: 435e5ee6d4d919e4d87fcaa915a6314b,
-    type: 3}
+  impactEffect: {fileID: 11400000, guid: 6421ad8ba279fca4995861fcf525e00c, type: 2}
 --- !u!114 &5328022389306351481
 MonoBehaviour:
   m_ObjectHideFlags: 0
