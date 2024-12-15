@@ -53,8 +53,9 @@ public class CameraController : Singleton<CameraController>
         // Initialize yaw and pitch with the current rotations
     }
 
-    public void TeleportCamera(Vector3 pos)
+    public void TeleportCamera(Vector3 pos, Vector3 eulerRot = default)
     {
+        yaw = eulerRot.y;
         moveTarget.position = pos;
     }
     

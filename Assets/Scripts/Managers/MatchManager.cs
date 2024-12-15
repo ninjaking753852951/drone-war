@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ImprovedTimers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityUtils;
@@ -28,6 +29,15 @@ public class MatchManager : Singleton<MatchManager>
     public TeamData defaultTeam;
     
     TeamData playerData;
+
+    public MatchState matchState = MatchState.PreMatch;
+
+    CountdownTimer moneyTick;
+    
+    public enum MatchState
+    {
+        PreMatch, Match
+    }
     
     [System.Serializable]
     public class TeamData
@@ -62,6 +72,7 @@ public class MatchManager : Singleton<MatchManager>
             }
         }
     }
+    
 
     public void PlayerJoined(ulong id)
     {
@@ -86,6 +97,9 @@ public class MatchManager : Singleton<MatchManager>
 
     public int RegisterTeam(DroneSpawner spawner)
     {
+        if (GameManager.Instance.IsOnlineAndClient())
+            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
+        
         if (!spawner.teamData.isAI)
             playerData = spawner.teamData;
 
@@ -103,43 +117,60 @@ public class MatchManager : Singleton<MatchManager>
         
         return curIndex;
     }
-    
-    void Awake()
-    {
-        //playerData = PlayerData();
-    }
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        if (GameManager.Instance.currentGameMode == GameMode.Battle)
-        {
-            Instantiate(playerSpawner);
-            InvokeRepeating(nameof(IncrementMoney),0,1);
-            NetworkManager.Singleton.OnClientConnectedCallback += AddNetworkPlayer;
-            NetworkManager.Singleton.OnServerStarted += StartMatch;
-            NetworkManager.Singleton.OnClientStarted += StartMatch;
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     void StartMatch()
     {
-        // on match start clear any existing players and add in new ones
+        matchState = MatchState.Match;
         ClearTeams();
+        winner = -1;
+        ResetMapObjectives();
+        
+        if (NetworkManager.Singleton.IsListening)
+        {
+            Debug.Log("ONLINE MATCH STARTED");
+            AddNetworkPlayers();
+        }
+        else
+        {
+            AddLocalPlayer();
+        }
+
+        moneyTick = new CountdownTimer(1);
+        moneyTick.OnTimerStop += IncrementMoney;
+        moneyTick.Start();
+    }
+
+    void ResetMapObjectives()
+    {
+        List<MapObjectivePoint> objectives = FindObjectsOfType<MapObjectivePoint>().ToList();
+        
+        foreach (var objective in objectives)
+        {
+            objective.Reset();
+        }
+    }
+    
+    void EndMatch()
+    {
+        //TODO
+        matchState = MatchState.PreMatch;
+        moneyTick.Dispose();
+        ClearTeams();
+        Utils.DestroyAllDrones();
     }
 
     void ClearTeams()
     {
-        Debug.Log("ONLINE MATCH STARTED");
         foreach (DroneSpawner team in teams)
         {
             Debug.Log("DESTROYING " + team.gameObject);
+
+            if (NetworkManager.Singleton.IsListening)
+            {
+                NetworkObject netObj = team.GetComponent<NetworkObject>();
+                netObj.Despawn(false);
+            }
+            
             Destroy(team.gameObject);
         }
         teams.Clear();
@@ -150,6 +181,18 @@ public class MatchManager : Singleton<MatchManager>
         Instantiate(aiSpawner);
     }
 
+    void AddLocalPlayer() => Instantiate(playerSpawner);
+
+    void AddNetworkPlayers()
+    {
+        List<ulong> players = NetworkManager.Singleton.ConnectedClientsIds.ToList();
+
+        foreach (ulong clientID in players)
+        {
+            AddNetworkPlayer(clientID);
+        }
+    }
+    
     void AddNetworkPlayer(ulong clientID)
     {
         if(!NetworkManager.Singleton.IsServer)
@@ -169,6 +212,10 @@ public class MatchManager : Singleton<MatchManager>
 
     void IncrementMoney()
     {
+        
+        if(GameManager.Instance.IsOnlineAndClient())
+            return;
+        
         List<MapObjectivePoint> objectives = FindObjectsOfType<MapObjectivePoint>().ToList();
 
         int[] heldObjectives = new int[teams.Count];
@@ -190,8 +237,13 @@ public class MatchManager : Singleton<MatchManager>
             {
                 Debug.Log("Team " +i+ " Wins!");
                 winner = i;
+                EndMatch();
+                return;
             }
         }
+        
+        moneyTick.Reset();
+        moneyTick.Start();
     }
 
     public TeamData Team(int teamID)
@@ -207,17 +259,89 @@ public class MatchManager : Singleton<MatchManager>
         }
     }
 
+    bool IsOnlineMatch() => NetworkManager.Singleton.IsListening;
+
     void OnGUI()
     {
-        
-        
         if (GameManager.Instance.currentGameMode != GameMode.Battle)
             return;
 
         // Get the screen width and height
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
+
+        // Label to indicate whether it's a local or online match
+        GUIStyle matchTypeStyle = new GUIStyle
+        {
+            fontSize = 18,
+            normal = { textColor = Color.white },
+            alignment = TextAnchor.UpperLeft
+        };
+        GUI.Label(new Rect(10, 10, 300, 30), IsOnlineMatch() ? "Match Type: Online" : "Match Type: Local", matchTypeStyle);
+
+
+
+        if (matchState == MatchState.PreMatch)
+        {
+            if (!GameManager.Instance.IsOnlineAndClient())
+            {
+                // Button to start the match
+                Rect startMatchButtonRect = new Rect(screenWidth / 2 - 100, 40, 200, 30);
+                if (GUI.Button(startMatchButtonRect, "Start Match"))
+                {
+                    StartMatch();
+                }   
+            }
+        }
         
+        // Display connected players in the lobby
+        GUIStyle playerListStyle = new GUIStyle
+        {
+            fontSize = 16,
+            normal = { textColor = Color.cyan },
+            alignment = TextAnchor.UpperLeft
+        };
+        
+        GUIStyle localPlayerListStyle = new GUIStyle
+        {
+            fontSize = 18,
+            normal = { textColor = Color.yellow },
+            alignment = TextAnchor.UpperLeft
+        };
+
+        Rect playerListRect = new Rect(10, 50, 300, 400);
+        GUI.Label(playerListRect, "Players in Lobby:", playerListStyle);
+
+        if (IsOnlineMatch())
+        {
+            var connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
+            for (int i = 0; i < connectedClientIds.Count; i++)
+            {
+                Rect clientLabelRect = new Rect(10, 80 + (i * 20), 300, 20);
+                string clientLabel = $"Client ID: {connectedClientIds[i]}";
+
+                GUIStyle style = playerListStyle;
+                
+                if (NetworkManager.Singleton.IsListening && NetworkManager.Singleton.LocalClientId == connectedClientIds[i])
+                {
+                    style = localPlayerListStyle;
+                }
+                
+                GUI.Label(clientLabelRect, clientLabel, style);
+            }
+        }
+        else
+        {
+            GUI.Label(new Rect(10, 80, 300, 20), "Local Player", playerListStyle);
+        }
+
+        /*// Add a button at the top of the screen to add an AI player
+        Rect addAIButtonRect = new Rect(screenWidth / 2 + 100, 40, 150, 30); // Centered horizontally
+        if (GUI.Button(addAIButtonRect, "Add AI Player"))
+        {
+            AddAIPlayer();
+        }*/
+
         // Define the style for the winner text
         GUIStyle winnerStyle = new GUIStyle
         {
@@ -225,26 +349,12 @@ public class MatchManager : Singleton<MatchManager>
             normal = { textColor = Color.yellow },
             alignment = TextAnchor.MiddleCenter
         };
-        
-        // Add a button at the top of the screen offset by 200 pixels
-        Rect buttonRect = new Rect(screenWidth / 2 + 100, 40, 100, 30); // Centered horizontally, 200px from the top
-        if (GUI.Button(buttonRect, "Add AI Player"))
-        {
-            AddAIPlayer();
-        }
-        
+
         // Check if the game is over and display the winner
         if (winner != -1)
         {
-            string winningTeam = "";
-            if (winner == 0)
-            {
-                winningTeam = "Player";
-            }
-            else
-            {
-                winningTeam = "AI";
-            }
+            string winningTeam = winner == playerID ? "Player" : $"AI {winner}";
+            winningTeam = "" + winner;
             string winnerText = $"Team {winningTeam} Wins!";
             Rect winnerRect = new Rect(screenWidth / 2 - 200, screenHeight / 2 - 50, 400, 100);
             GUI.Label(winnerRect, winnerText, winnerStyle);

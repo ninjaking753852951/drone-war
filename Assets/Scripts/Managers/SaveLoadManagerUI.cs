@@ -62,7 +62,7 @@ public class SaveLoadManagerUI : MonoBehaviour
         for (int i = 0; i < 10; i++)
         {
             int slot = i;
-            MachineSaveData machineData = saveLoad.LoadMachine(i);
+            MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(i);
             machineSelectionButtons.Add(new MachineSelectionButton(slot, machineData, this, () => SwitchMachineButton(slot)));
         }
     }

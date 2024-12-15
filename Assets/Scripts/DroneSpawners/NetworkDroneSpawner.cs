@@ -61,7 +61,7 @@ public class NetworkDroneSpawner : DroneSpawner
     {
         battleMenu.SetActive(GameManager.Instance.currentGameMode == GameMode.Battle);
         
-        CameraController.Instance.TeleportCamera(transform.position);
+        CameraController.Instance.TeleportCamera(transform.position, transform.rotation.eulerAngles);
         
         if (GameManager.Instance.currentGameMode == GameMode.Battle)
             BuildUI();
@@ -79,7 +79,7 @@ public class NetworkDroneSpawner : DroneSpawner
         for (int i = 1; i < 10; i++)
         {
             int slot = i;
-            MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);/*
+            MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(slot);/*
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachine(slot)));*/
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
         }
@@ -87,6 +87,11 @@ public class NetworkDroneSpawner : DroneSpawner
 
     void SpawnMachineCommand(int slot)
     {
+        MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);
+        
+        if(!teamData.CanAfford(machineData.totalCost))
+            MessageDisplay.Instance.DisplayMessage("INSUFFICIENT FUNDS!");
+        
         CommandManager commandManager = FindObjectOfType<CommandManager>();
         if (commandManager != null)
         {
@@ -106,6 +111,6 @@ public class NetworkDroneSpawner : DroneSpawner
     void UpdateUI()
     {
         if(MatchManager.Instance.PlayerData() != null)
-            playerBudgetText.text = "$" + MatchManager.Instance.PlayerData().budget;
+            playerBudgetText.text = "$" + teamData.budget;
     }
 }

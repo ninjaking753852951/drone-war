@@ -64,4 +64,14 @@
 
             return thumbnail;
         }
+        
+        public string SerializeToJson()
+        {
+            return JsonUtility.ToJson(this, true);
+        }
+
+        public static MachineSaveData DeserializeFromJson(string json)
+        {
+            return JsonUtility.FromJson<MachineSaveData>(json);
+        }
     }

@@ -2,12 +2,13 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
-public class NetworkDroneSpawnerHelper : NetworkBehaviour
+public class NetworkDroneSpawnerHelper : NetworkHelperBase
 {
         NetworkDroneSpawner spawner;
 
         public NetworkVariable<ulong> playerClientID;
         public NetworkVariable<Color> teamColour;
+        public NetworkVariable<float> budget;
         
         void Awake()
         {
@@ -29,16 +30,11 @@ public class NetworkDroneSpawnerHelper : NetworkBehaviour
                 }
         }
 
-        /*
-        [Rpc(SendTo.Everyone)]
-        void InitRPC(ulong playerClientID, Color teamColour)
+        void Update()
         {
-                if (playerClientID == NetworkManager.Singleton.LocalClientId)
-                {
-                        spawner.Init();
-                }
-        }*/
-
+                SyncValue(budget, ref spawner.teamData.budget);
+        }
+        
         public void Init(ulong clientID)
         {
                 teamColour.Value = Random.ColorHSV(0, 1, 0.6f, 0.6f, 0.8f, 0.8f);

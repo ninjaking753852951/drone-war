@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public class MapObjectivePoint : MonoBehaviour
 {
     public enum PointState
@@ -23,18 +22,20 @@ public class MapObjectivePoint : MonoBehaviour
     public float pollingInterval = 0.5f;
     public Transform indicator;
     public Transform healthIndicator;
+
+    [HideInInspector]
+    public float healthFill;
     
     private float pointHealth;
     public PointState currentState;
     private float timeSinceLastPoll;
 
-    void Start()
+    public void Start()
     {
         if(GameManager.Instance.currentGameMode != GameMode.Battle)
             gameObject.SetActive(false);
         // set indicator size correct
-        indicator.transform.localScale = new Vector3(radius * 2, indicator.transform.localScale.y, radius * 2);
-
+        SetIndicatorSize();
         /*if (forceOwner != -1)
         {
             currentOwner = forceOwner;
@@ -50,8 +51,8 @@ public class MapObjectivePoint : MonoBehaviour
     {
         //Health Indicator
 
-        float healthFill = 1 - (pointHealth / pointMaxHealth);
-        healthIndicator.transform.localScale = new Vector3(radius * 2 * healthFill, healthIndicator.transform.localScale.y, radius * 2 *healthFill);
+        healthFill = 1 - (pointHealth / pointMaxHealth);
+        SetFill(healthFill);
         
         timeSinceLastPoll += Time.deltaTime;
 
@@ -68,6 +69,17 @@ public class MapObjectivePoint : MonoBehaviour
         }
     }
 
+    public void SetIndicatorSize()
+    {
+        indicator.transform.localScale = new Vector3(radius * 2, indicator.transform.localScale.y, radius * 2);
+
+    }
+    
+    public void SetFill(float amount)
+    {
+        healthIndicator.transform.localScale = new Vector3(radius * 2 * amount, healthIndicator.transform.localScale.y, radius * 2 *amount);
+    }
+    
     void PollForOccupants()
     {
         currentOccupants.Clear();
@@ -112,10 +124,17 @@ public class MapObjectivePoint : MonoBehaviour
         }
     }
 
-    void SetIndicatorColour(int team)
+    public void SetIndicatorColour(int team)
     {
         Renderer rend = indicator.GetComponentInChildren<Renderer>();
-        rend.material.color = MatchManager.Instance.Team(team).colour;
+        if (team == -1)
+        {
+            rend.material.color = new Color(1,1,1,0.2f);
+        }
+        else
+        {
+            rend.material.color = MatchManager.Instance.Team(team).colour;   
+        }
     }
 
     void UpdatePointHealth()
@@ -143,5 +162,17 @@ public class MapObjectivePoint : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, radius);
+    }
+
+    public void Reset()
+    {
+        currentOwner = null;
+        currentOccupants.Clear();
+        pointHealth = pointMaxHealth;
+        currentState = PointState.Unowned;
+
+        // Reset visual indicators
+        SetIndicatorColour(-1); // Reset to default color or clear
+        healthIndicator.transform.localScale = new Vector3(0, healthIndicator.transform.localScale.y, 0);
     }
 }

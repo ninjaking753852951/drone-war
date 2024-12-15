@@ -43,6 +43,9 @@ public class NetworkConnectionMenu : MonoBehaviour
     //TODO create a host and join buttons 50 px down from the top middle of the screen 
     void OnGUI()
     {
+        if(GameManager.Instance.currentGameMode != GameMode.Battle)
+            return;
+        
         // Get the center of the screen
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
@@ -59,7 +62,7 @@ public class NetworkConnectionMenu : MonoBehaviour
         // Position for the Host button
         Rect hostButtonRect = new Rect(
             (screenWidth - buttonWidth) / 2, // Center horizontally
-            50, // 50px down from the top
+            50 + 50, // 50px down from the top
             buttonWidth,
             buttonHeight
         );
@@ -67,7 +70,7 @@ public class NetworkConnectionMenu : MonoBehaviour
         // Position for the Join button
         Rect joinButtonRect = new Rect(
             (screenWidth - buttonWidth) / 2, // Center horizontally
-            110, // 50px down + button height + spacing
+            110 + 50, // 50px down + button height + spacing
             buttonWidth,
             buttonHeight
         );

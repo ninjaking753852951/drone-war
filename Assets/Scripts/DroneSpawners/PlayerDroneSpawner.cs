@@ -51,7 +51,7 @@ public class PlayerDroneSpawner : DroneSpawner
         
         battleMenu.SetActive(GameManager.Instance.currentGameMode == GameMode.Battle);
         
-        CameraController.Instance.TeleportCamera(transform.position);
+        CameraController.Instance.TeleportCamera(transform.position, transform.rotation.eulerAngles);
         
         if (GameManager.Instance.currentGameMode == GameMode.Battle)
             BuildUI();
@@ -69,7 +69,7 @@ public class PlayerDroneSpawner : DroneSpawner
         for (int i = 1; i < 10; i++)
         {
             int slot = i;
-            MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);/*
+            MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(slot);/*
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachine(slot)));*/
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
         }

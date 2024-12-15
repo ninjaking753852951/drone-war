@@ -39,7 +39,7 @@ public abstract class DroneSpawner : MonoBehaviour
 
         Vector3 scanPos = SafeSpawnPosition();
         
-        MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(id);
+        MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(id);
         if(machineData == null)
             return;
         

@@ -115,11 +115,27 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
         saveData.totalCost = BuildingManager.Instance.totalCost;
 
-        string json = JsonUtility.ToJson(saveData, true);
+        string json = saveData.SerializeToJson();
         string path = GetMachineSlotPath(slot);
         File.WriteAllText(path, json);
 
         Debug.Log("Machine saved to slot " + slot);
+    }
+    
+    public MachineSaveData LoadMachine(int slot, bool dontSetSlot = false)
+    {
+        if(!dontSetSlot)
+            curSlot = slot;
+        string path = GetMachineSlotPath(slot);
+
+        if (!File.Exists(path))
+        {
+            //Debug.LogWarning("No save data found in slot " + slot);
+            return null;
+        }
+        
+        string json = File.ReadAllText(path);
+        return MachineSaveData.DeserializeFromJson(json);
     }
     
     public void SaveSubAssembly(int slot)
@@ -160,22 +176,6 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
 
         return saveData;
-    }
-    
-    public MachineSaveData LoadMachine(int slot, bool dontSetSlot = false)
-    {
-        if(!dontSetSlot)
-            curSlot = slot;
-        string path = GetMachineSlotPath(slot);
-
-        if (!File.Exists(path))
-        {
-            //Debug.LogWarning("No save data found in slot " + slot);
-            return null;
-        }
-        
-        string json = File.ReadAllText(path);
-        return JsonUtility.FromJson<MachineSaveData>(json);
     }
     
     public void LoadAndSpawnMachine(int slot, Vector3 offset = default)

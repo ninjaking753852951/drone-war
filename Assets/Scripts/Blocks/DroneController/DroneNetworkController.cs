@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
-public class DroneNetworkController : NetworkBehaviour
+public class DroneNetworkController : NetworkHelperBase
 {
     [HideInInspector]
     public NetworkVariable<int> blockCount;
@@ -32,26 +32,15 @@ public class DroneNetworkController : NetworkBehaviour
             {
                 ProxyDeploy();
             }
-            
-            controller.curHealth = health.Value;
-            controller.maxHealth = maxHealth.Value;
-            
-            controller.energy.energy = energy.Value;
-            controller.energy.maxEnergy = maxEnergy.Value;
-
-            controller.boundingSphereRadius = boundingRadius.Value;
         }
-
-        if (NetworkManager.Singleton.IsServer)
-        {
-            health.Value = controller.curHealth;
-            maxHealth.Value = controller.maxHealth;
-
-            energy.Value = controller.energy.energy;
-            maxEnergy.Value = controller.energy.maxEnergy;
-
-            boundingRadius.Value = controller.boundingSphereRadius;
-        }
+        
+        SyncValue(health, ref controller.curHealth);
+        SyncValue(maxHealth, ref controller.maxHealth);
+        
+        SyncValue(energy, ref controller.energy.energy);
+        SyncValue(maxEnergy, ref controller.energy.maxEnergy);
+        
+        SyncValue(boundingRadius, ref controller.boundingSphereRadius);
     }
 
     void ProxyDeploy()
@@ -65,11 +54,4 @@ public class DroneNetworkController : NetworkBehaviour
             proxyDeploy.ProxyDeploy();
         }
     }
-    
-    /*IEnumerator DelayedProxyDeploy()
-    {
-
-        yield return new WaitForEndOfFrame();
-        ProxyDeploy();
-    }*/
 }
