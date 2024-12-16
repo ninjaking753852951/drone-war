@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2611203027257188279}
   - component: {fileID: 6841417993929456388}
+  - component: {fileID: 8902785257960315341}
   - component: {fileID: 1999660179334152785}
   - component: {fileID: 5231889847655958430}
   - component: {fileID: 630475461580540650}
@@ -51,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 714443024
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -60,6 +61,37 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &8902785257960315341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 815193987416364843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 1
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!54 &1999660179334152785
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -115,9 +147,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  gridSize: {x: 1, y: 1, z: 1}
   mass: 25
   health: 10
-  cost: 25
+  cost: 50
   connectionPoint: {fileID: 8249416352327352621}
   onInit:
     m_PersistentCalls:
@@ -142,6 +176,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
 --- !u!65 &6480554552259157177
 BoxCollider:
   m_ObjectHideFlags: 0

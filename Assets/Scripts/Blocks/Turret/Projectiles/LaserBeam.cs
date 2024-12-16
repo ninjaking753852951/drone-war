@@ -95,7 +95,7 @@ public class LaserBeam : Projectile
             if (targetDroneBlock != null)
             {
                 if(targetDroneBlock.controller != null)
-                    targetDroneBlock.TakeDamage(core.laserDamage);
+                    targetDroneBlock.TakeDamage(core.DamageCalculation());
             }   
         }
         return firstHit;

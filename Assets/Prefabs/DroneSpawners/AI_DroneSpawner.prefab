@@ -136,13 +136,13 @@ MonoBehaviour:
   teamData:
     colour: {r: 1, g: 0, b: 0, a: 0}
     isAI: 1
-    budget: 3000
+    budget: 6000
     incomeMultiplier: 3
     clientID: 0
   spawnRate: 10
   spawnSlots:
-    x: 7
-    y: 9
+    x: 0
+    y: 5
 --- !u!114 &9079443613239034203
 MonoBehaviour:
   m_ObjectHideFlags: 0

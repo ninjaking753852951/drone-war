@@ -8,8 +8,9 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
 {
 
     [SerializeField]
-    BlockLibraryScriptableObject library;
+    //BlockLibraryScriptableObject library;
 
+    public List<BlockLibraryScriptableObject> libraries;
     
     public List<BlockData> placeableBlocks;
     public List<BlockData> blocks;
@@ -20,7 +21,8 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
     {
         base.Awake();
 
-        blocks = library.blocks.ToList();
+        //blocks = library.blocks.ToList();
+        blocks = CompileLibraries();
         
         // maybe convert blockdata (from the library) to a factory so that block datas can be edited at runtime for thumbnails
         placeableBlocks = new List<BlockData>();
@@ -32,6 +34,20 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
         }
 
         coreBlock = CoreBlock();
+    }
+
+    List<BlockData> CompileLibraries()
+    {
+        List<BlockData> blocks = new List<BlockData>();
+        
+        foreach (BlockLibraryScriptableObject library in libraries)
+        {
+            foreach (BlockData block in library.blocks)
+            {
+                blocks.Add(block);
+            }
+        }
+        return blocks;
     }
     
     BlockData CoreBlock()

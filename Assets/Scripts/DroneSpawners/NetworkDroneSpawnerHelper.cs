@@ -37,7 +37,7 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
         
         public void Init(ulong clientID)
         {
-                teamColour.Value = Random.ColorHSV(0, 1, 0.6f, 0.6f, 0.8f, 0.8f);
+                teamColour.Value = Random.ColorHSV(0, 1, 0.96f, 0.9f, 0.9f, 0.9f);
                 playerClientID.Value = clientID;
                 
                 NetworkObject netObj = GetComponent<NetworkObject>();

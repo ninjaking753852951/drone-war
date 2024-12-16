@@ -100,6 +100,13 @@ MonoBehaviour:
       type: 3}
     category: 7
   - isCore: 0
-    prefab: {fileID: 3587343873945772984, guid: fae70e3c2e9c1534983a0d54f6a34519,
+    prefab: {fileID: 3587343873945772984, guid: 4627ebe8afab08c46b3d1846c5cf2931,
       type: 3}
+    category: 7
+  - isCore: 0
+    prefab: {fileID: 3587343873945772984, guid: 05b152610d0822d40b3409fab5d53eb1,
+      type: 3}
+    category: 7
+  - isCore: 0
+    prefab: {fileID: 130770705048867853, guid: 60aa1aa21abcc644290da46f5b67e8c2, type: 3}
     category: 7

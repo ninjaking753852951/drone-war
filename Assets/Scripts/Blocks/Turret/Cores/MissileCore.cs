@@ -41,7 +41,7 @@ public class MissileCore : TurretCoreController
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
         float horizontalDistance = (targetPos - transform.position).With(y: 0).magnitude;
-        targetPos.y -= shootHeightOffset;
+        //targetPos.y -= shootHeightOffset;
         float launchAngle =
             CalculateMissileLaunchAngle(shootVelocity, missileAcceleration, new Vector2(horizontalDistance, targetPos.y));
 
@@ -64,6 +64,10 @@ public class MissileCore : TurretCoreController
         }
 
         return time;
+    }
+    public override float DamageCalculation()
+    {
+        return missileDamage * damageMultiplier;
     }
 
     float CalculateMissileLaunchAngle(float v0, float a, Vector2 targetPos)

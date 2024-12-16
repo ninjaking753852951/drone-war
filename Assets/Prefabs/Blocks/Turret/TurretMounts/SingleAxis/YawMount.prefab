@@ -330,7 +330,7 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 1
+  UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 1
   Interpolate: 0
@@ -352,7 +352,7 @@ MonoBehaviour:
   gridSize: {x: 1, y: 0.25, z: 1}
   mass: 100
   health: 10
-  cost: 50
+  cost: 25
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:

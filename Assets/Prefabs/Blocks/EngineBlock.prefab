@@ -866,7 +866,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 4147695182
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -909,9 +909,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  gridSize: {x: 1, y: 1, z: 1}
   mass: 100
   health: 10
-  cost: 200
+  cost: 150
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:
@@ -936,6 +938,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
 --- !u!114 &5745026338949347815
 MonoBehaviour:
   m_ObjectHideFlags: 0

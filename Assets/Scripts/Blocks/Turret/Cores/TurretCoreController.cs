@@ -16,6 +16,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     public float fireRate = 10;
     public float recoilMultiplier = 1;
     public float energyCost;
+    public float damageMultiplier = 1;
     
     public GameObject projectilePrefab;
     public Transform target;
@@ -49,10 +50,14 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     float maxRange;
 
     public List<TargetTypes> targetTypes;
+
+    public float aimTolerance = 1; // How off can the angle be in meters but still permit firing
     
-    public float shootHeightOffset = 0f;
 
     public ObjectPoolManager.PooledTypes projectileType;
+
+    float targetPitchAngle;
+    float targetYawAngle;
     
     protected Quaternion YawRotation()
     {
@@ -98,9 +103,16 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
         foreach (var barrel in barrels)
             barrel.Deploy(this);
-        
-        mainBarrel = Utils.FurthestFrom(Utils.GetTransformsFromComponents(barrels), transform.position)
-            .GetComponent<TurretBarrelController>();
+
+        if (barrels != null   && barrels.Count > 0)
+        {
+            mainBarrel = Utils.FurthestFrom(Utils.GetTransformsFromComponents(barrels), transform.position)
+                .GetComponent<TurretBarrelController>();   
+        }
+        else // no barrel so disable the obj
+        {
+            this.enabled = false;
+        }
 
         maxRange = MaxRange();
         rangeIndicator.SetRange(maxRange);
@@ -152,8 +164,8 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         Vector3 targetPosEstimate = target.position + targetRb.velocity * interceptTime;
         
         // Calculate Angles
-        float targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
-        float targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
+        targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
+        targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
         
         foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
             turretMountSingleAxis.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
@@ -277,8 +289,36 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     protected virtual bool ReadyToFire()
     {
-        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost);
+        
+        
+        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
     }
+
+    bool IsAimedAtTarget()
+    {
+        if (target == null)
+            return false;
+
+        // Calculate the direction from the turret to the target
+        Vector3 directionToTarget = (target.position - transform.position).normalized;
+
+        // Calculate the yaw and pitch angles for the direction to the target
+        float targetYaw = Mathf.Atan2(directionToTarget.x, directionToTarget.z) * Mathf.Rad2Deg;
+        float targetPitch = Mathf.Asin(directionToTarget.y) * Mathf.Rad2Deg;
+
+        // Get the turret's current yaw and pitch angles
+        Vector3 turretForward = transform.forward;
+        float currentYaw = Mathf.Atan2(turretForward.x, turretForward.z) * Mathf.Rad2Deg;
+        float currentPitch = Mathf.Asin(turretForward.y) * Mathf.Rad2Deg;
+
+        // Calculate the angular differences
+        float yawDifference = Mathf.DeltaAngle(currentYaw, targetYaw);
+        float pitchDifference = Mathf.DeltaAngle(currentPitch, targetPitch);
+
+        // Check if both yaw and pitch differences are within the aim tolerance
+        return Mathf.Abs(yawDifference) <= aimTolerance && Mathf.Abs(pitchDifference) <= aimTolerance;
+    }
+
 
 
     public void ProxyDeploy()
@@ -286,4 +326,6 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         maxRange = MaxRange();
         rangeIndicator.SetRange(maxRange);
     }
+
+    public abstract float DamageCalculation();
 }

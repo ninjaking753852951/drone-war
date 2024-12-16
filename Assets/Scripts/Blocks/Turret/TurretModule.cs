@@ -8,13 +8,22 @@ public class TurretModule : MonoBehaviour
     public float fireRateMultiplier = 1;
     public float recoilMultiplier = 1;
     public float energyCostMultiplier = 1;
-    
+    public float damageMultiplier = 1;
+
+    bool hasDeployed = false;
+        
     public void Deploy(TurretCoreController controller)
     {
+        if (hasDeployed)
+            return;
+
+        hasDeployed = true;
+        
         controller.shootVelocity *= velocityMultiplier;
         controller.fireRate *= fireRateMultiplier;
         controller.recoilMultiplier *= recoilMultiplier;
         controller.energyCost *= energyCostMultiplier;
+        controller.damageMultiplier *= damageMultiplier;
     }
     
 }

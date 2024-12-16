@@ -37,4 +37,8 @@ public class LaserCore : TurretCoreController
     {
         return 0;
     }
+    public override float DamageCalculation()
+    {
+        return laserDamage * damageMultiplier;
+    }
 }

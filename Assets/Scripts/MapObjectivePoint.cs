@@ -23,6 +23,8 @@ public class MapObjectivePoint : MonoBehaviour
     public Transform indicator;
     public Transform healthIndicator;
 
+    public float transparency = 0.5f;
+    
     [HideInInspector]
     public float healthFill;
     
@@ -126,15 +128,22 @@ public class MapObjectivePoint : MonoBehaviour
 
     public void SetIndicatorColour(int team)
     {
+        Color colour;
+        
         Renderer rend = indicator.GetComponentInChildren<Renderer>();
         if (team == -1)
         {
-            rend.material.color = new Color(1,1,1,0.2f);
+            colour = Color.white;
+
         }
         else
         {
-            rend.material.color = MatchManager.Instance.Team(team).colour;   
+            colour = MatchManager.Instance.Team(team).colour;
         }
+
+        colour.a = transparency;
+        
+        rend.material.color = colour;   
     }
 
     void UpdatePointHealth()

@@ -34,7 +34,7 @@ public class Bullet : Projectile
         if (droneBlock != null)
         {
             if(droneBlock.controller != null && droneBlock.controller.curTeam != originTeam)
-                droneBlock.TakeDamage(Mathf.Pow(rb.velocity.magnitude, 2)* rb.mass * turret.damageMultiplier);
+                droneBlock.TakeDamage(rb.velocity.magnitude* rb.mass * turret.DamageCalculation());
         }
         
         Deactivate();

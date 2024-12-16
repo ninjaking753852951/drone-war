@@ -66,7 +66,7 @@ public class PlayerDroneSpawner : DroneSpawner
     void BuildUI()
     {
         // Spawn machine buttons 
-        for (int i = 1; i < 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             int slot = i;
             MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(slot);/*

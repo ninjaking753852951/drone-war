@@ -99,6 +99,9 @@ public class Missile : Projectile, IDamageable
 
     void UpdateTrajectory()
     {
+        if(gameObject == null)
+            trackingTimer.Dispose();
+        
         if(transform == null || target == null)
             return;
         
@@ -203,9 +206,9 @@ public class Missile : Projectile, IDamageable
             velocity += velocity.normalized * acceleration * turret.simulationStepSize;
             velocity += Vector2.up * turret.simulationStepSize * Physics.gravity.y;
             
-            Vector3 rayPos = transform.position + Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, yDist, xDist);
-            Vector3 velocityRay = Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, velocity.y, velocity.x);
-            Debug.DrawLine( rayPos, rayPos + velocityRay * turret.simulationStepSize, Color.yellow,1/(float)trackingUpdateFrequency);
+            //Vector3 rayPos = transform.position + Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, yDist, xDist);
+            //Vector3 velocityRay = Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, velocity.y, velocity.x);
+           // Debug.DrawLine( rayPos, rayPos + velocityRay * turret.simulationStepSize, Color.yellow,1/(float)trackingUpdateFrequency);
 
 
             safety--;
@@ -239,7 +242,7 @@ public class Missile : Projectile, IDamageable
                     if (!controllers.Contains(droneBlock.controller))
                     {
                         controllers.Add(droneBlock.controller);
-                        droneBlock.TakeDamage(turret.missileDamage);      
+                        droneBlock.TakeDamage(turret.DamageCalculation());      
                     }
                     //droneBlock.TakeDamage(turret.laserDamage);  
                 }

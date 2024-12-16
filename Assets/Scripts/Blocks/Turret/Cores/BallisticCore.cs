@@ -11,9 +11,10 @@ public class BallisticCore : TurretCoreController
     public float accuracyTolerance = 0.5f;
 
     public GameObject shootEffect;
-    public float damageMultiplier;
 
     public float drag = 0.3f;         // Unity-style drag coefficient
+
+    public float ballisticDamageMultiplier = 1;
 
     public override void Shoot()
     {
@@ -48,7 +49,7 @@ public class BallisticCore : TurretCoreController
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
         float horizontalDistance = (targetPos - transform.position).With(y: 0).magnitude;
-        targetPos.y -= shootHeightOffset;
+        //targetPos.y -= shootHeightOffset;
         float launchAngle =
             CalculateBallisticLaunchAngle(shootVelocity, drag, new Vector2(horizontalDistance, targetPos.y));
 
@@ -72,7 +73,11 @@ public class BallisticCore : TurretCoreController
 
         return time;
     }
-    
+    public override float DamageCalculation()
+    {
+        return ballisticDamageMultiplier;
+    }
+
     float CalculateBallisticLaunchAngle(float v0, float a, Vector2 targetPos)
     {
         float bestAngle = 0;

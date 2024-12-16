@@ -24,6 +24,8 @@ public class DroneBlock : MonoBehaviour
 
     [HideInInspector]
     public DroneController controller;
+
+    public bool canOnlyAdoptTurretModules = false;
     
     void Awake()
     {
@@ -91,10 +93,23 @@ public class DroneBlock : MonoBehaviour
         // Loop through each collider and check if it has a DroneBlock component
         foreach (Collider collider in colliders)
         {
-            DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
-            if (droneBlock != null && droneBlock != this) // Exclude self
+            if (canOnlyAdoptTurretModules)
             {
-                droneBlocks.Add(droneBlock);
+                TurretModule module = collider.GetComponent<TurretModule>();
+                TurretBarrelController barrel = collider.GetComponent<TurretBarrelController>();
+                DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
+                if (droneBlock != null && droneBlock != this && (module != null || barrel != null)) // Exclude self
+                {
+                    droneBlocks.Add(droneBlock);
+                }   
+            }
+            else
+            {
+                DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
+                if (droneBlock != null && droneBlock != this) // Exclude self
+                {
+                    droneBlocks.Add(droneBlock);
+                }   
             }
         }
 

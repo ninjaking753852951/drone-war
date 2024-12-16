@@ -137,8 +137,8 @@ MonoBehaviour:
   teamData:
     colour: {r: 0, g: 0.3978877, b: 1, a: 0}
     isAI: 0
-    budget: 3000
-    incomeMultiplier: 1
+    budget: 6000
+    incomeMultiplier: 0.75
     clientID: 0
   battleMenu: {fileID: 1472726951618750018}
   playerBudgetText: {fileID: 4279703463554782640}

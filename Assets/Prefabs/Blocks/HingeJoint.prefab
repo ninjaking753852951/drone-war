@@ -363,7 +363,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5a0dc556c27724497346fa5c290f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxSize: {x: 1, y: 0.5, z: 0.5}
+  scanBoxOffset: {x: 0, y: 0.5, z: 0}
+  gridSize: {x: 1, y: 1, z: 1}
   mass: 50
   health: 10
   cost: 25
@@ -391,6 +393,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
 --- !u!65 &4390955685373644255
 BoxCollider:
   m_ObjectHideFlags: 0

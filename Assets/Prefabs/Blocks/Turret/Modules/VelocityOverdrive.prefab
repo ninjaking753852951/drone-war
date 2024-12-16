@@ -468,9 +468,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  gridSize: {x: 1, y: 1, z: 1}
   mass: 25
   health: 10
-  cost: 50
+  cost: 75
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:
@@ -520,6 +522,7 @@ MonoBehaviour:
   fireRateMultiplier: 1
   recoilMultiplier: 1
   energyCostMultiplier: 1.25
+  damageMultiplier: 1.25
 --- !u!1 &7342806459623457846
 GameObject:
   m_ObjectHideFlags: 0

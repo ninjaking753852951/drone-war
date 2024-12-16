@@ -300,7 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3702497
+  GlobalObjectIdHash: 3339337141
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -324,9 +324,9 @@ MonoBehaviour:
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
   gridSize: {x: 1, y: 1, z: 1}
-  mass: 25
+  mass: 100
   health: 10
-  cost: 50
+  cost: 200
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:
@@ -351,6 +351,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 1
 --- !u!65 &8037801357792849474
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -400,7 +401,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireRate: 0.5
   recoilMultiplier: 1
-  energyCost: 0.25
+  energyCost: 1
+  damageMultiplier: 1
   projectilePrefab: {fileID: 7256020650716156835, guid: 5058fb0daf3bd0940be6303acbc36653,
     type: 3}
   target: {fileID: 0}
@@ -413,13 +415,13 @@ MonoBehaviour:
   rb: {fileID: 0}
   turretUpdateRate: 5
   targetTypes: 00000000
-  shootHeightOffset: 0
+  aimTolerance: 180
   projectileType: 2
   missileAcceleration: 10
   missileExplosionRadiusMultiplier: 1
-  missileDamage: 10000
+  missileDamage: 5000
   simulationSafetyLimit: 500
-  simulationStepSize: 0.1
+  simulationStepSize: 0.2
 --- !u!1 &1337651016156115548
 GameObject:
   m_ObjectHideFlags: 0

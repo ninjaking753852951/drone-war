@@ -296,6 +296,16 @@ public class MatchManager : Singleton<MatchManager>
                 }   
             }
         }
+
+        if (matchState == MatchState.Match && !NetworkManager.Singleton.IsListening)
+        {
+            // Add a button at the top of the screen to add an AI player
+            Rect addAIButtonRect = new Rect(screenWidth / 2 + 100, 40, 150, 30); // Centered horizontally
+            if (GUI.Button(addAIButtonRect, "Add AI Player"))
+            {
+                AddAIPlayer();
+            }
+        }
         
         // Display connected players in the lobby
         GUIStyle playerListStyle = new GUIStyle
@@ -338,12 +348,7 @@ public class MatchManager : Singleton<MatchManager>
             GUI.Label(new Rect(10, 80, 300, 20), "Local Player", playerListStyle);
         }
 
-        /*// Add a button at the top of the screen to add an AI player
-        Rect addAIButtonRect = new Rect(screenWidth / 2 + 100, 40, 150, 30); // Centered horizontally
-        if (GUI.Button(addAIButtonRect, "Add AI Player"))
-        {
-            AddAIPlayer();
-        }*/
+
 
         // Define the style for the winner text
         GUIStyle winnerStyle = new GUIStyle

@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3337922004
+  GlobalObjectIdHash: 1730677149
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -158,9 +158,9 @@ MonoBehaviour:
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
   gridSize: {x: 1, y: 1, z: 1}
-  mass: 25
+  mass: 100
   health: 10
-  cost: 50
+  cost: 125
   connectionPoint: {fileID: 0}
   onInit:
     m_PersistentCalls:
@@ -185,6 +185,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 1
 --- !u!65 &8037801357792849474
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -235,6 +236,7 @@ MonoBehaviour:
   fireRate: 0.5
   recoilMultiplier: 1
   energyCost: 2.5
+  damageMultiplier: 1
   projectilePrefab: {fileID: 2508981756439933117, guid: 8564b73c06d572f4ca4452c40a0bceb9,
     type: 3}
   target: {fileID: 0}
@@ -247,10 +249,10 @@ MonoBehaviour:
   rb: {fileID: 0}
   turretUpdateRate: 60
   targetTypes: 0000000001000000
-  shootHeightOffset: 0
+  aimTolerance: 1
   projectileType: 1
   laserLifetime: 0.5
-  laserDamage: 1000
+  laserDamage: 2500
   laserRange: 30
 --- !u!1 &3255132468474217410
 GameObject:
