@@ -1487,6 +1487,50 @@ Transform:
   - {fileID: 892449703}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1002943566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1002943568}
+  - component: {fileID: 1002943567}
+  m_Layer: 0
+  m_Name: FPSDisplay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1002943567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002943566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1cb92e6f9172e448b8916d818eaa09d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1002943568
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002943566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1019740058
 GameObject:
   m_ObjectHideFlags: 0
@@ -2096,6 +2140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   indicatorMat: {fileID: 2100000, guid: 43e67e1f5474e60408bb293c0aa804dd, type: 2}
+  badIndicatorMat: {fileID: 2100000, guid: 75a6b19d1f2234c449d17b9f8201ce56, type: 2}
   buildingBlockIndicator: {fileID: 0}
   spawnPoint: {x: 0, y: 1.5, z: 0}
   totalCost: 0
@@ -2371,6 +2416,83 @@ MonoBehaviour:
     isCore: 0
     prefab: {fileID: 0}
     category: 0
+  blockRules:
+    combinations:
+    - parentBlock: 0
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 2
+      childBlock: 2
+      canPlace: 1
+    - parentBlock: 3
+      childBlock: 2
+      canPlace: 1
+    - parentBlock: 3
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 3
+      canPlace: 1
 --- !u!4 &1647236962
 Transform:
   m_ObjectHideFlags: 0
@@ -4160,3 +4282,4 @@ SceneRoots:
   - {fileID: 761413802}
   - {fileID: 987528277}
   - {fileID: 503665596}
+  - {fileID: 1002943568}

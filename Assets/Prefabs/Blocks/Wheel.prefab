@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2214232473
+  GlobalObjectIdHash: 1826522405
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -146,9 +146,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5a0dc556c27724497346fa5c290f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxSize: {x: 1.1, y: 0.5, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
-  gridSize: {x: 1, y: 1, z: 1}
+  gridSize: {x: 1, y: 0.5, z: 1}
   mass: 25
   health: 10
   cost: 25
@@ -176,6 +176,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
 --- !u!65 &6480554552259157177
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -209,7 +210,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.5, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -2, y: 0, z: -2.25}
+  m_ConnectedAnchor: {x: 0, y: -0.5, z: 0}
   serializedVersion: 2
   m_UseSpring: 0
   m_Spring:

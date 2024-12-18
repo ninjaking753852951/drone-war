@@ -5,7 +5,7 @@ public class BlockData : IPlaceable
 {
     public bool isCore;
     public GameObject prefab;
-    public BuildingManagerUI.PlaceableCategories category;
+    public BlockType category;
 
     public string PlaceableName()
     {
@@ -40,7 +40,7 @@ public class BlockData : IPlaceable
         GameObject obj = Spawn(offset, Quaternion.Euler(-35, 35, 0));
         return ThumbnailGenerator.Instance.GenerateThumbnail(obj);
     }
-    public BuildingManagerUI.PlaceableCategories Category()
+    public BlockType Category()
     {
         return category;
     }

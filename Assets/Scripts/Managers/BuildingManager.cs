@@ -11,6 +11,7 @@ using UnityUtils;
 public class BuildingManager : Singleton<BuildingManager>
 {
     public Material indicatorMat;
+    public Material badIndicatorMat;
     
     public GameObject buildingBlockIndicator;
     
@@ -26,6 +27,8 @@ public class BuildingManager : Singleton<BuildingManager>
     [HideInInspector]
     public float totalCost;
     IPlaceable curPlaceable;
+
+    bool isOnCompatibleBlock;
     
     void Start()
     {
@@ -76,7 +79,7 @@ public class BuildingManager : Singleton<BuildingManager>
         return allPlaceables;
     }
     
-    public List<IPlaceable> PlaceablesInCategory(BuildingManagerUI.PlaceableCategories targetCategory)
+    public List<IPlaceable> PlaceablesInCategory(BlockType targetCategory)
     {
         List<IPlaceable> targetPlaceables = new List<IPlaceable>();
 
@@ -107,7 +110,7 @@ public class BuildingManager : Singleton<BuildingManager>
         }
         
         //Place the block
-        if (Input.GetButtonDown("Fire1") && buildingBlockIndicator.activeSelf)
+        if (Input.GetButtonDown("Fire1") && buildingBlockIndicator.activeSelf && isOnCompatibleBlock)
         {
             curPlaceable.Spawn(buildingBlockIndicator.transform.position, buildingBlockIndicator.transform.rotation);
             totalCost = TotalCost();
@@ -156,7 +159,18 @@ public class BuildingManager : Singleton<BuildingManager>
 
         Vector3 placePoint = hitPoint + hit.normal * 0.5f;
 
-        float roundingSize = 1;
+        BlockType parentBlock = hitBlock.blockIdentity.category;
+        BlockType childBlock = curPlaceable.Category();
+
+        isOnCompatibleBlock = BlockLibraryManager.Instance.blockRules.IsCombinationTrue(parentBlock, childBlock);
+        if(isOnCompatibleBlock)
+        {
+            SetIndicatorColour(indicatorMat);
+        }
+        else
+        {
+            SetIndicatorColour(badIndicatorMat);
+        }
 
         placePoint = Utils.SnapToGrid(placePoint, hitBlock.gridSize, hit.collider.transform.position, hit.collider.transform.rotation);
         
@@ -204,6 +218,15 @@ public class BuildingManager : Singleton<BuildingManager>
         droneController.Deploy();
     }
 
+    void SetIndicatorColour(Material mat)
+    {
+        List<Renderer> rends = buildingBlockIndicator.GetComponentsInChildren<Renderer>().ToList();
+        foreach (Renderer rend in rends)
+        {
+            rend.material = mat;
+        }
+    }
+
     public void SetNewCurrentBlock(IPlaceable placeable)
     {
         curPlaceable = placeable;
@@ -226,17 +249,13 @@ public class BuildingManager : Singleton<BuildingManager>
             indicatorRigidbody.useGravity = false;
         }
         
-        List<Renderer> rends = buildingBlockIndicator.GetComponentsInChildren<Renderer>().ToList();
-        foreach (Renderer rend in rends)
-        {
-            rend.material = indicatorMat;
-        }
-        
         List<DroneBlock> childBlocks = buildingBlockIndicator.GetComponentsInChildren<DroneBlock>().ToList();
         foreach (DroneBlock childBlock in childBlocks)
         {
             Destroy(childBlock);
         }
+
+        SetIndicatorColour(indicatorMat);
 
         // get the one on the parent as well as the children
         DroneBlock block = buildingBlockIndicator.GetComponent<DroneBlock>();

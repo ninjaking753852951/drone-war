@@ -34,7 +34,7 @@ public class DroneController : MonoBehaviour, IProgressBar
     
     void Awake()
     {
-        instanceID = MachineInstanceManager.Instance.Register(gameObject);
+        instanceID = MachineInstanceManager.Instance.Register(this);
         rb = GetComponent<Rigidbody>();
         movementController.Initialize(rb, transform, this);
     }
@@ -170,5 +170,10 @@ public class DroneController : MonoBehaviour, IProgressBar
     public bool IsDestroyed()
     {
         return this == null;
+    }
+    
+    void OnDestroy()
+    {
+        MachineInstanceManager.Instance.DeregisterDrone(this);
     }
 }

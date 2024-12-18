@@ -91,9 +91,9 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
             GameObject obj = Spawn(offset, Quaternion.Euler(-35, 35, 0));
             return ThumbnailGenerator.Instance.GenerateThumbnail(obj);
         }
-        public BuildingManagerUI.PlaceableCategories Category()
+        public BlockType Category()
         {
-            return BuildingManagerUI.PlaceableCategories.SubAssemblies;
+            return BlockType.SubAssemblies;
         }
     }
     

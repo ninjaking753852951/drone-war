@@ -18,7 +18,6 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     public float energyCost;
     public float damageMultiplier = 1;
     
-    public GameObject projectilePrefab;
     public Transform target;
     public float shootVelocity;
     [HideInInspector]
@@ -35,7 +34,6 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     
     CountdownTimer fireTimer;
     bool isDeployed = false;
-    bool targetInRange;
     
     [HideInInspector]
     public DroneController controller;
@@ -56,6 +54,11 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     public ObjectPoolManager.PooledTypes projectileType;
 
+    [Header("Projectile Simulation")]
+    public int simulationSafetyLimit = 500;
+    public float simulationStepSize = 0.1f;
+
+    
     float targetPitchAngle;
     float targetYawAngle;
     
@@ -136,16 +139,10 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         if(!isDeployed || GameManager.Instance.IsOnlineAndClient())
             return;
 
-        List<Transform> targets = FindEnemies();
-        if (targets == null || targets.Count == 0 )
-            return;
-        target = Utils.ClosestTo(targets, transform.position);
-        
-        if(turretUpdateTimer.IsFinished)
-            AimTurret();
 
 
-        targetInRange = Vector3.Distance(target.position, transform.position) < maxRange;
+
+        AimTurret();
 
         
         if(ReadyToFire())
@@ -156,6 +153,11 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     {
         turretUpdateTimer.Reset(1/turretUpdateRate);
         turretUpdateTimer.Start();
+        
+        List<Transform> targets = FindEnemies();
+        if (targets == null || targets.Count == 0 )
+            return;
+        target = Utils.ClosestTo(targets, transform.position);
         
         Rigidbody targetRb = target.root.GetComponent<Rigidbody>();
 
@@ -170,8 +172,6 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
             turretMountSingleAxis.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
         
-        //mount.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
-        //mount.UpdateTurretAim(this, target.position,targetRb.velocity);
     }
     
     float EstimateInterceptTime(Vector3 targetPos, Vector3 targetVelocity)
@@ -181,7 +181,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         float time = 0f;
         const float tolerance = 0.01f;
-        const int maxIterations = 100;
+        int maxIterations = simulationSafetyLimit;
 
         for (int i = 0; i < maxIterations; i++)
         {
@@ -202,7 +202,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     {
         int curTeam = controller.curTeam;
 
-        List<DroneController> droneControllers = FindObjectsOfType<DroneController>().ToList();
+        List<DroneController> droneControllers = MachineInstanceManager.Instance.FetchAllDrones();
         List<Transform> validTargets = new List<Transform>();
 
         foreach (var droneController in droneControllers)
@@ -291,7 +291,12 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     {
         
         
-        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && targetInRange && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
+        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange() && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
+    }
+
+    protected bool TargetInRange()
+    {
+        return Vector3.Distance(target.position, transform.position) < maxRange;
     }
 
     bool IsAimedAtTarget()

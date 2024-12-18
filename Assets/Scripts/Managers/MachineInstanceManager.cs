@@ -7,13 +7,40 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
 
     ulong curID = 0;
     
-    Dictionary<ulong, GameObject> machines = new Dictionary<ulong, GameObject>();
+    Dictionary<ulong, MachineInstance> machines = new Dictionary<ulong, MachineInstance>();
 
-    public ulong Register(GameObject obj)
+    class MachineInstance
+    {
+        public DroneController controller;
+        public GameObject gameObject;
+
+        public MachineInstance(DroneController controller)
+        {
+            this.controller = controller;
+            this.gameObject = controller.gameObject;
+        }
+    }
+    
+    public ulong Register(DroneController obj)
     {
         curID++;
-        machines.Add(curID, obj);
+        machines.Add(curID, new MachineInstance(obj));
         return curID;
+    }
+
+    public List<DroneController> FetchAllDrones()
+    {
+        List<DroneController> drones = new List<DroneController>();
+        foreach (var machine in machines)
+        {
+            if(machine.Value != null)
+                drones.Add(machine.Value.controller);
+        }
+
+        if (drones.Count == 0)
+            Debug.Log("noDronesFound");
+
+        return drones;
     }
 
     public GameObject FetchGameObject(ulong id)
@@ -22,11 +49,16 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
         {
             return NetworkManager.Singleton.SpawnManager.SpawnedObjects[id].gameObject;
         }
-        
-        if (machines.TryGetValue(id, out GameObject fetch))
-            return fetch;
+
+        if (machines.ContainsKey(id))
+        {
+            return machines[id].gameObject;
+        }
         else
+        {
+            Debug.LogWarning("Couldnt find drone instance associated with " + id);
             return null;
+        }
     }
     
     public ulong FetchID(GameObject obj)
@@ -42,7 +74,7 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
         
         foreach (var pair in machines)
         {
-            if (pair.Value == obj)
+            if (pair.Value.gameObject == obj)
             {
                 return pair.Key; // Return the ID associated with the object
             }
@@ -50,4 +82,26 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
 
         return 0; // Return 0 if the object is not found
     }
+
+    public void DeregisterDrone(DroneController obj)
+    {
+        // If the network manager is running, return and do nothing
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            return;
+        }
+
+        // If the obj is present in the machine list dictionary, remove it
+        foreach (var pair in machines)
+        {
+            if (pair.Value.controller == obj)
+            {
+                machines.Remove(pair.Key);
+                break;
+            }
+        }
+    }
+
+    
+    
 }

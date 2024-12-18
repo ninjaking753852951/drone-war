@@ -6,10 +6,6 @@ public class MissileCore : TurretCoreController
     public float missileAcceleration = 1;
     public float missileExplosionRadiusMultiplier = 1;
     public float missileDamage = 1000;
-
-
-    public int simulationSafetyLimit = 500;
-    public float simulationStepSize = 0.1f;
     
 
     public override void Shoot()
@@ -52,15 +48,15 @@ public class MissileCore : TurretCoreController
         float time = 0f;
         float velocity = initialVelocity;
 
-        int safety = 500;
+        int safety = simulationSafetyLimit;
         
         while (distance > 0 && safety > 0)
         {
             safety--;
-            float deltaDistance = velocity * Time.fixedDeltaTime;
+            float deltaDistance = velocity * simulationStepSize;
             distance -= deltaDistance;
             velocity += missileAcceleration * simulationStepSize;
-            time += Time.fixedDeltaTime;
+            time += simulationStepSize;
         }
 
         return time;
@@ -74,7 +70,7 @@ public class MissileCore : TurretCoreController
     {
         float bestAngle = 0;
         float closestDistance = float.MaxValue;
-        float tolerance = 0.5f;
+        float tolerance = 1;
         Vector2 angleLimits = new Vector2(90, 0);
         int safety = simulationSafetyLimit;
 
@@ -113,7 +109,6 @@ public class MissileCore : TurretCoreController
         float yDist = 0;
         bool pastApex = false;
         
-
         Vector2 velocity =
             new Vector2(initialVelocity * Mathf.Cos(angle * Mathf.Deg2Rad), initialVelocity * Mathf.Sin(angle * Mathf.Deg2Rad));
 

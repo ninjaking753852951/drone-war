@@ -403,8 +403,6 @@ MonoBehaviour:
   recoilMultiplier: 1
   energyCost: 1
   damageMultiplier: 1
-  projectilePrefab: {fileID: 7256020650716156835, guid: 5058fb0daf3bd0940be6303acbc36653,
-    type: 3}
   target: {fileID: 0}
   shootVelocity: 15
   mainBarrel: {fileID: 0}
@@ -413,15 +411,15 @@ MonoBehaviour:
   yawMount: {fileID: 0}
   controller: {fileID: 0}
   rb: {fileID: 0}
-  turretUpdateRate: 5
+  turretUpdateRate: 2.5
   targetTypes: 00000000
   aimTolerance: 180
   projectileType: 2
+  simulationSafetyLimit: 100
+  simulationStepSize: 0.4
   missileAcceleration: 10
   missileExplosionRadiusMultiplier: 1
   missileDamage: 5000
-  simulationSafetyLimit: 500
-  simulationStepSize: 0.2
 --- !u!1 &1337651016156115548
 GameObject:
   m_ObjectHideFlags: 0

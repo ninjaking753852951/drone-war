@@ -135,5 +135,4 @@ public class DroneBlock : MonoBehaviour
         if(controller!= null)
             controller.TakeDamage(damage);
     }
-
 }

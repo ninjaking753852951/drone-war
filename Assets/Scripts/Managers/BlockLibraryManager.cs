@@ -16,6 +16,38 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
     public List<BlockData> blocks;
 
     public BlockData coreBlock;
+
+    public BlockAdoptionRules blockRules;
+    
+    [System.Serializable]
+    public class BlockAdoptionRules
+    {
+        [Header("Block Adoption Matrix")]
+        public List<EnumMatrix> combinations = new List<EnumMatrix>();
+
+        // Method to check if a combination is true
+        public bool IsCombinationTrue(BlockType first, BlockType second)
+        {
+            foreach (var combo in combinations)
+            {
+                if ((combo.parentBlock == first && combo.childBlock == second))// Symmetrical
+                {
+                    return combo.canPlace;
+                }
+            }
+
+            // Default to false if not specified
+            return false;
+        }
+        
+        [System.Serializable]
+        public class EnumMatrix
+        {
+            public BlockType parentBlock;
+            public BlockType childBlock;
+            public bool canPlace;
+        }
+    }
     
     new void Awake()
     {
@@ -62,7 +94,7 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
         return null;
     }
 
-    public List<BlockData> PlaceablesInCategory(BuildingManagerUI.PlaceableCategories targetCategory)
+    public List<BlockData> PlaceablesInCategory(BlockType targetCategory)
     {
         List<BlockData> targetPlaceables = new List<BlockData>();
 

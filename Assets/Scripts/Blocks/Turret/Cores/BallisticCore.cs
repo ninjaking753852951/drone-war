@@ -3,8 +3,6 @@ using UnityUtils;
 public class BallisticCore : TurretCoreController
 {
     
-    public int simulationSafetyLimit = 500;
-    public float simulationStepSize = 0.1f;
 
     public float deviance = 1;
 
@@ -60,15 +58,15 @@ public class BallisticCore : TurretCoreController
         float time = 0f;
         float velocity = initialVelocity;
 
-        int safety = 500;
+        int safety = simulationSafetyLimit;
         
         while (distance > 0 && safety > 0)
         {
             safety--;
-            float deltaDistance = velocity * Time.fixedDeltaTime;
+            float deltaDistance = velocity * simulationStepSize;
             distance -= deltaDistance;
-            velocity *= (1 - drag * Time.fixedDeltaTime);
-            time += Time.fixedDeltaTime;
+            velocity *= (1 - drag * simulationStepSize);
+            time += simulationStepSize;
         }
 
         return time;

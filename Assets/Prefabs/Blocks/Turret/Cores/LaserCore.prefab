@@ -233,12 +233,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72762cffa73445de8448002aa9c1f1c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.5
+  fireRate: 1
   recoilMultiplier: 1
   energyCost: 2.5
   damageMultiplier: 1
-  projectilePrefab: {fileID: 2508981756439933117, guid: 8564b73c06d572f4ca4452c40a0bceb9,
-    type: 3}
   target: {fileID: 0}
   shootVelocity: 999
   mainBarrel: {fileID: 0}
@@ -247,10 +245,12 @@ MonoBehaviour:
   yawMount: {fileID: 0}
   controller: {fileID: 0}
   rb: {fileID: 0}
-  turretUpdateRate: 60
+  turretUpdateRate: 30
   targetTypes: 0000000001000000
   aimTolerance: 1
   projectileType: 1
+  simulationSafetyLimit: 500
+  simulationStepSize: 0.1
   laserLifetime: 0.5
   laserDamage: 2500
   laserRange: 30

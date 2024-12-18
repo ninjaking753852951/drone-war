@@ -1,0 +1,1 @@
+public enum BlockType {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power, Structure}

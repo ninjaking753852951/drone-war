@@ -21,10 +21,9 @@ public class BuildingManagerUI : MonoBehaviour
     public Transform placeableParent;
 
     public TextMeshProUGUI machineCost;
-    
-    public enum PlaceableCategories {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power, Structure}
-    PlaceableCategories[] placeableCategories = { PlaceableCategories.Basic, PlaceableCategories.Structure, PlaceableCategories.Power,PlaceableCategories.TurretMounts,
-        PlaceableCategories.TurretBarrels, PlaceableCategories.TurretCores, PlaceableCategories.SubAssemblies, PlaceableCategories.TurretModules };
+
+    BlockType[] placeableCategories = { BlockType.Basic, BlockType.Structure, BlockType.Power,BlockType.TurretMounts,
+        BlockType.TurretBarrels, BlockType.TurretCores, BlockType.SubAssemblies, BlockType.TurretModules };
     
     void Awake()
     {
@@ -64,7 +63,7 @@ public class BuildingManagerUI : MonoBehaviour
         menuGameObject.SetActive(active);
     }
 
-    public void ShowCategory(PlaceableCategories categoryIndex)
+    public void ShowCategory(BlockType categoryIndex)
     {
         Utils.DestroyAllChildren(placeableParent);
         

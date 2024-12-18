@@ -233,12 +233,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f71238f724b44535bf8a06ab0a861580, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 2
+  fireRate: 1
   recoilMultiplier: 35
   energyCost: 0.25
   damageMultiplier: 1
-  projectilePrefab: {fileID: 7256020650716156835, guid: 9985a4eb551ecb34ba1ee4ff270feb04,
-    type: 3}
   target: {fileID: 0}
   shootVelocity: 60
   mainBarrel: {fileID: 0}

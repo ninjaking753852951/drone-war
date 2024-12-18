@@ -15,18 +15,28 @@ public class CircleOutlineGenerator : MonoBehaviour
     [SerializeField]
     private float moveSpeed = 1f;
 
+    public float speedMultiplier = 1;
+
     private List<Vector2> outlinePoints = new List<Vector2>();
     private List<GameObject> lineObjects = new List<GameObject>();
     private List<float> segmentProgress = new List<float>();
 
+    public SphereCollider mainWheel;
+    
+    public List<SphereCollider> wheels;
+
+    public TankTrack tankTrack;
+
     void Start()
     {
-        circles = new List<(Vector2, float)>
+
+
+        foreach (var wheel in wheels)
         {
-            (new Vector2(0, 0), 3),
-            (new Vector2(5, 5), 2),
-            (new Vector2(-4, 2), 1.5f)
-        };
+            Vector2 wheelPos = new Vector2(wheel.transform.position.x, wheel.transform.position.z);
+            float radius = wheel.radius * 2;
+            circles.Add((wheelPos, radius));
+        }
 
         GenerateUniformOutline(circles);
         SpawnOutlineSegments();
@@ -156,7 +166,7 @@ public class CircleOutlineGenerator : MonoBehaviour
     {
         for (int i = 0; i < lineObjects.Count; i++)
         {
-            segmentProgress[i] += Time.deltaTime * (moveSpeed * 100) / (outlinePoints.Count - 1);
+            segmentProgress[i] += Time.deltaTime * (tankTrack.linearSpeed * 100 * speedMultiplier) / (outlinePoints.Count - 1);
 
             if (segmentProgress[i] > 1f)
             {
