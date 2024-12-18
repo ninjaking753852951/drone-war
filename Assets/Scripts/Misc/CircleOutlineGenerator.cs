@@ -44,7 +44,7 @@ public class CircleOutlineGenerator : MonoBehaviour
 
     void Update()
     {
-        UpdateSegmentPositionsAndRotations();
+        //UpdateSegmentPositionsAndRotations();
     }
 
     private void GenerateUniformOutline(List<(Vector2 center, float radius)> circles)
@@ -147,16 +147,14 @@ public class CircleOutlineGenerator : MonoBehaviour
 
     private void SpawnLineSegment(Vector2 start, Vector2 end)
     {
-        Vector3 startPos = new Vector3(start.x, 0, start.y);
-        Vector3 endPos = new Vector3(end.x, 0, end.y);
+        Vector3 startPos = new Vector3(0, start.x, start.y);
+        Vector3 endPos = new Vector3(0, end.x, end.y);
         Vector3 midPoint = (startPos + endPos) / 2;
-        Vector3 direction = (endPos - startPos).normalized;
+        Vector3 direction = (endPos - startPos);
 
-        float length = Vector3.Distance(startPos, endPos);
         Quaternion rotation = Quaternion.LookRotation(direction);
 
         GameObject line = Instantiate(linePrefab, midPoint, rotation);
-        //line.transform.localScale = new Vector3(lineWidth, lineWidth, length);
 
         lineObjects.Add(line);
         segmentProgress.Add(0f);
@@ -166,7 +164,7 @@ public class CircleOutlineGenerator : MonoBehaviour
     {
         for (int i = 0; i < lineObjects.Count; i++)
         {
-            segmentProgress[i] += Time.deltaTime * (tankTrack.linearSpeed * 100 * speedMultiplier) / (outlinePoints.Count - 1);
+            segmentProgress[i] += Time.deltaTime * (tankTrack.linearSpeed * 100 * speedMultiplier) / outlinePoints.Count;
 
             if (segmentProgress[i] > 1f)
             {
@@ -198,4 +196,5 @@ public class CircleOutlineGenerator : MonoBehaviour
             lineObjects[i].transform.rotation = rotation;
         }
     }
+
 }

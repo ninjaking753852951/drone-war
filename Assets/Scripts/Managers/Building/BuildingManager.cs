@@ -6,6 +6,7 @@ using Interfaces;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityUtils;
 
 public class BuildingManager : Singleton<BuildingManager>
@@ -28,6 +29,9 @@ public class BuildingManager : Singleton<BuildingManager>
     public float totalCost;
     IPlaceable curPlaceable;
 
+    public TankTrackBuilder tankTrack;
+
+    public StepPlacementManager stepPlacementManager = new StepPlacementManager();
     bool isOnCompatibleBlock;
     
     void Start()
@@ -76,6 +80,8 @@ public class BuildingManager : Singleton<BuildingManager>
             allPlaceables.Add(subAssembly);
         }
 
+        //allPlaceables.Add(tankTrack);
+        
         return allPlaceables;
     }
     
@@ -112,7 +118,21 @@ public class BuildingManager : Singleton<BuildingManager>
         //Place the block
         if (Input.GetButtonDown("Fire1") && buildingBlockIndicator.activeSelf && isOnCompatibleBlock)
         {
-            curPlaceable.Spawn(buildingBlockIndicator.transform.position, buildingBlockIndicator.transform.rotation);
+            Vector3 placePosition = buildingBlockIndicator.transform.position;
+            
+            if (curPlaceable is IStepPlaceable stepPlaceable)
+            {
+                if (!stepPlacementManager.IsActive)
+                {
+                    stepPlacementManager.StartPlacement(stepPlaceable);
+                }
+                stepPlacementManager.ProcessStep(placePosition);
+            }
+            else
+            {
+                curPlaceable.Spawn(placePosition, buildingBlockIndicator.transform.rotation);
+                totalCost = TotalCost();
+            }
             totalCost = TotalCost();
         }
 
@@ -120,7 +140,8 @@ public class BuildingManager : Singleton<BuildingManager>
         bool hasHitDroneBlock = false;
         if (Physics.Raycast(ray, out hit))
         {
-            DroneBlock hitDroneBlock = hit.collider.GetComponent<DroneBlock>();
+            DroneBlock hitDroneBlock = hit.collider.GetComponentInParent<DroneBlock>();
+            //DroneBlock hitDroneBlock = hit.collider.GetComponent<DroneBlock>();
             hasHitDroneBlock = hitDroneBlock != null;
             
             if (hasHitDroneBlock)
@@ -159,7 +180,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
         Vector3 placePoint = hitPoint + hit.normal * 0.5f;
 
-        BlockType parentBlock = hitBlock.blockIdentity.category;
+        BlockType parentBlock = hitBlock.blockIdentity.Category();
         BlockType childBlock = curPlaceable.Category();
 
         isOnCompatibleBlock = BlockLibraryManager.Instance.blockRules.IsCombinationTrue(parentBlock, childBlock);
@@ -234,7 +255,16 @@ public class BuildingManager : Singleton<BuildingManager>
         if(buildingBlockIndicator != null)
             Destroy(buildingBlockIndicator);
 
-        buildingBlockIndicator = placeable.Spawn(Vector3.zero, quaternion.identity);
+        if (curPlaceable is IStepPlaceable stepPlaceable)
+        {
+            buildingBlockIndicator = stepPlaceable.SpawnMarker(Vector3.zero, quaternion.identity);
+        }
+        else
+        {
+            buildingBlockIndicator = placeable.Spawn(Vector3.zero, quaternion.identity);
+        }
+        
+
         
         List<Collider> indicatorColliders = buildingBlockIndicator.GetComponentsInChildren<Collider>().ToList();
         foreach (Collider indicatorCollider in indicatorColliders)

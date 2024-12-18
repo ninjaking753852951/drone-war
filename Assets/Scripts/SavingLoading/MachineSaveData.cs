@@ -1,4 +1,5 @@
     using System.Collections.Generic;
+    using Interfaces;
     using Unity.Netcode;
     using UnityEngine;
     [System.Serializable]
@@ -14,7 +15,7 @@
 
             foreach (MachineSaveLoadManager.BlockSaveData blockSaveData in blocks)
             {
-                BlockData blockData = BlockLibraryManager.Instance.BlockData(blockSaveData.blockID);
+                IPlaceable blockData = BlockLibraryManager.Instance.BlockData(blockSaveData.blockID);
                 if (blockData == null)
                     continue;
                 
@@ -24,6 +25,17 @@
 
                 GameObject newBlock = blockData.Spawn(position, rotation, network);
                 newBlock.transform.parent = parent;
+                
+                //Inject the saved meta data so that it can be pulled by whatever needs it
+
+                DroneBlock droneBlock = newBlock.GetComponent<DroneBlock>();
+
+
+                if (blockSaveData.meta != null && droneBlock != null)
+                {
+                    droneBlock.meta = blockSaveData.meta;     
+                }
+
                 
                 DroneController curDroneController = newBlock.GetComponent<DroneController>();
                 if (curDroneController != null)

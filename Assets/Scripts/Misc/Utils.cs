@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 public static class Utils
 {
-    public static Rigidbody FindParentRigidbody(Transform startTransform, Rigidbody avoid)
+    public static Rigidbody FindParentRigidbody(Transform startTransform, Rigidbody avoid = null)
     {
         Transform currentTransform = startTransform;
 
@@ -21,6 +21,28 @@ public static class Utils
         return null; // No Rigidbody found in the hierarchy
     }
 
+    public static SphereCollider FindSphereColliderAtPosition(Vector3 position, float radius = 0.1f, LayerMask layerMask = default)
+    {
+        // Default to everything if no layer mask is provided
+        if (layerMask == default)
+        {
+            layerMask = ~0; // Equivalent to "Everything"
+        }
+
+        // Get all colliders in the sphere
+        Collider[] colliders = Physics.OverlapSphere(position, radius, layerMask);
+
+        foreach (Collider collider in colliders)
+        {
+            SphereCollider sphere = collider.GetComponent<SphereCollider>();
+            if (sphere != null && Vector3.Distance(sphere.bounds.center, position) < radius)
+            {
+                return sphere;
+            }
+        }
+
+        return null; // No SphereCollider found
+    }
 
     public static Transform ClosestTo(List<Transform> transforms, Vector3 target)
     {

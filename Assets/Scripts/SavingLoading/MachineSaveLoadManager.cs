@@ -26,11 +26,14 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         public Vector3 eulerRot;
         public int blockID;
 
-        public BlockSaveData(Vector3 pos, Vector3 eulerRot, int blockID)
+        public BlockSaveMetaData meta;
+
+        public BlockSaveData(Vector3 pos, Vector3 eulerRot, int blockID, BlockSaveMetaData meta = null)
         {
             this.pos = pos;
             this.eulerRot = eulerRot;
             this.blockID = blockID;
+            this.meta = meta;
         }
     }
     
@@ -73,7 +76,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         
             foreach (MachineSaveLoadManager.BlockSaveData blockSaveData in blocks)
             {
-                BlockData blockData = BlockLibraryManager.Instance.blocks[blockSaveData.blockID];
+                IPlaceable blockData = BlockLibraryManager.Instance.blocks[blockSaveData.blockID];
                 if (blockData != null)
                 {
                     GameObject blockClone = blockData.Spawn(blockSaveData.pos, Quaternion.Euler(blockSaveData.eulerRot));
@@ -105,10 +108,13 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
         foreach (DroneBlock droneBlock in machineBlocks)
         {
+
+            
             BlockSaveData blockSaveData = new BlockSaveData(
                 droneBlock.transform.position,
                 droneBlock.transform.rotation.eulerAngles,
-                BlockLibraryManager.Instance.blocks.IndexOf(droneBlock.blockIdentity)
+                BlockLibraryManager.Instance.blocks.IndexOf(droneBlock.blockIdentity),
+                droneBlock.meta
             );
             saveData.blocks.Add(blockSaveData);
         }

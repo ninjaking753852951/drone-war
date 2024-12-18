@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Interfaces;
 using UnityEngine;
 using UnityUtils;
 
@@ -12,10 +13,14 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
 
     public List<BlockLibraryScriptableObject> libraries;
     
-    public List<BlockData> placeableBlocks;
-    public List<BlockData> blocks;
+    public List<IPlaceable> placeableBlocks;
+    public List<IPlaceable> blocks;
 
+    
+    
     public BlockData coreBlock;
+
+    public TankTrackBuilder tankTrack;
 
     public BlockAdoptionRules blockRules;
     
@@ -57,20 +62,19 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
         blocks = CompileLibraries();
         
         // maybe convert blockdata (from the library) to a factory so that block datas can be edited at runtime for thumbnails
-        placeableBlocks = new List<BlockData>();
+        placeableBlocks = new List<IPlaceable>();
 
-        foreach (BlockData block in blocks)
+        foreach (IPlaceable block in blocks)
         {
-            if(!block.isCore)
-                placeableBlocks.Add(block);
+            placeableBlocks.Add(block);
         }
 
         coreBlock = CoreBlock();
     }
 
-    List<BlockData> CompileLibraries()
+    List<IPlaceable> CompileLibraries()
     {
-        List<BlockData> blocks = new List<BlockData>();
+        List<IPlaceable> blocks = new List<IPlaceable>();
         
         foreach (BlockLibraryScriptableObject library in libraries)
         {
@@ -79,6 +83,11 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
                 blocks.Add(block);
             }
         }
+        
+        blocks.Add(tankTrack);
+        
+        Debug.Log(blocks.Count);
+        
         return blocks;
     }
     
@@ -94,13 +103,13 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
         return null;
     }
 
-    public List<BlockData> PlaceablesInCategory(BlockType targetCategory)
+    public List<IPlaceable> PlaceablesInCategory(BlockType targetCategory)
     {
-        List<BlockData> targetPlaceables = new List<BlockData>();
+        List<IPlaceable> targetPlaceables = new List<IPlaceable>();
 
         foreach (var placeable in placeableBlocks)
         {
-            if (placeable.category == targetCategory)
+            if (placeable.Category() == targetCategory)
             {
                 targetPlaceables.Add(placeable);
             }
@@ -109,7 +118,7 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
         return targetPlaceables;
     }
 
-    public BlockData BlockData(int id)
+    public IPlaceable BlockData(int id)
     {
         if (id < Instance.blocks.Count && id >= 0)
         {

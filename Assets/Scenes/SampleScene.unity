@@ -2144,6 +2144,13 @@ MonoBehaviour:
   buildingBlockIndicator: {fileID: 0}
   spawnPoint: {x: 0, y: 1.5, z: 0}
   totalCost: 0
+  tankTrack:
+    tankTrackPrefab: {fileID: 7015720582745033744, guid: e81fe0805e1114045a00b32c0bb44136,
+      type: 3}
+    marker: {fileID: 3459020136245715050, guid: 449b0126176104e4abe43b6941404675,
+      type: 3}
+  stepPlacementManager:
+    currentStepIndex: 0
 --- !u!4 &1446311337
 Transform:
   m_ObjectHideFlags: 0
@@ -2410,12 +2417,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   libraries:
   - {fileID: 11400000, guid: 3ab57d19e4a13a946922fde660304b24, type: 2}
-  placeableBlocks: []
-  blocks: []
   coreBlock:
     isCore: 0
     prefab: {fileID: 0}
     category: 0
+  tankTrack:
+    tankTrackPrefab: {fileID: 7015720582745033744, guid: e81fe0805e1114045a00b32c0bb44136,
+      type: 3}
+    marker: {fileID: 3459020136245715050, guid: 449b0126176104e4abe43b6941404675,
+      type: 3}
   blockRules:
     combinations:
     - parentBlock: 0

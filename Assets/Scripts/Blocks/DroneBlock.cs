@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,12 +21,14 @@ public class DroneBlock : MonoBehaviour
     public UnityEvent postAdoptionInit;
 
     [HideInInspector]
-    public BlockData blockIdentity;
+    public IPlaceable blockIdentity;
 
     [HideInInspector]
     public DroneController controller;
 
     public bool canOnlyAdoptTurretModules = false;
+
+    public BlockSaveMetaData meta;
     
     void Awake()
     {
