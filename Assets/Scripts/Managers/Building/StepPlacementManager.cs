@@ -3,7 +3,7 @@ using UnityEngine;
 [System.Serializable]
 public class StepPlacementManager
 {
-    IStepPlaceable currentStepPlaceable;
+    /*IStepPlaceable currentStepPlaceable;
     public int currentStepIndex;
 
     public bool IsActive => currentStepPlaceable != null;
@@ -19,7 +19,7 @@ public class StepPlacementManager
         if (currentStepPlaceable == null)
             return;
 
-        currentStepPlaceable.OnStepCompleted(currentStepIndex, position);
+        currentStepPlaceable.OnStepCompleted(position);
         currentStepIndex++;
 
         if (currentStepPlaceable.IsPlacementComplete)
@@ -33,5 +33,5 @@ public class StepPlacementManager
         currentStepPlaceable.FinalizePlacement();
         currentStepPlaceable = null;
         currentStepIndex = 0;
-    }
+    }*/
 }

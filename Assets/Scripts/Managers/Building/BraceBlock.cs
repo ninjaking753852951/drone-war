@@ -9,7 +9,12 @@ public class BraceBlock : IPlaceable, IStepPlaceable
     private bool isComplete = false;
 
     public GameObject brace;
-    
+
+    public void OnStepCompleted(Vector3 position)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public bool IsPlacementComplete => isComplete;
 
     public void OnStepCompleted(int stepIndex, Vector3 position)

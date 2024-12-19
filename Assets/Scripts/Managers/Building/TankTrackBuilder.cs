@@ -15,15 +15,17 @@ public class TankTrackBuilder : IPlaceable, IStepPlaceable
 
     public GameObject marker;
 
+
+
     public bool IsPlacementComplete => isComplete;
 
-    public void OnStepCompleted(int stepIndex, Vector3 position)
+    public void OnStepCompleted(Vector3 position)
     {
-        Debug.Log("step " + stepIndex);
-
+        
         if (points.Contains(position))
         {
             isComplete = true;
+            FinalizePlacement();
             return;
         }
 
@@ -32,9 +34,7 @@ public class TankTrackBuilder : IPlaceable, IStepPlaceable
 
     public GameObject FinalizePlacement()
     {
-
-
-
+        
         GameObject tankTrackClone = GameObject.Instantiate(this.tankTrackPrefab, BuildingManager.Instance.spawnPoint,
             Quaternion.identity);
         //brace.transform.localScale = new Vector3(0.1f, 0.1f, distance);

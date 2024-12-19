@@ -31,7 +31,7 @@ public class BuildingManager : Singleton<BuildingManager>
 
     public TankTrackBuilder tankTrack;
 
-    public StepPlacementManager stepPlacementManager = new StepPlacementManager();
+    //public StepPlacementManager stepPlacementManager = new StepPlacementManager();
     bool isOnCompatibleBlock;
     
     void Start()
@@ -122,11 +122,7 @@ public class BuildingManager : Singleton<BuildingManager>
             
             if (curPlaceable is IStepPlaceable stepPlaceable)
             {
-                if (!stepPlacementManager.IsActive)
-                {
-                    stepPlacementManager.StartPlacement(stepPlaceable);
-                }
-                stepPlacementManager.ProcessStep(placePosition);
+                stepPlaceable.OnStepCompleted(placePosition);
             }
             else
             {
