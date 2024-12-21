@@ -146,14 +146,23 @@ public static class Utils
         }
     }
     
-    /*public static void DestroyAllDrones()
+    public static bool IsCursorOutsideCameraFrustum(Camera camera = null)
     {
-        List<DroneBlock> machineBlocks = GameObject.FindObjectsByType<DroneBlock>(FindObjectsSortMode.None).ToList();
-        foreach (DroneBlock machineBlock in machineBlocks)
+        if (!Application.isFocused)
+            return true;
+
+        camera ??= Camera.main;
+
+        if (camera == null)
         {
-            GameObject.Destroy(machineBlock.gameObject);
+            Debug.LogError("No camera provided and Camera.main is null.");
+            return true;
         }
-    }*/
+
+        Vector3 mouseViewportPos = camera.ScreenToViewportPoint(Input.mousePosition);
+
+        return mouseViewportPos.x < 0 || mouseViewportPos.x > 1 || mouseViewportPos.y < 0 || mouseViewportPos.y > 1;
+    }
     
     public static List<DroneController> DronesFromTeam(List<DroneController> drones, int teamID)
     {

@@ -79,7 +79,7 @@ GameObject:
   - component: {fileID: 2271621746088097780}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Untagged
+  m_TagString: IgnoreMaterialOverride
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -388,12 +388,10 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
-  blockIdentity:
-    isCore: 0
-    prefab: {fileID: 0}
-    category: 0
   controller: {fileID: 0}
   canOnlyAdoptTurretModules: 0
+  meta:
+    specialPositions: []
 --- !u!65 &4390955685373644255
 BoxCollider:
   m_ObjectHideFlags: 0

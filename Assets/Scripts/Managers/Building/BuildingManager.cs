@@ -101,9 +101,11 @@ public class BuildingManager : Singleton<BuildingManager>
     
     void BuildUpdate()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
+        Camera cam = Camera.main;
+        
+        if(cam == null || Utils.IsCursorOutsideCameraFrustum(cam))
+            return;
+        
         // Rotate the block
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -128,6 +130,8 @@ public class BuildingManager : Singleton<BuildingManager>
         }
 
 
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
         bool hasHitDroneBlock = false;
         if (Physics.Raycast(ray, out hit))
         {
