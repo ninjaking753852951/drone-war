@@ -20,7 +20,7 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
     
     public BlockData coreBlock;
 
-    public TankTrackBuilder tankTrack;
+    public List<TankTrackBuilder> tankTracks = new List<TankTrackBuilder>();
 
     public BlockAdoptionRules blockRules;
     
@@ -66,6 +66,8 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
 
         foreach (IPlaceable block in blocks)
         {
+            if(block.Category() == BlockType.Core)
+                continue;
             placeableBlocks.Add(block);
         }
 
@@ -83,10 +85,12 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
                 blocks.Add(block);
             }
         }
+
+        foreach (var tankTrack in tankTracks)
+        {
+            blocks.Add(tankTrack);
+        }
         
-        blocks.Add(tankTrack);
-        
-        Debug.Log(blocks.Count);
         
         return blocks;
     }
@@ -95,7 +99,7 @@ public class BlockLibraryManager : Singleton<BlockLibraryManager>
     {
         foreach (BlockData block in blocks)
         {
-            if(block.isCore)
+            if(block.Category() == BlockType.Core)
                 return block;
         }
 

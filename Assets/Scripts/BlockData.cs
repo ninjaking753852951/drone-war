@@ -3,7 +3,6 @@ using UnityEngine;
 [System.Serializable]
 public class BlockData : IPlaceable
 {
-    public bool isCore;
     public GameObject prefab;
     public BlockType category;
 

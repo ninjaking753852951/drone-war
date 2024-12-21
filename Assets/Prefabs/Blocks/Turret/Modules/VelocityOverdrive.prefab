@@ -480,11 +480,10 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
-  blockIdentity:
-    isCore: 0
-    prefab: {fileID: 0}
-    category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
+  meta:
+    specialPositions: []
 --- !u!65 &125682899572221569
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -521,7 +520,7 @@ MonoBehaviour:
   velocityMultiplier: 1.2
   fireRateMultiplier: 1
   recoilMultiplier: 1
-  energyCostMultiplier: 1.25
+  energyCostMultiplier: 1.5
   damageMultiplier: 1.25
 --- !u!1 &7342806459623457846
 GameObject:

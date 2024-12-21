@@ -29,9 +29,6 @@ public class BuildingManager : Singleton<BuildingManager>
     public float totalCost;
     IPlaceable curPlaceable;
 
-    public TankTrackBuilder tankTrack;
-
-    //public StepPlacementManager stepPlacementManager = new StepPlacementManager();
     bool isOnCompatibleBlock;
     
     void Start()
@@ -79,8 +76,6 @@ public class BuildingManager : Singleton<BuildingManager>
                 continue;
             allPlaceables.Add(subAssembly);
         }
-
-        //allPlaceables.Add(tankTrack);
         
         return allPlaceables;
     }
@@ -240,7 +235,8 @@ public class BuildingManager : Singleton<BuildingManager>
         List<Renderer> rends = buildingBlockIndicator.GetComponentsInChildren<Renderer>().ToList();
         foreach (Renderer rend in rends)
         {
-            rend.material = mat;
+            if(!rend.transform.CompareTag("IgnoreMaterialOverride"))
+                rend.material = mat;
         }
     }
 

@@ -19,7 +19,7 @@ public class TurretModule : MonoBehaviour
 
         hasDeployed = true;
         
-        controller.shootVelocity *= velocityMultiplier;
+        controller.shootVelocityMultiplier *= velocityMultiplier;
         controller.fireRate *= fireRateMultiplier;
         controller.recoilMultiplier *= recoilMultiplier;
         controller.energyCost *= energyCostMultiplier;

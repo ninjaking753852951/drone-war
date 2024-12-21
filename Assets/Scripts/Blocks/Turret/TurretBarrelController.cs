@@ -7,10 +7,7 @@ public class TurretBarrelController : MonoBehaviour
 {
 
     public Transform shootPoint;
-
-    public float velocityMultiplier = 1;
-    public float fireRateMultiplier = 1;
-    public float recoilMultiplier = 1;
+    
     [HideInInspector]
     public float barrelLength;
 
@@ -23,9 +20,6 @@ public class TurretBarrelController : MonoBehaviour
 
     public void Deploy(TurretCoreController controller)
     {
-        controller.shootVelocity *= velocityMultiplier;
-        controller.fireRate *= fireRateMultiplier;
-        controller.recoilMultiplier *= recoilMultiplier;
         barrelLength = Vector3.Distance(controller.transform.position, shootPoint.position);
     }
 

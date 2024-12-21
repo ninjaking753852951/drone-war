@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 8195791674565725172}
   m_Layer: 0
   m_Name: Cube (2)
-  m_TagString: Untagged
+  m_TagString: IgnoreMaterialOverride
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 9515655723743161}
   m_Layer: 0
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: IgnoreMaterialOverride
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 521058174
+  GlobalObjectIdHash: 612666028
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -384,11 +384,10 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
-  blockIdentity:
-    isCore: 0
-    prefab: {fileID: 0}
-    category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
+  meta:
+    specialPositions: []
 --- !u!54 &2905760135991923378
 Rigidbody:
   m_ObjectHideFlags: 0

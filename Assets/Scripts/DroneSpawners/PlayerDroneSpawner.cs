@@ -1,13 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-
 public class PlayerDroneSpawner : DroneSpawner
 {
+      
     
     List<MachineSpawnButton> machineSpawnButtons = new List<MachineSpawnButton>();
 
@@ -28,12 +27,17 @@ public class PlayerDroneSpawner : DroneSpawner
             obj = Instantiate(spawner.spawnMachineButtonPrefab, spawner.spawnMachineUIParent);
             
             this.slot = slot;
-            
-            if(machineData != null)
+
+            string cost = "N/A";
+
+            if (machineData != null)
+            {
+                cost = "$" + machineData.totalCost;
                 obj.transform.FindChildWithTag("UIIcon").GetComponent<Image>().sprite = machineData.GenerateThumbnail();
+                obj.GetComponentInChildren<Button>().onClick.AddListener(call);
+            }
             
-            obj.GetComponentInChildren<TextMeshProUGUI>().text = slot+".";
-            obj.GetComponentInChildren<Button>().onClick.AddListener(call);
+            obj.GetComponentInChildren<TextMeshProUGUI>().text =cost;
 
             //Update(saveLoadUI);
         }
@@ -44,11 +48,22 @@ public class PlayerDroneSpawner : DroneSpawner
         }
     }
     
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+    
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-        
+
+        //Init(0, playerID.Value);
+    }
+
+
+    public void Init()
+    {
         battleMenu.SetActive(GameManager.Instance.currentGameMode == GameMode.Battle);
         
         CameraController.Instance.TeleportCamera(transform.position, transform.rotation.eulerAngles);
@@ -77,17 +92,22 @@ public class PlayerDroneSpawner : DroneSpawner
 
     void SpawnMachineCommand(int slot)
     {
+        MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);
+        
+        if(!teamData.CanAfford(machineData.totalCost))
+            MessageDisplay.Instance.DisplayMessage("INSUFFICIENT FUNDS!");
+        
         CommandManager commandManager = FindObjectOfType<CommandManager>();
         if (commandManager != null)
         {
             if (GameManager.Instance.IsOnlineAndClient())
             {
-                Debug.Log("SENDING COMMAND NET");
+                //Debug.Log("SENDING COMMAND NET");
                 commandManager.AddCommandRPC(new CommandManager.Command(NetworkManager.Singleton.LocalClientId,slot).GenerateData());
             }
             else
             {
-                Debug.Log("SENDING COMMAND LOCAL");
+                //Debug.Log("SENDING COMMAND LOCAL");
                 commandManager.AddCommand(new CommandManager.Command((ulong)0, slot));
             }
         }
@@ -96,7 +116,6 @@ public class PlayerDroneSpawner : DroneSpawner
     void UpdateUI()
     {
         if(MatchManager.Instance.PlayerData() != null)
-            playerBudgetText.text = "$" + MatchManager.Instance.PlayerData().budget;
+            playerBudgetText.text = "$" + teamData.budget;
     }
-    
 }

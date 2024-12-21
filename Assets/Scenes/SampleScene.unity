@@ -2144,13 +2144,6 @@ MonoBehaviour:
   buildingBlockIndicator: {fileID: 0}
   spawnPoint: {x: 0, y: 1.5, z: 0}
   totalCost: 0
-  tankTrack:
-    tankTrackPrefab: {fileID: 7015720582745033744, guid: e81fe0805e1114045a00b32c0bb44136,
-      type: 3}
-    marker: {fileID: 3459020136245715050, guid: 449b0126176104e4abe43b6941404675,
-      type: 3}
-  stepPlacementManager:
-    currentStepIndex: 0
 --- !u!4 &1446311337
 Transform:
   m_ObjectHideFlags: 0
@@ -2418,14 +2411,9 @@ MonoBehaviour:
   libraries:
   - {fileID: 11400000, guid: 3ab57d19e4a13a946922fde660304b24, type: 2}
   coreBlock:
-    isCore: 0
     prefab: {fileID: 0}
     category: 0
-  tankTrack:
-    tankTrackPrefab: {fileID: 7015720582745033744, guid: e81fe0805e1114045a00b32c0bb44136,
-      type: 3}
-    marker: {fileID: 3459020136245715050, guid: 449b0126176104e4abe43b6941404675,
-      type: 3}
+  tankTracks: []
   blockRules:
     combinations:
     - parentBlock: 0
@@ -2466,7 +2454,7 @@ MonoBehaviour:
       canPlace: 1
     - parentBlock: 2
       childBlock: 2
-      canPlace: 1
+      canPlace: 0
     - parentBlock: 3
       childBlock: 2
       canPlace: 1
@@ -2502,6 +2490,24 @@ MonoBehaviour:
       canPlace: 1
     - parentBlock: 7
       childBlock: 3
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 3
+      childBlock: 4
       canPlace: 1
 --- !u!4 &1647236962
 Transform:
@@ -3342,6 +3348,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: MatchManager
       objectReference: {fileID: 0}
+    - target: {fileID: 3716164402260070428, guid: 568c6d3cbdd8cd84fa17dbe8587f3759,
+        type: 3}
+      propertyPath: playerSpawner
+      value: 
+      objectReference: {fileID: 1062115354071084172, guid: 67f05243c09423848ac035f9465e3b1d,
+        type: 3}
     - target: {fileID: 4910485871524663002, guid: 568c6d3cbdd8cd84fa17dbe8587f3759,
         type: 3}
       propertyPath: m_LocalPosition.x

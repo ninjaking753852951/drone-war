@@ -26,7 +26,7 @@ public class LaserBeam : Projectile
         
         Transform firstHit = DamageScan();
         
-        Vector3 endPoint = transform.position + transform.forward *turret.laserRange;
+        Vector3 endPoint = transform.position + transform.forward *turret.MaxRange();
         if (firstHit != null)
         {
             endPoint = firstHit.transform.position;
@@ -64,7 +64,7 @@ public class LaserBeam : Projectile
     Transform DamageScan()
     {
         
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, core.laserRange);
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, core.MaxRange());
         List<Transform> hitTransforms = new List<Transform>();
         
         foreach (var hit in hits)      

@@ -17,9 +17,10 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     public float recoilMultiplier = 1;
     public float energyCost;
     public float damageMultiplier = 1;
+    public float shootVelocityMultiplier = 1;
+    public float shootVelocity;
     
     public Transform target;
-    public float shootVelocity;
     [HideInInspector]
     public TurretBarrelController mainBarrel;
     List<TurretBarrelController> barrels;
@@ -98,10 +99,8 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
             if (turretMountSingleAxis.controlType == TurretMountSingleAxis.ControlType.Yaw)
                 yawMount = turretMountSingleAxis;
         }
-        
-        List<TurretModule> turretModules = GetComponentsInChildren<TurretModule>().ToList();
-        foreach (var turretModule in turretModules)
-            turretModule.Deploy(this);
+
+        DeployModules();
 
         barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
         foreach (var barrel in barrels)
@@ -119,6 +118,13 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         maxRange = MaxRange();
         rangeIndicator.SetRange(maxRange);
+    }
+
+    void DeployModules()
+    {
+        List<TurretModule> turretModules = GetComponentsInChildren<TurretModule>().ToList();
+        foreach (var turretModule in turretModules)
+            turretModule.Deploy(this);
     }
     
     void Awake()
@@ -139,11 +145,11 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         if(!isDeployed || GameManager.Instance.IsOnlineAndClient())
             return;
 
-
-
-
+        
         AimTurret();
-
+        
+        if(target == null)
+            return;
         
         if(ReadyToFire())
             Fire();
@@ -207,6 +213,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         foreach (var droneController in droneControllers)
         {
+            if(droneController == null)
+                continue;
+            
             if (droneController.transform.root != transform.root)
             {
                 if (droneController.curTeam != curTeam)
@@ -289,13 +298,14 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     protected virtual bool ReadyToFire()
     {
-        
-        
         return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange() && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
     }
 
     protected bool TargetInRange()
     {
+        if (target == null)
+            return false;
+        
         return Vector3.Distance(target.position, transform.position) < maxRange;
     }
 
@@ -328,9 +338,15 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     public void ProxyDeploy()
     {
+        DeployModules();
         maxRange = MaxRange();
         rangeIndicator.SetRange(maxRange);
     }
 
     public abstract float DamageCalculation();
+    
+    public float ShootVelocity()
+    {
+        return shootVelocity * shootVelocityMultiplier;
+    }
 }

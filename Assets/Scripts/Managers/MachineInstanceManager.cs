@@ -23,6 +23,7 @@ public class MachineInstanceManager : Singleton<MachineInstanceManager>
     
     public ulong Register(DroneController obj)
     {
+        Debug.Log("REGISTERING ");
         curID++;
         machines.Add(curID, new MachineInstance(obj));
         return curID;

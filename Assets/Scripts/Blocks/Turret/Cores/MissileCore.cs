@@ -20,7 +20,7 @@ public class MissileCore : TurretCoreController
         
         //rb.ResetInertiaTensor();
         rb.velocity = Vector3.zero;
-        rb.AddForce(projectileClone.transform.forward * shootVelocity, ForceMode.VelocityChange);
+        rb.AddForce(projectileClone.transform.forward * ShootVelocity(), ForceMode.VelocityChange);
 
         Missile projectile = projectileClone.GetComponent<Missile>();
         if (projectile != null)
@@ -32,14 +32,13 @@ public class MissileCore : TurretCoreController
     public override float MaxRange()
     {
         float maxDistAngle = 45;
-        return SimulateMissileArc(shootVelocity, maxDistAngle, missileAcceleration, 0);
+        return SimulateMissileArc(ShootVelocity(), maxDistAngle, missileAcceleration, 0);
     }
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
         float horizontalDistance = (targetPos - transform.position).With(y: 0).magnitude;
-        //targetPos.y -= shootHeightOffset;
         float launchAngle =
-            CalculateMissileLaunchAngle(shootVelocity, missileAcceleration, new Vector2(horizontalDistance, targetPos.y));
+            CalculateMissileLaunchAngle(ShootVelocity(), missileAcceleration, new Vector2(horizontalDistance, targetPos.y));
 
         return launchAngle;
     }

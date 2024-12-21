@@ -20,7 +20,7 @@ public class LaserCore : TurretCoreController
     }
     public override float MaxRange()
     {
-        return laserRange;
+        return laserRange * shootVelocityMultiplier;
     }
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {

@@ -23,12 +23,12 @@ public class BallisticCore : TurretCoreController
         float projectileMass = rb.mass;
         
         if(pitchMount != null)
-            pitchMount.rb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
+            pitchMount.rb.AddForceAtPosition(Vector3.up * projectileMass * ShootVelocity() * recoilMultiplier, mainBarrel.shootPoint.position);
         if(yawMount != null)
-            controller.rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * shootVelocity * recoilMultiplier * -1);
+            controller.rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * ShootVelocity() * recoilMultiplier * -1);
         
         rb.velocity = Vector3.zero;
-        rb.AddForce(projectileClone.transform.forward * shootVelocity + Random.insideUnitSphere * deviance, ForceMode.VelocityChange);
+        rb.AddForce(projectileClone.transform.forward * ShootVelocity() + Random.insideUnitSphere * deviance, ForceMode.VelocityChange);
 
         Instantiate(shootEffect, mainBarrel.shootPoint);
         
@@ -42,14 +42,14 @@ public class BallisticCore : TurretCoreController
     public override float MaxRange()
     {
         float maxDistAngle = 45;
-        return SimulateBallisticArcTargetY(shootVelocity, maxDistAngle, drag, 0);
+        return SimulateBallisticArcTargetY(ShootVelocity(), maxDistAngle, drag, 0);
     }
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
         float horizontalDistance = (targetPos - transform.position).With(y: 0).magnitude;
         //targetPos.y -= shootHeightOffset;
         float launchAngle =
-            CalculateBallisticLaunchAngle(shootVelocity, drag, new Vector2(horizontalDistance, targetPos.y));
+            CalculateBallisticLaunchAngle(ShootVelocity(), drag, new Vector2(horizontalDistance, targetPos.y));
 
         return launchAngle;
     }

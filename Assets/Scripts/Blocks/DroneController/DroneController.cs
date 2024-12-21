@@ -34,7 +34,7 @@ public class DroneController : MonoBehaviour, IProgressBar
     
     void Awake()
     {
-        instanceID = MachineInstanceManager.Instance.Register(this);
+
         rb = GetComponent<Rigidbody>();
         movementController.Initialize(rb, transform, this);
     }
@@ -99,6 +99,8 @@ public class DroneController : MonoBehaviour, IProgressBar
 
     public void Deploy()
     {
+        instanceID = MachineInstanceManager.Instance.Register(this);
+        
         GetComponent<DroneBlock>().Init();
         rb.isKinematic = false;
         rb.useGravity = true;

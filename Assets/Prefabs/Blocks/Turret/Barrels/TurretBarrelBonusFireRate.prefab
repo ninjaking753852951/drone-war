@@ -636,6 +636,7 @@ GameObject:
   - component: {fileID: 2546990371594382385}
   - component: {fileID: 1319933411505476146}
   - component: {fileID: 125682899572221569}
+  - component: {fileID: 3472368979470883875}
   m_Layer: 0
   m_Name: TurretBarrelBonusFireRate
   m_TagString: Untagged
@@ -723,11 +724,10 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
-  blockIdentity:
-    isCore: 0
-    prefab: {fileID: 0}
-    category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
+  meta:
+    specialPositions: []
 --- !u!65 &125682899572221569
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -749,6 +749,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 1, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3472368979470883875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5964089242917160205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c66976cb1c6e4c4095cd0ef0bcac7d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocityMultiplier: 1
+  fireRateMultiplier: 2
+  recoilMultiplier: 0.5
+  energyCostMultiplier: 1
+  damageMultiplier: 1
 --- !u!1 &6006172345735416925
 GameObject:
   m_ObjectHideFlags: 0

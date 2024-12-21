@@ -4,7 +4,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 public class NetworkDroneSpawnerHelper : NetworkHelperBase
 {
-        NetworkDroneSpawner spawner;
+        PlayerDroneSpawner spawner;
 
         public NetworkVariable<ulong> playerClientID;
         public NetworkVariable<Color> teamColour;
@@ -15,7 +15,7 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
                 playerClientID.Initialize(this);
                 teamColour.Initialize(this);
                 
-                spawner = GetComponent<NetworkDroneSpawner>();
+                spawner = GetComponent<PlayerDroneSpawner>();
         }
 
         void Start()
