@@ -173,7 +173,6 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
         if (!File.Exists(path))
         {
-            Debug.LogWarning("No save data found in SubAssembly slot ");
             return null;
         }
         

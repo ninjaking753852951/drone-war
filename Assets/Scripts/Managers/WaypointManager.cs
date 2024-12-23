@@ -15,66 +15,58 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
 
     List<Waypoint> waypoints = new List<Waypoint>();
 
-    public ISpreadPattern spreadPattern = new CircleSpreadPattern();
+    protected ISpreadPattern spreadPattern = new CircleSpreadPattern();
     
-    class Waypoint
+    public class Waypoint
     {
         public GameObject waypointMarker;
-        List<DroneController> followers;
+        DroneController follower;
         
-        public Waypoint(WaypointManager waypointManager, Vector3 pos, List<DroneController> followers)
-        {
-            waypointMarker = Instantiate(waypointManager.waypointPrefab, pos, quaternion.identity);
-            RegisterFollower(followers);
-        }
         public Waypoint(WaypointManager waypointManager, Vector3 pos, DroneController follower)
         {
             waypointMarker = Instantiate(waypointManager.waypointPrefab, pos, quaternion.identity);
             if(NetworkManager.Singleton.IsServer)
                 waypointMarker.GetComponent<NetworkObject>().Spawn();
             
-            RegisterFollower(follower);
+            RegisterFollower(follower, waypointManager);
         }
 
-        void RegisterFollower(DroneController follower)
+        void RegisterFollower(DroneController follower, WaypointManager waypointManager)
         {
-            followers ??= new List<DroneController>();
+            this.follower = follower;
+
+            //follower.onDroneDestroyed.AddListener(waypointManager.RemoveDroneFromWayPoints);
             
-            followers.Add(follower);
-            follower.SetDestination(waypointMarker.transform.position);
-        }
-
-        void RegisterFollower(List<DroneController> followers)
-        {
-            foreach (DroneController follower in followers)
-            {
-                RegisterFollower(follower);
-            }
+            follower.AddWaypoint(this);
         }
         
         public bool DeregisterFollower(DroneController follower)
         {
-            followers.Remove(follower);
-            
-            if(followers.Count == 0 && waypointMarker != null)
-                Destroy(waypointMarker);
-            
-            return followers.Count == 0;
+            if (this.follower == follower)
+            {
+                Dispose();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public bool DeregisterFollower(List<DroneController> followers)
+        public void Dispose()
         {
-            bool isEmpty = false;
-            for (int i = followers.Count - 1; i >= 0; i--)
+            if (NetworkManager.Singleton.IsServer)
             {
-                DroneController follower = followers[i];
-                isEmpty = isEmpty || DeregisterFollower(follower);
+                waypointMarker.GetComponent<NetworkObject>().Despawn();  
             }
-            return isEmpty;
+            else
+            {
+                Destroy(waypointMarker);
+            }
         }
     }
 
-    void Start()
+    protected virtual void Start()
     {
         GameManager.Instance.onEnterBuildMode.AddListener(ClearWaypoints);
     }
@@ -87,58 +79,29 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
         foreach (Waypoint waypoint in waypoints)
         {
             if(waypoint.waypointMarker != null)
-                Destroy(waypoint.waypointMarker);
+                waypoint.Dispose();
         }
         waypoints.Clear();
     }
 
-    /*protected void CreateSpreadWaypoints(Vector3 pos, List<DroneController> drones, float spreadMultiplier)
+
+    public void CreateAndSetWaypoint(Vector3 pos, DroneController controller)
     {
-        if(pos == Vector3.zero)
-            Debug.LogWarning("Waypoint created at null position (zero)");
-        
-        if(drones.Count == 0)
-            return;
-        
-        RemoveDronesFromWayPoints(drones);
-        float spread = FindBiggestRadius(drones) * 2;// ASSUMING WORST CASE SCENARIO THE TWO BIGGEST ARE NEXT TO EACHOTHER
-
-        List<Vector3> posOffsets = spreadPattern.GenerateSpread(drones.Count, spread * spreadMultiplier);
-
-        for (var i = 0; i < drones.Count; i++)
-        {
-            Waypoint waypoint = new Waypoint(this, pos + posOffsets[i], drones[i]);
-            waypoints.Add(waypoint);
-        }
-    }*/
-
-    public void CreateAndAssignToWaypoint(Vector3 pos, DroneController controller)
+        controller.ClearWaypoints();
+        waypoints.Add(new Waypoint(this, pos, controller));
+    }
+    
+    public void CreateAndQueueWaypoint(Vector3 pos, DroneController controller)
     {
-        RemoveDroneFromWayPoints(controller);
         waypoints.Add(new Waypoint(this, pos, controller));
     }
 
     protected float FindBiggestRadius(List<DroneController> drones)
     {
-        float biggestRadius = 0;
-        
-        foreach (var drone in drones)
-        {
-            biggestRadius = Mathf.Max(biggestRadius, drone.boundingSphereRadius);
-        }
-
-        return biggestRadius;
-    }
-
-    void RemoveDronesFromWayPoints(List<DroneController> dronesToRemove)
-    {
-        foreach (DroneController drone in dronesToRemove)
-        {
-            RemoveDroneFromWayPoints(drone);
-        }
+        return drones.Max(drone => drone.boundingSphereRadius);
     }
     
-    void RemoveDroneFromWayPoints(DroneController droneToRemove)
+    /*void RemoveDroneFromWayPoints(DroneController droneToRemove)
     {
         // Iterate backwards to allow safe removal of waypoints from the list
         for (int i = waypoints.Count - 1; i >= 0; i--)
@@ -150,8 +113,13 @@ public class WaypointManager : UnityUtils.Singleton<WaypointManager>
                 waypoints.RemoveAt(i);
             }
         }
-    }
+    }*/
 
+    public void DisposeWaypoint(Waypoint waypoint)
+    {
+        waypoint.Dispose();
+        waypoints.Remove(waypoint);
+    }
 }
 
 
@@ -176,6 +144,10 @@ public class CircleSpreadPattern : ISpreadPattern
             return positions;
         }
 
+        // Calculate the radius of the circle so that the distance between points equals `spread`
+        float circumference = spread * points * 2;
+        float radius = circumference / (2 * Mathf.PI);
+
         // Calculate angle between points
         float angleStep = 360f / points;
 
@@ -183,8 +155,8 @@ public class CircleSpreadPattern : ISpreadPattern
         {
             // Calculate the position of each point
             float angleInRadians = Mathf.Deg2Rad * angleStep * i;
-            float x = Mathf.Cos(angleInRadians) * spread;
-            float z = Mathf.Sin(angleInRadians) * spread;
+            float x = Mathf.Cos(angleInRadians) * radius;
+            float z = Mathf.Sin(angleInRadians) * radius;
 
             positions.Add(new Vector3(x, 0, z)); // Assuming a flat circle on the XZ plane
         }
@@ -192,6 +164,7 @@ public class CircleSpreadPattern : ISpreadPattern
         return positions;
     }
 }
+
 
 public class SquareGridSpreadPattern : ISpreadPattern
 {

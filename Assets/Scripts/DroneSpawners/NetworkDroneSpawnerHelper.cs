@@ -6,12 +6,15 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
 {
         PlayerDroneSpawner spawner;
 
+        public Color colour;
+
         public NetworkVariable<ulong> playerClientID;
         public NetworkVariable<Color> teamColour;
         public NetworkVariable<float> budget;
         
         void Awake()
         {
+                teamColour.Value = colour;
                 playerClientID.Initialize(this);
                 teamColour.Initialize(this);
                 

@@ -11,6 +11,8 @@ public class NetworkConnectionMenu : MonoBehaviour
     string ipAddress = "127.0.0.1"; // Default IP
     const string IP_PREFS_KEY = "SavedIPAddress";
 
+    public bool showOverride = false;
+
     void Awake()
     {
         net = GetComponent<NetworkManager>();
@@ -51,8 +53,11 @@ public class NetworkConnectionMenu : MonoBehaviour
 
     void OnGUI()
     {
-        if (GameManager.Instance.currentGameMode != GameMode.Battle)
-            return;
+        if (!showOverride)
+        {
+            if (GameManager.Instance.currentGameMode != GameMode.Battle)
+                return;   
+        }
 
         // Get the center of the screen
         float screenWidth = Screen.width;

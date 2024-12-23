@@ -13,21 +13,21 @@ public class CommandManager : NetworkBehaviour
     {
         public enum Type
         {
-            Waypoint, SpawnMachine
+            SetWaypoint, SpawnMachine, QueueWaypoint
         }
 
-        public Type type = Type.Waypoint;
+        public Type type = Type.SetWaypoint;
         public Vector3 waypointPosition = Vector3.zero;
         public ulong machineID = 0;
         public int spawnSlot = -1;
         public ulong source = 0;
 
-        public Command(ulong source,ulong machineID, Vector3 waypointPosition)
+        public Command(ulong source,ulong machineID, Vector3 waypointPosition, bool queue)
         {
             this.source = source;
             this.machineID = machineID;
             this.waypointPosition = waypointPosition;
-            type = Type.Waypoint;
+            type = queue ? Type.QueueWaypoint : Type.SetWaypoint;
         }
         
         public Command(ulong source, int spawnSlot)
@@ -102,8 +102,11 @@ public class CommandManager : NetworkBehaviour
             switch (command.type)
             {
 
-                case Command.Type.Waypoint:
-                    ProcessWaypointCommand(command);
+                case Command.Type.SetWaypoint:
+                    ProcessWaypointCommand(command, false);
+                    break;
+                case Command.Type.QueueWaypoint:
+                    ProcessWaypointCommand(command, true);
                     break;
                 case Command.Type.SpawnMachine:
                     ProcessSpawnMachineCommand(command);
@@ -116,10 +119,17 @@ public class CommandManager : NetworkBehaviour
         }
     }
 
-    void ProcessWaypointCommand(Command command)
+    void ProcessWaypointCommand(Command command, bool queue)
     {
         DroneController controller = MachineInstanceManager.Instance.FetchGameObject(command.machineID).GetComponent<DroneController>();
-        WaypointManager.Instance.CreateAndAssignToWaypoint(command.waypointPosition, controller);
+        if (queue)
+        {
+            WaypointManager.Instance.CreateAndQueueWaypoint(command.waypointPosition, controller);   
+        }
+        else
+        {
+            WaypointManager.Instance.CreateAndSetWaypoint(command.waypointPosition, controller);
+        }
     }
 
     void ProcessSpawnMachineCommand(Command command)

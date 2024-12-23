@@ -18,8 +18,7 @@ public class MatchManager : Singleton<MatchManager>
 
     public GameObject playerSpawner;
     public GameObject aiSpawner;
-    public GameObject networkSpawner;
-    
+
     public int winner =-1;
 
     public readonly int playerID = 0;
@@ -201,11 +200,9 @@ public class MatchManager : Singleton<MatchManager>
         if(!NetworkManager.Singleton.IsServer)
             return;
         
-        Debug.Log(clientID);
-        
         int curIndex = (int)clientID;
         
-        GameObject networkSpawnerClone = Instantiate(networkSpawner,spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
+        GameObject networkSpawnerClone = Instantiate(playerSpawner, spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
         NetworkObject netObj = networkSpawnerClone.GetComponent<NetworkObject>();
         
         NetworkDroneSpawnerHelper spawnerHelper = networkSpawnerClone.GetComponent<NetworkDroneSpawnerHelper>();

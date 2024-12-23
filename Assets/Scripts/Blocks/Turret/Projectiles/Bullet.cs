@@ -8,33 +8,33 @@ public class Bullet : Projectile
 
     public VFXData vfxImpactEffect;
     
-    new BallisticCore turret;
+    new BallisticCore bulletTurret;
     
     void Update()
     {
-        if(body != null && rb !=null && rb.velocity != Vector3.zero)
-            body.rotation = Quaternion.LookRotation(rb.velocity);
+        if(body != null && rb !=null && rb.linearVelocity != Vector3.zero)
+            body.rotation = Quaternion.LookRotation(rb.linearVelocity);
     }
     
     public void Init(BallisticCore turret)
     {
         base.Init(turret);
-        this.turret = turret;
+        this.bulletTurret = turret;
         rb = GetComponent<Rigidbody>();
-        rb.drag = turret.drag;
+        rb.linearDamping = turret.drag;
     }
     
     protected override void Hit(Collider other)
     {
         
         //SpawnImpactEffect(transform.position, Quaternion.LookRotation(rb.velocity * -1));
-        VFXManager.instance.Spawn(vfxImpactEffect, transform.position, Quaternion.LookRotation(rb.velocity * -1), true);
+        VFXManager.instance.Spawn(vfxImpactEffect, transform.position, Quaternion.LookRotation(rb.linearVelocity * -1), true);
         
         DroneBlock droneBlock = other.gameObject.GetFirstComponentInHierarchy<DroneBlock>();
         if (droneBlock != null)
         {
             if(droneBlock.controller != null && droneBlock.controller.curTeam != originTeam)
-                droneBlock.TakeDamage(rb.velocity.magnitude* rb.mass * turret.DamageCalculation());
+                droneBlock.TakeDamage(rb.linearVelocity.magnitude* rb.mass * bulletTurret.DamageCalculation());
         }
         
         Deactivate();

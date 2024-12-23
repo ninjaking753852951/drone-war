@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2371648764
+  GlobalObjectIdHash: 3579771818
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -74,7 +74,7 @@ MonoBehaviour:
   scanRadius: 10
   teamID: 0
   teamData:
-    colour: {r: 1, g: 0.77993584, b: 0, a: 0}
+    colour: {r: 1, g: 1, b: 1, a: 1}
     isAI: 0
     budget: 6000
     incomeMultiplier: 0.75
@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fded1f7f5c8430ca2b90cd07b72e642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  colour: {r: 0, g: 0.42352915, b: 1, a: 1}
   playerClientID:
     m_InternalValue: 0
   teamColour:
@@ -160,6 +161,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

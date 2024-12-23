@@ -16,7 +16,7 @@ public class Missile : Projectile, IDamageable
 
     public float trackingAngularSpeed = 30;
     
-    new MissileCore turret;
+    MissileCore missileTurret;
     
     float missileAcceleration;
     
@@ -50,22 +50,22 @@ public class Missile : Projectile, IDamageable
     void FixedUpdate()
     {
         if(rb != null)
-            rb.AddForce(rb.velocity.normalized * ( missileAcceleration * Time.fixedDeltaTime ), ForceMode.VelocityChange);
+            rb.AddForce(rb.linearVelocity.normalized * ( missileAcceleration * Time.fixedDeltaTime ), ForceMode.VelocityChange);
     }
     
     void Update()
     {
-        if(body != null && rb !=null && rb.velocity != Vector3.zero)
-            body.rotation = Quaternion.LookRotation(rb.velocity);
+        if(body != null && rb !=null && rb.linearVelocity != Vector3.zero)
+            body.rotation = Quaternion.LookRotation(rb.linearVelocity);
     }
     
     public void Init(MissileCore turret)
     {
         base.Init(turret);
         this.target = turret.target;
-        this.turret = turret;
+        this.missileTurret = turret;
         rb = GetComponent<Rigidbody>();
-        rb.drag = 0;
+        rb.linearDamping = 0;
         missileAcceleration = turret.missileAcceleration;
         trackingTimer = new FrequencyTimer(trackingUpdateFrequency);
         trackingTimer.Start();
@@ -87,9 +87,9 @@ public class Missile : Projectile, IDamageable
 
     float ExplosionRadius()
     {
-        if (turret != null)
+        if (missileTurret != null)
         {
-            return explosionRadius * turret.missileExplosionRadiusMultiplier;
+            return explosionRadius * missileTurret.missileExplosionRadiusMultiplier;
         }
         else
         {
@@ -105,32 +105,32 @@ public class Missile : Projectile, IDamageable
         if(transform == null || target == null)
             return;
         
-        float xVelocity = rb.velocity.With(y: 0).magnitude;
+        float xVelocity = rb.linearVelocity.With(y: 0).magnitude;
         float xDist = (target.position - transform.position).With(y:0).magnitude;
         float yDist = target.position.y - transform.position.y;
         Vector2 targetPos2D = new Vector2(xDist, target.position.y);
         
         Vector3 horizontalTargetDirection = (target.position - transform.position).With(y:0).normalized;
-        Vector3 horizontalVelocity = rb.velocity.With(y:0).normalized;
+        Vector3 horizontalVelocity = rb.linearVelocity.With(y:0).normalized;
 
         float yawAngleError = Vector3.SignedAngle(horizontalVelocity, horizontalTargetDirection, Vector3.up);
         
-        float verticalAngle = CalculateBallisticLaunchAngle(rb.velocity.magnitude, missileAcceleration, targetPos2D, 0 * Mathf.Rad2Deg);
-        float currentVerticalAngle = Mathf.Asin(rb.velocity.y / rb.velocity.magnitude) * Mathf.Rad2Deg;
+        float verticalAngle = CalculateBallisticLaunchAngle(rb.linearVelocity.magnitude, missileAcceleration, targetPos2D, 0 * Mathf.Rad2Deg);
+        float currentVerticalAngle = Mathf.Asin(rb.linearVelocity.y / rb.linearVelocity.magnitude) * Mathf.Rad2Deg;
         float pitchAngleError = currentVerticalAngle - verticalAngle;
         
-        Vector3 forward = rb.velocity.normalized;
+        Vector3 forward = rb.linearVelocity.normalized;
         Vector3 pitchAxis = Vector3.Cross(forward, Vector3.up).normalized;
 
         Quaternion verticalRotation = Quaternion.AngleAxis(-pitchAngleError, pitchAxis);
         Quaternion horizontalRotation = Quaternion.AngleAxis(yawAngleError, Vector3.up);
         Quaternion targetRotation = horizontalRotation * verticalRotation;
         Quaternion correctionRotation = Quaternion.RotateTowards(Quaternion.identity, targetRotation, trackingAngularSpeed / trackingUpdateFrequency);
-        rb.velocity = correctionRotation * rb.velocity;
+        rb.linearVelocity = correctionRotation * rb.linearVelocity;
 
 
         //DEBUG RAY
-        Vector3 velocityRay = correctionRotation * rb.velocity.normalized;
+        Vector3 velocityRay = correctionRotation * rb.linearVelocity.normalized;
         Debug.DrawLine( transform.position, transform.position + velocityRay * 5, Color.red,1/(float)trackingUpdateFrequency);
     }
 
@@ -146,7 +146,7 @@ public class Missile : Projectile, IDamageable
         
         /*Vector2 angleLimits = new Vector2(90, -90);*/
         Vector2 angleLimits = new Vector2(estimate + estimateLimits, estimate - estimateLimits);
-        int safety = turret.simulationSafetyLimit;
+        int safety = missileTurret.simulationSafetyLimit;
 
         targetPos.y -= transform.position.y;
         
@@ -187,7 +187,7 @@ public class Missile : Projectile, IDamageable
         Vector2 velocity =
             new Vector2(initialVelocity * Mathf.Cos(angle * Mathf.Deg2Rad), initialVelocity * Mathf.Sin(angle * Mathf.Deg2Rad));
 
-        int safety = turret.simulationSafetyLimit;
+        int safety = missileTurret.simulationSafetyLimit;
         while (safety > 0)
         {
             if(xDist > targetDist|| velocity.magnitude < initialVelocity/2)
@@ -199,12 +199,12 @@ public class Missile : Projectile, IDamageable
             if(goingDownwards && targetIsAbove || !goingDownwards && !targetIsAbove)
                 break;*/
             
-            yDist += velocity.y * turret.simulationStepSize;
-            xDist += velocity.x * turret.simulationStepSize;
+            yDist += velocity.y * missileTurret.simulationStepSize;
+            xDist += velocity.x * missileTurret.simulationStepSize;
 
 
-            velocity += velocity.normalized * acceleration * turret.simulationStepSize;
-            velocity += Vector2.up * turret.simulationStepSize * Physics.gravity.y;
+            velocity += velocity.normalized * acceleration * missileTurret.simulationStepSize;
+            velocity += Vector2.up * missileTurret.simulationStepSize * Physics.gravity.y;
             
             //Vector3 rayPos = transform.position + Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, yDist, xDist);
             //Vector3 velocityRay = Quaternion.LookRotation(transform.forward.With(y:0))* new Vector3(0, velocity.y, velocity.x);
@@ -237,12 +237,12 @@ public class Missile : Projectile, IDamageable
 
             if (droneBlock != null)
             {
-                if(droneBlock.controller != null && droneBlock.controller.curTeam != turret.controller.curTeam)
+                if(droneBlock.controller != null && droneBlock.controller.curTeam != missileTurret.controller.curTeam)
                 {
                     if (!controllers.Contains(droneBlock.controller))
                     {
                         controllers.Add(droneBlock.controller);
-                        droneBlock.TakeDamage(turret.DamageCalculation());      
+                        droneBlock.TakeDamage(missileTurret.DamageCalculation());      
                     }
                     //droneBlock.TakeDamage(turret.laserDamage);  
                 }
@@ -263,7 +263,7 @@ public class Missile : Projectile, IDamageable
     }
     public int Team()
     {
-        return turret.controller.curTeam;
+        return missileTurret.controller.curTeam;
     }
     public Transform Transform()
     {

@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 [System.Serializable]
 public class MovementController
 {
     [Header("Steering Settings")]
-    public float safeTurnAngleMultiplier = 1f;
+    public float safeTurnLimitMultiplier = 1f;
     public float steerMultiplier = 1f;
 
     [Header("Motor Settings")]
@@ -20,16 +21,22 @@ public class MovementController
 
     [Header("Avoidance Settings")]
     public float avoidanceRange = 10f;
-    public float avoidanceFalloff = 1f;
     public float baseAvoidanceWeight = 1f;
     public float bonusAvoidanceWeight = 0.5f;
     public float reverseDuration = 3f;
-    public float droneAheadDistance = 5f;
+    
+    [Header("Drone Ahead Settings")]
+    public bool droneAhead;
+    public float droneAheadDistanceMultiplier = 1f;
+    public float droneAheadSensitivityMultiplier = 0.1f;
 
+    public LayerMask droneAheadLayerMask;
+    
+    [Header("Reverse Settings")]
+    public float triggerReverseMultiplier = 1;
 
     [HideInInspector] public float movementEnergyCost;
     [HideInInspector] public float currentSteer;
-    [HideInInspector] public bool droneAhead;
     [HideInInspector] public float velocity;
     DroneController controller;
 
@@ -45,6 +52,10 @@ public class MovementController
 
     public MovementState _currentMovementState;
     private MovementState _oldMoveState;
+
+    public float safeTurnAngle;
+
+    float BoundingRadius() => controller.boundingSphereRadius;
 
     public enum MovementState
     {
@@ -70,25 +81,35 @@ public class MovementController
         CalculateTrackWidth();
     }
 
-    public void UpdateMovement(Vector3 targetDestination, float boundingSphereRadius)
+    public void UpdateMovement(Vector3 targetDestination)
     {
-        velocity = _rb.velocity.magnitude;
+        if (targetDestination == Vector3.zero)
+            targetDestination = _transform.position;
+        
+        velocity = _rb.linearVelocity.magnitude;
 
         Vector3 directionToTarget = CalculateTargetDirection(targetDestination);
-        directionToTarget = GetSteering(directionToTarget, boundingSphereRadius);
+        directionToTarget = GetSteering(directionToTarget);
 
         float yawAngleError = Vector3.SignedAngle(_transform.forward, directionToTarget, Vector3.up);
-        currentSteer = Mathf.Clamp(yawAngleError * steerMultiplier, -89 * safeTurnAngleMultiplier, 89 * safeTurnAngleMultiplier);
-
-        float destinationDistance = Vector3.Distance(_transform.position, targetDestination);
+        currentSteer = Mathf.Clamp(yawAngleError, -45, 45);
+        currentSteer *= steerMultiplier;
         
-        UpdateMovementState(velocity, boundingSphereRadius, destinationDistance);
+        float destinationDistance = Vector3.Distance(_transform.position, targetDestination);
+
+        if (destinationDistance < BoundingRadius() * 2)
+        {
+            controller.ReachedWaypoint();
+        }
+        
+        UpdateMovementState(velocity, destinationDistance);
         UpdateComponents();
     }
     
 
-    private void UpdateMovementState(float velocity, float boundingSphereRadius, float destinationDistance)
+    private void UpdateMovementState(float velocity, float destinationDistance)
     {
+        ScanForDroneAhead();
         
         if (_oldMoveState != MovementState.Reversing && _currentMovementState == MovementState.Reversing)
         {
@@ -108,18 +129,18 @@ public class MovementController
                 Time.deltaTime * 0.5f / (reverseDuration));
         }
 
-        float stoppingDistance = CalculateStoppingDistance(mass, 1, motorTorque, velocity);
-        stoppingDistance += boundingSphereRadius;
+        _curStoppingDistance = CalculateStoppingDistance(mass, 1, motorTorque, velocity);
+        _curStoppingDistance += BoundingRadius();
 
-        if (destinationDistance < stoppingDistance || Mathf.Abs(currentSteer) > CalculateMaxSafeSteeringAngle())
+        if (droneAhead && controller.distanceTracker.totalDistance < BoundingRadius() * triggerReverseMultiplier || _reverseTime > 0)
+        {
+            _currentMovementState = MovementState.Reversing;
+        }
+        else if (destinationDistance < _curStoppingDistance || Mathf.Abs(currentSteer) > CalculateMaxSafeSteeringAngle() || droneAhead)
         {
             /*if(Mathf.Abs(currentSteer) > CalculateMaxSafeSteeringAngle())
                 Debug.Log("BREAKING FOR STEERING");*/
             _currentMovementState = MovementState.Braking;
-        }
-        else if (droneAhead && _reverseTime > 0)
-        {
-            _currentMovementState = MovementState.Reversing;
         }
         else
         {
@@ -131,6 +152,8 @@ public class MovementController
     {
         if(_hingeControllers == null)
             return;
+
+        safeTurnAngle = CalculateMaxSafeSteeringAngle();
         
         foreach (HingeController hingeController in _hingeControllers)
         {
@@ -146,26 +169,6 @@ public class MovementController
         
         float wheelTorque = motorTorque / _wheelControllers.Count;
         float targetVelocity = Mathf.Infinity;
-        /*foreach (WheelController wheelController in _wheelControllers)
-        {
-            switch (_currentMovementState)
-            {
-                case MovementState.Accelerating:
-                    wheelController.SetForwardTorque(wheelTorque);
-                    wheelController.SetTargetVelocity(targetVelocity);
-                    break;
-                case MovementState.Braking:
-                    wheelController.SetTargetVelocity(0);
-                    break;
-                case MovementState.Reversing:
-                    
-                    wheelController.SetForwardTorque(wheelTorque);
-                    wheelController.SetTargetVelocity(-targetVelocity);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }*/
         
         float energyCost = movementEnergyCost * Time.deltaTime;
 
@@ -175,7 +178,6 @@ public class MovementController
         {
             torqueMultiplier = 1;
         }
-
         
         switch (_currentMovementState)
         {
@@ -217,7 +219,7 @@ public class MovementController
         return (destination - origin).normalized;
     }
 
-    private Vector3 GetSteering(Vector3 goalDirection, float boundingSphereRadius)
+    private Vector3 GetSteering(Vector3 goalDirection)
     {
         Vector3 avoidanceVector = Vector3.zero;
 
@@ -228,7 +230,7 @@ public class MovementController
             Vector3 obstacleDirection = drone.transform.position - _transform.position;
             float distanceToObstacle = obstacleDirection.magnitude;
 
-            float combinedRadius = boundingSphereRadius + drone.boundingSphereRadius;
+            float combinedRadius = BoundingRadius() + drone.boundingSphereRadius;
             float weight = Mathf.Clamp01(1 - Mathf.InverseLerp(combinedRadius, avoidanceRange, distanceToObstacle));
             avoidanceVector -= obstacleDirection.normalized * weight;
         }
@@ -285,6 +287,42 @@ public class MovementController
         trackWidth = rightTrack.x - leftTrack.x;
     }
 
+    /*void ScanForDroneAhead()
+    {
+        List<DroneController> drones = MachineInstanceManager.Instance.FetchAllDrones();
+        
+        foreach (DroneController drone in drones)
+        {
+            if(drone == controller)
+                continue;
+            
+            Vector3 dir = drone.transform.position - _transform.position;
+
+            if (dir.magnitude < _curStoppingDistance * droneAheadDistanceMultiplier)
+            {
+                if (Vector3.Dot(_transform.forward, dir.normalized) > droneAheadSensitivity)
+                {
+                    droneAhead = true;
+                    return;
+                }
+            }
+        }
+        droneAhead = false;
+    }*/
+    
+    void ScanForDroneAhead()
+    {
+        Ray droneCheckRay = new Ray(_transform.position, _transform.forward);
+        RaycastHit hitDrone;
+        if (Physics.SphereCast(droneCheckRay, BoundingRadius() * droneAheadSensitivityMultiplier, out hitDrone, _curStoppingDistance * droneAheadDistanceMultiplier, droneAheadLayerMask))
+        {
+            Debug.DrawLine(_transform.position, hitDrone.point);
+            droneAhead = true;
+            return;
+        }
+        droneAhead = false;
+    }
+
     void CalculateComHeight()
     {
         comHeight = _rb.worldCenterOfMass.y - GetLowerBound();
@@ -317,6 +355,6 @@ public class MovementController
 
         //Debug.Log("Max safe turn angle" + turnAngleDegrees);
         
-        return turnAngleDegrees * safeTurnAngleMultiplier;
+        return turnAngleDegrees * safeTurnLimitMultiplier;
     }
 }

@@ -92,10 +92,11 @@ public class SelectionManager : Singleton<SelectionManager>
 
     void OnGUI()
     {
+        
         if(GameManager.Instance.currentGameMode == GameMode.Build)
             return;
         
-        GUI.Label(new Rect(Screen.width - 200, 10, 190, 30), "Selected Drones: ");
+        /*GUI.Label(new Rect(Screen.width - 200, 10, 190, 30), "Selected Drones: ");
         
         if (selectedDrones.Count > 0)
         {
@@ -115,7 +116,7 @@ public class SelectionManager : Singleton<SelectionManager>
                 yPos += 15;
                 GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Velocity: " + Mathf.Round(selectedDrones[i].movementController.velocity *10)/10 + " m/s");
             }
-        }
+        }*/
         
         if (isDragging)
         {

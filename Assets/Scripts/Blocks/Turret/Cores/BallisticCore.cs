@@ -18,17 +18,16 @@ public class BallisticCore : TurretCoreController
     {
         GameObject projectileClone = SpawnProjectile();
 
-        Rigidbody rb = projectileClone.GetComponent<Rigidbody>();
+        Rigidbody projectileRb = projectileClone.GetComponent<Rigidbody>();
 
-        float projectileMass = rb.mass;
+        float projectileMass = projectileRb.mass;
         
-        if(pitchMount != null)
-            pitchMount.rb.AddForceAtPosition(Vector3.up * projectileMass * ShootVelocity() * recoilMultiplier, mainBarrel.shootPoint.position);
-        if(yawMount != null)
-            controller.rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * ShootVelocity() * recoilMultiplier * -1);
+        rb.AddForceAtPosition(Vector3.up * projectileMass * ShootVelocity() * recoilMultiplier, mainBarrel.shootPoint.position);
+        rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * ShootVelocity() * recoilMultiplier * -1);
         
-        rb.velocity = Vector3.zero;
-        rb.AddForce(projectileClone.transform.forward * ShootVelocity() + Random.insideUnitSphere * deviance, ForceMode.VelocityChange);
+        projectileRb.linearVelocity = Vector3.zero;
+        Vector3 devianceForce = Random.insideUnitSphere * (deviance/MaxRange());
+        projectileRb.AddForce(projectileClone.transform.forward * ShootVelocity() + devianceForce, ForceMode.VelocityChange);
 
         Instantiate(shootEffect, mainBarrel.shootPoint);
         

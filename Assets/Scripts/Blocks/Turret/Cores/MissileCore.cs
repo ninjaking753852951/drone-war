@@ -16,10 +16,7 @@ public class MissileCore : TurretCoreController
 
         float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
         
-        //mount.pitchRb.AddForceAtPosition(Vector3.up * projectileMass * shootVelocity * recoilMultiplier, mainBarrel.shootPoint.position);
-        
-        //rb.ResetInertiaTensor();
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.AddForce(projectileClone.transform.forward * ShootVelocity(), ForceMode.VelocityChange);
 
         Missile projectile = projectileClone.GetComponent<Missile>();

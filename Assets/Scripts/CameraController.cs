@@ -14,6 +14,7 @@ public class CameraController : Singleton<CameraController>
     public float panSpeed = 10f; // Sensitivity of the mouse movement
 
     public float moveSpeed = 10;
+    public float moveSpeedZoomMultiplier = 0.8f;
 
     public float sprintMultiplier = 2;
     
@@ -75,6 +76,8 @@ public class CameraController : Singleton<CameraController>
 
 
         curMoveSpeed = Input.GetKey(KeyCode.LeftShift) ? moveSpeed * sprintMultiplier : moveSpeed;
+
+        curMoveSpeed *= zoom*moveSpeedZoomMultiplier;
         
         moveTarget.Translate(moveDir * Time.deltaTime * curMoveSpeed);
 

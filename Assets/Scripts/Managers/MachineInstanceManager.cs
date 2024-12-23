@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityUtils;
-public class MachineInstanceManager : Singleton<MachineInstanceManager>
+public class MachineInstanceManager : RegulatorSingleton<MachineInstanceManager>
 {
 
-    ulong curID = 0;
+    public ulong curID = 0;
     
     Dictionary<ulong, MachineInstance> machines = new Dictionary<ulong, MachineInstance>();
 

@@ -3,58 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityUtils;
 
-public class WheelController : MonoBehaviour
+public class WheelController : MovingDroneBlockBase
 {
     [Header("References")]
-    public ConstantForce wheelForce;
     public HingeJoint wheelJoint;
-    public Rigidbody rb;
     
     float torqueDirection;
     float targetSteerRot;
     
-    // Start is called before the first frame update
-    void Start()
-    {
 
-    }
-
-    public void Init()
+    public override void Deploy()
     {
-        rb.isKinematic = false;
-        rb.useGravity = true;
+        base.Deploy();
+        
         wheelJoint.connectedBody = Utils.FindParentRigidbody(transform, rb);
         
         torqueDirection = CalculateTorqueDirection();
     }
 
-    public void SetForwardTorque( float torque)
+    public void SetForwardTorque(float torque)
     {
         JointMotor motor = wheelJoint.motor;
 
         motor.force = torque;
         
         wheelJoint.motor = motor;
-        
-        //wheelForce.relativeTorque = new Vector3(0,0, torque * torqueDirection);
     }
     
-    public void SetTargetVelocity( float velocity)
+    public void SetTargetVelocity(float velocity)
     {
-
         JointMotor motor = wheelJoint.motor;
 
         motor.targetVelocity = velocity * torqueDirection;
         
         wheelJoint.motor = motor;
     }
-    
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     
     float CalculateTorqueDirection()
     {
@@ -67,6 +50,5 @@ public class WheelController : MonoBehaviour
 
         // If the dot product is positive, b is on the right side of a
         return dotProduct > 0 ? 1 : -1;
-        
     }
 }

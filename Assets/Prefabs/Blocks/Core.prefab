@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1831586664412360915}
   - component: {fileID: 3576969292278427690}
   - component: {fileID: 7477153313750559185}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,6 +58,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -101,7 +104,7 @@ GameObject:
   - component: {fileID: 3188130482216549444}
   - component: {fileID: 8163985959737980395}
   - component: {fileID: 4779883787462750595}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -242,24 +245,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementController:
-    safeTurnAngleMultiplier: 0.9
-    steerMultiplier: 0.5
+    safeTurnLimitMultiplier: 0.6
+    steerMultiplier: 0.75
     motorTorque: 0
     mass: 100
     trackWidth: 0
     wheelBase: 0
     comHeight: 0
     avoidanceRange: 30
-    avoidanceFalloff: 0.6
     baseAvoidanceWeight: 1
     bonusAvoidanceWeight: 0.5
     reverseDuration: 2
-    droneAheadDistance: 0
+    droneAhead: 0
+    droneAheadDistanceMultiplier: 1
+    droneAheadSensitivityMultiplier: 1
+    droneAheadLayerMask:
+      serializedVersion: 2
+      m_Bits: 128
+    triggerReverseMultiplier: 1
     movementEnergyCost: 0
     currentSteer: 0
-    droneAhead: 0
     velocity: 0
     _currentMovementState: 0
+    safeTurnAngle: 0
+  distanceTracker: {fileID: 8163985959737980395}
   outline: {fileID: 0}
   selectionWidth: 4
   healthMultiplier: 100
@@ -284,6 +293,9 @@ MonoBehaviour:
   targetDestination: {x: 0, y: 0, z: 0}
   rb: {fileID: 0}
   boundingSphereRadius: 0
+  onDroneDestroyed:
+    m_PersistentCalls:
+      m_Calls: []
   instanceID: 0
   healthBarSettings:
     worldOffsetHeight: 5
@@ -314,11 +326,10 @@ MonoBehaviour:
   postAdoptionInit:
     m_PersistentCalls:
       m_Calls: []
-  blockIdentity:
-    isCore: 0
-    prefab: {fileID: 0}
-    category: 0
   controller: {fileID: 0}
+  canOnlyAdoptTurretModules: 0
+  meta:
+    specialPositions: []
 --- !u!114 &3188130482216549444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,6 +385,8 @@ MonoBehaviour:
     m_InternalValue: 0
   maxEnergy:
     m_InternalValue: 0
+  boundingRadius:
+    m_InternalValue: 0
 --- !u!1 &3170781993727125655
 GameObject:
   m_ObjectHideFlags: 0
@@ -386,7 +399,7 @@ GameObject:
   - component: {fileID: 500399668958403904}
   - component: {fileID: 4972858966128822518}
   - component: {fileID: 7671421710147017333}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -433,6 +446,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -491,7 +507,7 @@ GameObject:
   - component: {fileID: 8437405410555383261}
   - component: {fileID: 1156924774422680647}
   - component: {fileID: 3131105817385086640}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -538,6 +554,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -595,7 +614,7 @@ GameObject:
   - component: {fileID: 5132321682762963416}
   - component: {fileID: 8460982488673780593}
   - component: {fileID: 4817536295136154598}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -642,6 +661,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -678,7 +700,7 @@ GameObject:
   - component: {fileID: 2311817614417658543}
   - component: {fileID: 6742239584680061081}
   - component: {fileID: 2503077712160491368}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -725,6 +747,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -762,7 +787,7 @@ GameObject:
   - component: {fileID: 4066982093014898225}
   - component: {fileID: 5738559115302630519}
   - component: {fileID: 5254044458283318315}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -809,6 +834,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

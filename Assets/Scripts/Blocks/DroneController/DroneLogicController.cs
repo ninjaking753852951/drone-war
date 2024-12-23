@@ -79,7 +79,8 @@ public class GoToLocationOrder : IDroneOrder
 
     public void Execute(DroneLogicController logicController)
     {
-        logicController.controller.SetDestination(destination);
+        WaypointManager.Instance.CreateAndSetWaypoint(destination, logicController.controller);
+        //logicController.controller.SetDestination(destination);
     }
 
     public void Dispose()
@@ -145,7 +146,7 @@ public class CaptureNearestObjective : IDroneOrder
 
         Transform closestTarget = Utils.ClosestTo(targetObjectives, logicController.transform.position);
         
-        logicController.controller.SetDestination(closestTarget.position);
+        WaypointManager.Instance.CreateAndSetWaypoint(destination, logicController.controller);
     }
 
     public void Dispose()
@@ -187,7 +188,7 @@ public class WanderAround : IDroneOrder
             Vector3 offset = Random.insideUnitSphere * wanderDistance;
             offset.y = 0;
             wanderLocation = logicController.transform.position + offset;
-            logicController.controller.SetDestination(wanderLocation);
+            WaypointManager.Instance.CreateAndSetWaypoint(wanderLocation, logicController.controller);
             cooldownTimer.Reset(wanderCooldown);
             cooldownTimer.Start();
         }

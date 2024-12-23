@@ -24,15 +24,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     [HideInInspector]
     public TurretBarrelController mainBarrel;
     List<TurretBarrelController> barrels;
-    //public TurretMountController mount;
+    
+    List<TurretMountSingleAxis> mountsSingleAxis;
 
-    public List<TurretMountSingleAxis> mountSingleAxis;
-    [HideInInspector]
-    public TurretMountSingleAxis pitchMount;
-    [HideInInspector]
-    public TurretMountSingleAxis yawMount;
-    
-    
     CountdownTimer fireTimer;
     bool isDeployed = false;
     
@@ -68,7 +62,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         Vector3 dir = transform.forward.With(y: 0);
         if (dir != Vector3.zero)
         {
-            return           Quaternion.LookRotation(transform.forward.With(y: 0));
+            return Quaternion.LookRotation(transform.forward.With(y: 0));
         }
         else
         {
@@ -78,35 +72,22 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     
     public void Deploy(bool deploy)
     {
+        isDeployed = deploy;
+        
         turretUpdateTimer = new CountdownTimer(1 / turretUpdateRate);
         turretUpdateTimer.Start();
         
         controller = transform.root.GetComponent<DroneController>();
 
-        rb = Utils.FindParentRigidbody(transform, null);
+        rb = Utils.FindParentRigidbody(transform);
+
+        mountsSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
         
-        isDeployed = deploy;
-        /*mount = GetComponentInParent<TurretMountController>();
-        mount.Deploy(this);*/
-
-        mountSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
-        foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
-        {
-            turretMountSingleAxis.Deploy(this);
-            if (turretMountSingleAxis.controlType == TurretMountSingleAxis.ControlType.Pitch)
-                pitchMount = turretMountSingleAxis;
-            
-            if (turretMountSingleAxis.controlType == TurretMountSingleAxis.ControlType.Yaw)
-                yawMount = turretMountSingleAxis;
-        }
-
         DeployModules();
-
+        
         barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
-        foreach (var barrel in barrels)
-            barrel.Deploy(this);
-
-        if (barrels != null   && barrels.Count > 0)
+        
+        if (barrels != null && barrels.Count > 0)
         {
             mainBarrel = Utils.FurthestFrom(Utils.GetTransformsFromComponents(barrels), transform.position)
                 .GetComponent<TurretBarrelController>();   
@@ -142,6 +123,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     // Update is called once per frame
     void Update()
     {
+        
         if(!isDeployed || GameManager.Instance.IsOnlineAndClient())
             return;
 
@@ -168,14 +150,14 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         Rigidbody targetRb = target.root.GetComponent<Rigidbody>();
 
         //Estimate position accounting for velocity
-        float interceptTime = EstimateInterceptTime(target.position, targetRb.velocity);
-        Vector3 targetPosEstimate = target.position + targetRb.velocity * interceptTime;
+        float interceptTime = EstimateInterceptTime(target.position, targetRb.linearVelocity);
+        Vector3 targetPosEstimate = target.position + targetRb.linearVelocity * interceptTime;
         
         // Calculate Angles
         targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
         targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
         
-        foreach (TurretMountSingleAxis turretMountSingleAxis in mountSingleAxis)
+        foreach (TurretMountSingleAxis turretMountSingleAxis in mountsSingleAxis)
             turretMountSingleAxis.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
         
     }

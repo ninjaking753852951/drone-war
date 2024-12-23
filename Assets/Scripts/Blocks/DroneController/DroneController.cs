@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class DroneController : MonoBehaviour, IProgressBar
 {
     [Header("Movement Settings")]
     public MovementController movementController;
-
+    public DistanceTracker distanceTracker;
+    
     [Header("Outline Settings")]
     public Outline outline;
     public float selectionWidth = 2;
@@ -24,11 +27,26 @@ public class DroneController : MonoBehaviour, IProgressBar
     [Header("Energy Settings")]
     public EnergyController energy;
 
-    public Vector3 targetDestination = Vector3.zero;
+    public Queue<WaypointManager.Waypoint> waypoints = new Queue<WaypointManager.Waypoint>();
+
+
+    public Vector3 TargetDestination()
+    {
+        if (waypoints != null && waypoints.Count != 0)
+        {
+            WaypointManager.Waypoint waypoint = waypoints.Peek();
+            return waypoint.waypointMarker.transform.position;
+        }
+        
+        return Vector3.zero;
+    } 
 
     [HideInInspector] public Rigidbody rb;
     public float boundingSphereRadius;
 
+    [HideInInspector]
+    public UnityEvent<DroneController> onDroneDestroyed = new UnityEvent<DroneController>();
+    
     public ulong instanceID;
     bool isNetworkProxy;
     
@@ -49,9 +67,9 @@ public class DroneController : MonoBehaviour, IProgressBar
         
         energy.Update(Time.deltaTime);
         
-        if (targetDestination == Vector3.zero || movementController == null) return;
+        if (movementController == null) return;
 
-        movementController.UpdateMovement(targetDestination, boundingSphereRadius);
+        movementController.UpdateMovement(TargetDestination());
     }
 
     public void Select(bool select)
@@ -123,9 +141,31 @@ public class DroneController : MonoBehaviour, IProgressBar
         movementController.InitializeComponents();
     }
 
-    public void SetDestination(Vector3 destination)
+    public void ReachedWaypoint()
     {
-        targetDestination = destination;
+        if(waypoints.Count == 0)
+            return;
+        
+        WaypointManager.Instance.DisposeWaypoint(waypoints.Dequeue());
+    }
+
+    public void ClearWaypoints()
+    {
+        foreach (var waypoint in waypoints)
+        {
+            waypoint.Dispose();
+        }
+        waypoints.Clear();
+    }
+
+    /*public void SetDestination(Vector3 destination)
+    {
+        TargetDestination() = destination;
+    }*/
+
+    public void AddWaypoint(WaypointManager.Waypoint waypoint)
+    {
+        waypoints.Enqueue(waypoint);
     }
     
     public void TakeDamage(float damage)
@@ -176,6 +216,7 @@ public class DroneController : MonoBehaviour, IProgressBar
     
     void OnDestroy()
     {
+        onDroneDestroyed.Invoke(this);
         MachineInstanceManager.Instance.DeregisterDrone(this);
     }
 }

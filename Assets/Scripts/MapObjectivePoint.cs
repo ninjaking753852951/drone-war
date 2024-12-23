@@ -141,9 +141,9 @@ public class MapObjectivePoint : MonoBehaviour
             colour = MatchManager.Instance.Team(team).colour;
         }
 
-        colour.a = transparency;
+        //colour.a = transparency;
         
-        rend.material.color = colour;   
+        rend.material.SetColor("_MainColour", colour);   
     }
 
     void UpdatePointHealth()

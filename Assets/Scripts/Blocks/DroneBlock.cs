@@ -17,8 +17,8 @@ public class DroneBlock : MonoBehaviour
     
     public Transform connectionPoint;
 
-    public UnityEvent onInit;
-    public UnityEvent postAdoptionInit;
+    public UnityEvent onInit; // called when all parents have been reparented to the core
+    public UnityEvent postAdoptionInit; // called when all parents and children have been reparented to the core
 
     [HideInInspector]
     public IPlaceable blockIdentity;
@@ -34,6 +34,8 @@ public class DroneBlock : MonoBehaviour
     {
         if (connectionPoint == null)
             connectionPoint = transform;
+        
+        
     }
 
     void Start()
@@ -43,15 +45,12 @@ public class DroneBlock : MonoBehaviour
 
     public void Init()
     {
-        
-                
         onInit.Invoke();
-
-        Rigidbody rb = GetComponent<Rigidbody>();
         
-
         controller = transform.root.GetComponent<DroneController>();
         controller.curHealth += health;
+        
+        Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.mass = mass;
@@ -63,18 +62,17 @@ public class DroneBlock : MonoBehaviour
 
         
         HashSet<DroneBlock> blocks = ScanForNeighboringDroneBlocks();
-        HashSet<DroneBlock> blocksToInit = new HashSet<DroneBlock>(); // Use a HashSet
+        HashSet<DroneBlock> blocksToInit = new HashSet<DroneBlock>();
 
         foreach (DroneBlock droneBlock in blocks)
         {
             if (droneBlock.transform.root != transform.root)
             {
                 droneBlock.transform.parent = connectionPoint;
-                blocksToInit.Add(droneBlock); // Mark for removal after the loop
+                blocksToInit.Add(droneBlock);
             }
         }
-
-        // Remove blocks that were marked
+        
         foreach (DroneBlock droneBlock in blocksToInit)
         {
             droneBlock.Init();
