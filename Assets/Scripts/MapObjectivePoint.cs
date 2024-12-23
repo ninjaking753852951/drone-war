@@ -21,9 +21,9 @@ public class MapObjectivePoint : MonoBehaviour
     public LayerMask droneLayer;
     public float pollingInterval = 0.5f;
     public Transform indicator;
-    public Transform healthIndicator;
+    public CircleRenderer healthIndicatorCircle;
 
-    public float transparency = 0.5f;
+    public Color unownedColour;
     
     [HideInInspector]
     public float healthFill;
@@ -44,6 +44,8 @@ public class MapObjectivePoint : MonoBehaviour
             currentState = PointState.Owned;
             SetIndicatorColour(currentOwner.Value);
         }*/
+        
+        healthIndicatorCircle.SetRadius(radius);
         
         pointHealth = pointMaxHealth;
         UpdatePointState();
@@ -79,7 +81,8 @@ public class MapObjectivePoint : MonoBehaviour
     
     public void SetFill(float amount)
     {
-        healthIndicator.transform.localScale = new Vector3(radius * 2 * amount, healthIndicator.transform.localScale.y, radius * 2 *amount);
+        healthIndicatorCircle.SetFill(amount);
+        //healthIndicator.transform.localScale = new Vector3(radius * 2 * amount, healthIndicator.transform.localScale.y, radius * 2 *amount);
     }
     
     void PollForOccupants()
@@ -133,7 +136,7 @@ public class MapObjectivePoint : MonoBehaviour
         Renderer rend = indicator.GetComponentInChildren<Renderer>();
         if (team == -1)
         {
-            colour = Color.white;
+            colour = unownedColour;
 
         }
         else
@@ -182,6 +185,7 @@ public class MapObjectivePoint : MonoBehaviour
 
         // Reset visual indicators
         SetIndicatorColour(-1); // Reset to default color or clear
-        healthIndicator.transform.localScale = new Vector3(0, healthIndicator.transform.localScale.y, 0);
+        healthIndicatorCircle.SetFill(0);
+        //healthIndicator.transform.localScale = new Vector3(0, healthIndicator.transform.localScale.y, 0);
     }
 }
