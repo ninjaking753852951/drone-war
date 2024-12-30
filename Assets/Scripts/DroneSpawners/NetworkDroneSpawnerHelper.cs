@@ -14,7 +14,7 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
         
         void Awake()
         {
-                teamColour.Value = colour;
+                //teamColour.Value = colour;
                 playerClientID.Initialize(this);
                 teamColour.Initialize(this);
                 

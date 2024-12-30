@@ -24,16 +24,16 @@ public class DroneNetworkController : NetworkHelperBase
         controller = GetComponent<DroneController>();
     }
 
+    /*public override void OnNetworkSpawn()
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            ProxyDeploy();
+        }
+    }*/
+    
     void Update()
     {
-        if (GameManager.Instance.IsOnlineAndClient())
-        {
-            if (!hasClientDeployed && blockCount.Value == GetComponentsInChildren<DroneBlock>().Length)
-            {
-                ProxyDeploy();
-            }
-        }
-        
         SyncValue(health, ref controller.curHealth);
         SyncValue(maxHealth, ref controller.maxHealth);
         
@@ -41,6 +41,14 @@ public class DroneNetworkController : NetworkHelperBase
         SyncValue(maxEnergy, ref controller.energy.maxEnergy);
         
         SyncValue(boundingRadius, ref controller.boundingSphereRadius);
+        
+        if (GameManager.Instance.IsOnlineAndClient())
+        {
+            if (!hasClientDeployed && blockCount.Value == GetComponentsInChildren<DroneBlock>().Length)
+            {
+                ProxyDeploy();
+            }
+        }
     }
 
     void ProxyDeploy()

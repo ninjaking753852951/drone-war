@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
-public class DroneController : MonoBehaviour, IProgressBar
+public class DroneController : NetworkBehaviour, IProgressBar
 {
     [Header("Movement Settings")]
     public MovementController movementController;
@@ -20,6 +20,8 @@ public class DroneController : MonoBehaviour, IProgressBar
     public float healthMultiplier = 10;
     public float curHealth;
     public float maxHealth;
+    //public DynamicLocalNetworkVariable<float> maxHealth;
+    
     public List<MeshRenderer> coreBlocks;
     public int curTeam;
     List<TurretRangeIndicator> rangeIndicators;
@@ -29,7 +31,9 @@ public class DroneController : MonoBehaviour, IProgressBar
 
     public Queue<WaypointManager.Waypoint> waypoints = new Queue<WaypointManager.Waypoint>();
 
-
+    
+    
+    
     public Vector3 TargetDestination()
     {
         if (waypoints != null && waypoints.Count != 0)
@@ -125,6 +129,7 @@ public class DroneController : MonoBehaviour, IProgressBar
         rb.mass = movementController.mass;
         curHealth *= healthMultiplier;
         maxHealth = curHealth;
+        //maxHealth.SetValue(curHealth);
         
         energy.Init(this);
 
@@ -203,6 +208,10 @@ public class DroneController : MonoBehaviour, IProgressBar
     public float ProgressBarFill()
     {
         return curHealth / maxHealth;
+    }
+    public float ProgressBarMaximum()
+    {
+        return maxHealth;
     }
     public ProgressBarSettings healthBarSettings;
     public ProgressBarSettings ProgressBarSettings()

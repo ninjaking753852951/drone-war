@@ -958,7 +958,7 @@ MonoBehaviour:
   scanBoxOffset: {x: 0, y: 0, z: 0}
   gridSize: {x: 1, y: 1, z: 1}
   mass: 15
-  health: 100
+  health: 50
   cost: 50
   connectionPoint: {fileID: 0}
   onInit:

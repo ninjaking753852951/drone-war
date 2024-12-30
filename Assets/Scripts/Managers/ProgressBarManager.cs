@@ -27,6 +27,11 @@ public class ProgressBarManager : Singleton<ProgressBarManager>
         {
             this.target = controller.ProgressBarWorldTarget();
             this.slider = obj.GetComponentInChildren<Slider>();
+
+            HealthbarController healthbarController = obj.GetComponent<HealthbarController>();
+            if(healthbarController != null)
+                healthbarController.GenerateHealthBar(controller.ProgressBarMaximum());
+            
             obj.transform.FindChildWithTag("UIIcon").GetComponent<Image>().color = controller.ProgressBarSettings().colour;
             this.obj = obj;
             this.controller = controller;

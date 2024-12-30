@@ -5,6 +5,8 @@ public interface IProgressBar
         public Transform ProgressBarWorldTarget();
         public float ProgressBarFill();
 
+        public float ProgressBarMaximum();
+        
         public ProgressBarSettings ProgressBarSettings();
 
         public bool IsDestroyed();

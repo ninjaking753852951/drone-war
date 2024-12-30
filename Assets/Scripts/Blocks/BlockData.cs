@@ -1,4 +1,6 @@
-﻿using Interfaces;using Unity.Netcode;
+﻿using System;
+using System.Collections.Generic;
+using Interfaces;using Unity.Netcode;
 using UnityEngine;
 [System.Serializable]
 public class BlockData : IPlaceable
@@ -22,13 +24,21 @@ public class BlockData : IPlaceable
         if (NetworkManager.Singleton.IsListening && network)
         {
             NetworkObject netObj = blockClone.GetComponent<NetworkObject>();
-                    
-            if(netObj != null)
-                netObj.Spawn();
+
+            if (netObj != null)
+            {
+                //netObj.SpawnWithObservers = false;
+                netObj.Spawn();   
+            }
+            
+            //netObj.SpawnWithObservers()
         }
         else
         {
-            Utils.RemoveNetworkComponents(blockClone);
+            List<Type> exceptions = new List<Type>();
+            exceptions.Add(typeof(DroneController));
+            
+            Utils.RemoveNetworkComponents(blockClone, exceptions);
         }
                 
         return blockClone;

@@ -30,6 +30,10 @@ public class EnergyController : IProgressBar
     {
         return energy / maxEnergy;
     }
+    public float ProgressBarMaximum()
+    {
+        return maxEnergy;
+    }
     public ProgressBarSettings ProgressBarSettings()
     {
         return energyBarSettings;

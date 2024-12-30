@@ -23,7 +23,7 @@ public class CircleRenderer : MonoBehaviour
 
     void Start()
     {
-        DrawCircle(1f); // Default to a full circle
+        //DrawCircle(1f); // Default to a full circle
     }
     
     /*public void DrawCircle(float fill)
@@ -70,7 +70,6 @@ public class CircleRenderer : MonoBehaviour
                 if (i == pointCount)
                 {
                     float lerpAmount = (resolution * fill) % 1;
-                    Debug.Log(i);
                     points[i] = Vector3.Lerp(circlePoints[i], circlePoints[(i+1) % resolution], lerpAmount);
                 }
                 else

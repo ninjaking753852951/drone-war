@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
+using Object = UnityEngine.Object;
 public static class Utils
 {
     public static Rigidbody FindParentRigidbody(Transform startTransform, Rigidbody avoid = null)
@@ -328,28 +330,46 @@ public static class Utils
         RenderTexture.active = null;
     }
     
-    public static void RemoveNetworkComponents(GameObject gameObject)
+    public static void RemoveNetworkComponents(GameObject gameObject, List<Type> exceptionTypes = null)
     {
-        // Remove NetworkObject component
+        // Remove NetworkObject component unless it's in the exception list
         NetworkObject networkObject = gameObject.GetComponent<NetworkObject>();
-        if (networkObject != null)
+        if (networkObject != null && !IsInExceptionList(networkObject.GetType(), exceptionTypes))
         {
-            Object.DestroyImmediate(networkObject);
+            UnityEngine.Object.DestroyImmediate(networkObject);
         }
 
-        // Remove all NetworkBehaviour components
+        // Remove all NetworkBehaviour components unless they are in the exception list
         NetworkBehaviour[] networkBehaviours = gameObject.GetComponents<NetworkBehaviour>();
         for (int i = networkBehaviours.Length - 1; i >= 0; i--)
         {
             NetworkBehaviour behaviour = networkBehaviours[i];
-            Object.DestroyImmediate(behaviour);
+            if (!IsInExceptionList(behaviour.GetType(), exceptionTypes))
+            {
+                UnityEngine.Object.DestroyImmediate(behaviour);
+            }
         }
 
         // Recursively clean up all child objects
         foreach (Transform child in gameObject.transform)
         {
-            RemoveNetworkComponents(child.gameObject);
+            RemoveNetworkComponents(child.gameObject, exceptionTypes);
         }
+    }
+
+    private static bool IsInExceptionList(Type type, List<Type> exceptionTypes)
+    {
+        if (exceptionTypes == null)
+            return false;
+        
+        foreach (Type exceptionType in exceptionTypes)
+        {
+            if (exceptionType.IsAssignableFrom(type)) // Check if type or derived type matches
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Vector3 SnapToGrid(Vector3 position, Vector3 cellSize, Vector3? gridCenter = null, Quaternion? gridRotation = null)

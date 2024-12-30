@@ -14,7 +14,7 @@ public class MapObjectiveNetworkHelper : NetworkHelperBase
     {
         base.OnNetworkSpawn();
         if(!NetworkManager.Singleton.IsServer)
-            DisableLocalLogic();
+            LocalInit();
     }
     
     void Awake()
@@ -46,10 +46,13 @@ public class MapObjectiveNetworkHelper : NetworkHelperBase
         }
     }
 
-    void DisableLocalLogic()
+    void LocalInit()
     {
         objective.SetIndicatorSize();
         objective.enabled = false;
+        Debug.Log("FILL IS " + fill.Value);
+        objective.SetFill(fill.Value);
+        objective.SetIndicatorColour(currentOwner.Value);
     }
 
     void UpdateFill(float previousValue, float newValue)

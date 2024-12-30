@@ -45,12 +45,20 @@
                     if (NetworkManager.Singleton.IsListening)
                     {
                         DroneNetworkController networkController = newBlock.GetComponent<DroneNetworkController>();
-
                         if (networkController != null)
                         {
                             networkController.blockCount.Value = blocks.Count;
                             networkController.curTeam.Value = teamID;
                         }
+
+                        /*NetworkObject rootNetObj = curDroneController.transform.gameObject.GetComponent<NetworkObject>();
+                        if (rootNetObj != null)
+                        {
+                            foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
+                            {
+                                rootNetObj.NetworkShow(clientId);   
+                            }
+                        }*/
                     }
                     
                     droneController.curTeam = teamID;
