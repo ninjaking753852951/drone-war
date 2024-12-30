@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2362564599
+  GlobalObjectIdHash: 1126454336
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -290,7 +290,6 @@ MonoBehaviour:
       worldOffsetHeight: 5
       screenOffsetHeight: -10
       colour: {r: 0.28773582, g: 0.8273331, b: 1, a: 1}
-  targetDestination: {x: 0, y: 0, z: 0}
   rb: {fileID: 0}
   boundingSphereRadius: 0
   onDroneDestroyed:
@@ -399,7 +398,7 @@ GameObject:
   - component: {fileID: 500399668958403904}
   - component: {fileID: 4972858966128822518}
   - component: {fileID: 7671421710147017333}
-  m_Layer: 7
+  m_Layer: 2
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -507,7 +506,7 @@ GameObject:
   - component: {fileID: 8437405410555383261}
   - component: {fileID: 1156924774422680647}
   - component: {fileID: 3131105817385086640}
-  m_Layer: 7
+  m_Layer: 2
   m_Name: Cube (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -787,7 +786,7 @@ GameObject:
   - component: {fileID: 4066982093014898225}
   - component: {fileID: 5738559115302630519}
   - component: {fileID: 5254044458283318315}
-  m_Layer: 7
+  m_Layer: 2
   m_Name: Cube (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
