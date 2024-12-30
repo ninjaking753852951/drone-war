@@ -26,8 +26,8 @@ public class DroneBlock : MonoBehaviour
     [HideInInspector]
     public DroneController controller;
 
-    public bool canOnlyAdoptTurretModules = false;
-
+    //public bool isJoint;
+    
     public BlockSaveMetaData meta;
     
     void Awake()
@@ -50,14 +50,14 @@ public class DroneBlock : MonoBehaviour
         controller = transform.root.GetComponent<DroneController>();
         controller.curHealth += health;
         
-        Rigidbody rb = GetComponent<Rigidbody>();
+        Rigidbody rb = Utils.FindParentRigidbody(transform);
         if (rb != null)
         {
-            rb.mass = mass;
+            rb.mass += mass;
         }
         else
         {
-            controller.movementController.mass += mass;
+            //controller.movementController.mass += mass;
         }
 
         
@@ -66,11 +66,18 @@ public class DroneBlock : MonoBehaviour
 
         foreach (DroneBlock droneBlock in blocks)
         {
+            Rigidbody newRb = Utils.FindParentRigidbody(droneBlock.transform);
+            
             if (droneBlock.transform.root != transform.root)
             {
                 droneBlock.transform.parent = connectionPoint;
                 blocksToInit.Add(droneBlock);
             }
+            /*else if(newRb != null && newRb != rb && isJoint)
+            {
+                FixedJoint fixedJoint = gameObject.AddComponent<FixedJoint>();
+                fixedJoint.connectedBody = newRb;
+            }*/
         }
         
         foreach (DroneBlock droneBlock in blocksToInit)
@@ -94,24 +101,11 @@ public class DroneBlock : MonoBehaviour
         // Loop through each collider and check if it has a DroneBlock component
         foreach (Collider collider in colliders)
         {
-            if (canOnlyAdoptTurretModules)
+            DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
+            if (droneBlock != null && droneBlock != this) // Exclude self
             {
-                TurretModule module = collider.GetComponent<TurretModule>();
-                TurretBarrelController barrel = collider.GetComponent<TurretBarrelController>();
-                DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
-                if (droneBlock != null && droneBlock != this && (module != null || barrel != null)) // Exclude self
-                {
-                    droneBlocks.Add(droneBlock);
-                }   
-            }
-            else
-            {
-                DroneBlock droneBlock = collider.GetComponent<DroneBlock>();
-                if (droneBlock != null && droneBlock != this) // Exclude self
-                {
-                    droneBlocks.Add(droneBlock);
-                }   
-            }
+                droneBlocks.Add(droneBlock);
+            }  
         }
 
         return droneBlocks;

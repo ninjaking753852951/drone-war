@@ -126,7 +126,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
         GetComponent<DroneBlock>().Init();
         rb.isKinematic = false;
         rb.useGravity = true;
-        rb.mass = movementController.mass;
+        //rb.mass = movementController.mass;
         curHealth *= healthMultiplier;
         maxHealth = curHealth;
         //maxHealth.SetValue(curHealth);

@@ -26,6 +26,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     List<TurretBarrelController> barrels;
     
     List<TurretMountSingleAxis> mountsSingleAxis;
+    Rigidbody highestRb;
 
     CountdownTimer fireTimer;
     bool isDeployed = false;
@@ -82,6 +83,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         rb = Utils.FindParentRigidbody(transform);
 
         mountsSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
+        Transform eldestMount = Utils.GetHighestInHierarchy(mountsSingleAxis).transform;
+        highestRb = Utils.FindParentRigidbody(eldestMount, eldestMount.GetComponent<Rigidbody>());
+        
         
         DeployModules();
         
@@ -156,9 +160,13 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         // Calculate Angles
         targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
         targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
+
+        //Debug.Log( "Pitch" + targetPitchAngle + " Yaw " + targetYawAngle);
+        
+        Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, highestRb.transform.up, highestRb.transform.forward);
         
         foreach (TurretMountSingleAxis turretMountSingleAxis in mountsSingleAxis)
-            turretMountSingleAxis.UpdateTurretAngles(targetYawAngle, targetPitchAngle);
+            turretMountSingleAxis.UpdateTurretAngles(transformedPitchYaw.y, transformedPitchYaw.x);
         
     }
     
@@ -243,16 +251,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         
         GameObject projectileClone = ObjectPoolManager.Instance.RequestObject(projectileType, spawnPos).gameObject;
 
-        /*NetworkTransform netTransform = projectileClone.GetComponent<NetworkTransform>();
-        if (netTransform != null)
-        {
-            netTransform.Teleport(mainBarrel.shootPoint.position, mainBarrel.shootPoint.rotation, Vector3.one);
-        }*/
-        //else
-        //{
-            projectileClone.transform.position = mainBarrel.shootPoint.position;
-            projectileClone.transform.rotation = mainBarrel.shootPoint.rotation;   
-        //}
+        projectileClone.transform.position = mainBarrel.shootPoint.position;
+        projectileClone.transform.rotation = mainBarrel.shootPoint.rotation;  
+        
         return projectileClone;
     }
     
@@ -269,7 +270,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         // Calculate the yaw angle (angle around the Y-axis)
         float targetYawAngle = Mathf.Atan2(horizontalDirection.x, horizontalDirection.z) * Mathf.Rad2Deg;
 
-        return (targetYawAngle -  transform.root.rotation.eulerAngles.y) %360;
+        return (targetYawAngle -  highestRb.rotation.eulerAngles.y) %360;
         
         /*
         // account for base rotation
@@ -314,6 +315,26 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         // Check if both yaw and pitch differences are within the aim tolerance
         return Mathf.Abs(yawDifference) <= aimTolerance && Mathf.Abs(pitchDifference) <= aimTolerance;
+    }
+    
+    protected Vector2 TransformAngles(float pitch, float yaw, Vector3 up, Vector3 forward)
+    {
+
+        
+        Vector3 shootDir = Utils.AnglesToDirection(yaw, pitch);
+        //shootDir = highestRb.transform.rotation * shootDir;
+        
+        Debug.DrawRay(transform.position, shootDir * 10, Color.magenta);
+        
+        Quaternion offsetRot = Quaternion.FromToRotation(up, Vector3.up);
+
+        shootDir = offsetRot * shootDir;
+        
+        //shootDir = highestRb.transform.rotation * shootDir;
+
+        Vector2 angles = Utils.DirectionToAngles(shootDir);
+        
+        return angles;
     }
 
 

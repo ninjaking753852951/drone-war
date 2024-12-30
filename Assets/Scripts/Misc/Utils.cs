@@ -435,6 +435,72 @@ public static class Utils
         }
     }
     
+    public static Vector3 AnglesToDirection(float yawDegrees, float pitchDegrees)
+    {
+        // Convert angles to radians
+        float yaw = yawDegrees * Mathf.Deg2Rad;
+        float pitch = pitchDegrees * Mathf.Deg2Rad;
+        
+        // Calculate direction vector components
+        float x = Mathf.Sin(yaw) * Mathf.Cos(pitch);
+        float y = -Mathf.Sin(pitch); // Negative because pitch up is negative in Unity
+        float z = Mathf.Cos(yaw) * Mathf.Cos(pitch);
+        
+        return new Vector3(x, y, z).normalized;
+    }
+    
+    public static Vector2 DirectionToAngles(Vector3 direction)
+    {
+        direction = direction.normalized;
+        
+        // Calculate pitch (-90 to 90 degrees)
+        float pitch = -Mathf.Asin(direction.y) * Mathf.Rad2Deg; // Negative because pitch up is negative in Unity
+        
+        // Calculate yaw (0 to 360 degrees)
+        float yaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        
+        // Normalize yaw to -180 to 180 range
+        if (yaw < -180f) yaw += 360f;
+        if (yaw > 180f) yaw -= 360f;
+        
+        return new Vector2(pitch, yaw);
+    }
+    
+    public static T GetHighestInHierarchy<T>(List<T> components) where T : Component
+    {
+        if (components == null || components.Count == 0)
+            return null;
+        
+        T highest = components[0];
+        int lowestDepth = GetHierarchyDepth(highest.transform);
+    
+        foreach (T component in components)
+        {
+            int depth = GetHierarchyDepth(component.transform);
+            if (depth < lowestDepth)
+            {
+                lowestDepth = depth;
+                highest = component;
+            }
+        }
+    
+        return highest;
+    }
+
+    private static int GetHierarchyDepth(Transform transform)
+    {
+        int depth = 0;
+        Transform parent = transform.parent;
+    
+        while (parent != null)
+        {
+            depth++;
+            parent = parent.parent;
+        }
+    
+        return depth;
+    }
+    
 }
 
 public static class GameObjectExtensions
