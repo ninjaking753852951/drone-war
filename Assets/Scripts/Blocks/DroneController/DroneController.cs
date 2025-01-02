@@ -21,6 +21,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
     public float curHealth;
     public float maxHealth;
     //public DynamicLocalNetworkVariable<float> maxHealth;
+    public GameObject physParent;
     
     public List<MeshRenderer> coreBlocks;
     public int curTeam;
@@ -80,9 +81,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     public void Select(bool select)
     {
-        Debug.Log("Is Selected");
-        return;
         outline.enabled = select;
+        return;
         foreach (var rangeIndicator in rangeIndicators)
         {
             rangeIndicator.Select(select);
@@ -101,7 +101,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     void InitOutline()
     {
-        outline = gameObject.AddComponent<Outline>();
+        outline = transform.root.gameObject.AddComponent<Outline>();
         outline.OutlineWidth = selectionWidth;
         outline.enabled = false;
     }
@@ -126,14 +126,18 @@ public class DroneController : NetworkBehaviour, IProgressBar
     public void Deploy()
     {
         instanceID = MachineInstanceManager.Instance.Register(this);
-        
-        FindFirstObjectByType<PhysParent>().Build();
+
+        Instantiate(physParent).GetComponent<PhysParent>().Build();
         
         
         rb = physBlock.Cluster().rb;
         movementController.Initialize(rb, transform, this);
-        
+        movementController.mass = physBlock.Cluster().physParent.TotalMass();
         movementController.InitializeComponents();
+        
+        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(physBlock.Cluster().physParent.transform);
+        
+        InitOutline();
         
         return;
         
@@ -146,11 +150,10 @@ public class DroneController : NetworkBehaviour, IProgressBar
         //maxHealth.SetValue(curHealth);
         
         energy.Init(this);
-
-        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(rb);
+        
         
 
-        InitOutline();
+
         InitRangeIndicator();
         
         ProgressBarManager.Instance.RegisterHealthBar(this);

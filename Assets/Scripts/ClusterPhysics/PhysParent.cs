@@ -10,6 +10,8 @@ public class PhysParent : MonoBehaviour
     List<PhysCluster> clusters = new List<PhysCluster>();
 
     public bool deployOnStart;
+
+    float totalMass;
     
     void Start()
     {
@@ -63,6 +65,9 @@ public class PhysParent : MonoBehaviour
         foreach (PhysCluster cluster in clusters)
         {
             cluster.FinalizeBuild();
+            totalMass += cluster.rb.mass;
         }
     }
+
+    public float TotalMass() => totalMass;
 }

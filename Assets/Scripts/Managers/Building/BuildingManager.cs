@@ -5,14 +5,15 @@ using System.Linq;
 using Interfaces;
 using Unity.Mathematics;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityUtils;
 
-public class BuildingManager : Singleton<BuildingManager>
+public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 {
     public Material indicatorMat;
     public Material badIndicatorMat;
+    
     
     public GameObject buildingBlockIndicator;
     
@@ -212,6 +213,10 @@ public class BuildingManager : Singleton<BuildingManager>
         GameManager.Instance.EnterBuildMode();
         
         Utils.DestroyAllDrones();
+        PhysParent parent = FindFirstObjectByType<PhysParent>();
+        if(parent != null)
+            DestroyImmediate(parent.gameObject);
+        
         MachineSaveLoadManager.instance.LoadAndSpawnMachine(MachineSaveLoadManager.instance.curSlot);// corresponds to active game save slot;
         SetNewCurrentBlock(BlockLibraryManager.Instance.blocks[0]);
     }

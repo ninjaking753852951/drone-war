@@ -247,6 +247,8 @@ MonoBehaviour:
   healthMultiplier: 100
   curHealth: 0
   maxHealth: 0
+  physParent: {fileID: 3309993929037192745, guid: 946e8fcb981031a4aa13110533949c69,
+    type: 3}
   coreBlocks:
   - {fileID: 7477153313750559185}
   - {fileID: 4817536295136154598}
@@ -263,6 +265,7 @@ MonoBehaviour:
       worldOffsetHeight: 5
       screenOffsetHeight: -10
       colour: {r: 0.28773582, g: 0.8273331, b: 1, a: 1}
+  physBlock: {fileID: 0}
   rb: {fileID: 0}
   boundingSphereRadius: 0
   onDroneDestroyed:
@@ -372,6 +375,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
+  mass: 25
+  onBuildFinalized:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3170781993727125655
 GameObject:
   m_ObjectHideFlags: 0

@@ -15,7 +15,8 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     float targetSteer;
     float curSteer;
 
-    public float springForce = 1000;
+    public float springForce = 100000;
+    public float dampnerForce = 2000;
     
     DroneController controller;
 
@@ -53,6 +54,7 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
         JointSpring curSpring = joint.spring;
         curSpring.targetPosition = curSteer;
         curSpring.spring = springForce;
+        curSpring.damper = dampnerForce;
         joint.spring = curSpring;
     }
     

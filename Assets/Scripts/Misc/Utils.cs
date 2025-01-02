@@ -249,6 +249,50 @@ public static class Utils
         return maxDistance;
     }
     
+    public static float CalculateBoundingSphereRadius(Transform transform)
+    {
+        if (transform == null)
+        {
+            Debug.LogWarning("Transform is null.");
+            return 0f;
+        }
+
+        // Get all colliders attached to the Transform and its children
+        Collider[] colliders = transform.GetComponentsInChildren<Collider>();
+        if (colliders.Length == 0)
+        {
+            Debug.LogWarning("No colliders found on the Transform or its children.");
+            return 0f;
+        }
+
+        // Calculate the combined bounds of all colliders to determine the center
+        Bounds combinedBounds = colliders[0].bounds;
+        for (int i = 1; i < colliders.Length; i++)
+        {
+            combinedBounds.Encapsulate(colliders[i].bounds);
+        }
+
+        Vector3 center = combinedBounds.center;
+        float maxDistance = 0f;
+
+        foreach (Collider collider in colliders)
+        {
+            // Get the bounds of the collider
+            Bounds bounds = collider.bounds;
+
+            // Calculate the farthest distance from the combined center
+            Vector3[] corners = new Vector3[8];
+            bounds.GetCorners(corners);
+            foreach (Vector3 corner in corners)
+            {
+                float distance = Vector3.Distance(center, corner);
+                maxDistance = Mathf.Max(maxDistance, distance);
+            }
+        }
+
+        return maxDistance;
+    }
+    
     public static void GetCorners(this Bounds bounds, Vector3[] corners)
     {
         if (corners.Length < 8)

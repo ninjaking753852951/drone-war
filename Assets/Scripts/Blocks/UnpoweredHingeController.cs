@@ -8,9 +8,10 @@ public class UnpoweredHingeController : MovingDroneBlockBase
 
     public override void Deploy()
     {
-        base.Deploy();
-        joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
-        body.transform.parent = transform.parent;
+        //base.Deploy();
+        
+        //joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
+        //body.transform.parent = transform.parent;
     }
 
 }

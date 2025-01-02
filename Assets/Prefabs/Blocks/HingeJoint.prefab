@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3431741349
+  GlobalObjectIdHash: 2699380834
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -262,7 +262,8 @@ MonoBehaviour:
   turnLimit: 45
   maxTurnSpeed: 90
   body: {fileID: 708164786544932463}
-  springForce: 2000
+  springForce: 100000
+  dampnerForce: 2000
   block: {fileID: 0}
 --- !u!114 &4399024851177919533
 MonoBehaviour:
