@@ -64,7 +64,7 @@ public class SelectionManager : Singleton<SelectionManager>
         if (hitTransform != null)
         {
             // Check if the root object has a DroneController component
-            DroneController drone = hitTransform.root.GetComponent<DroneController>();
+            DroneController drone = hitTransform.root.GetComponentInChildren<DroneController>();
 
             if (drone != null)
             {

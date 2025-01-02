@@ -10,13 +10,23 @@ public class WheelController : MovingDroneBlockBase
     
     float torqueDirection;
     float targetSteerRot;
-    
 
+    public PhysJointPhysBlock block;
+
+    DroneController controller;
+    
     public override void Deploy()
     {
-        base.Deploy();
+        //base.Deploy();
         
-        wheelJoint.connectedBody = Utils.FindParentRigidbody(transform, rb);
+        //wheelJoint.connectedBody = Utils.FindParentRigidbody(transform, rb);
+        
+        Debug.Log("Deploying wheel");
+
+        controller = transform.root.GetComponentInChildren<DroneController>();
+        
+        block = GetComponent<PhysJointPhysBlock>();
+        wheelJoint = (HingeJoint)block.joint;
         
         torqueDirection = CalculateTorqueDirection();
     }
@@ -32,6 +42,8 @@ public class WheelController : MovingDroneBlockBase
     
     public void SetTargetVelocity(float velocity)
     {
+        //Debug.Log("Setting wheel velocity " + velocity);
+
         JointMotor motor = wheelJoint.motor;
 
         motor.targetVelocity = velocity * torqueDirection;
@@ -41,13 +53,17 @@ public class WheelController : MovingDroneBlockBase
     
     float CalculateTorqueDirection()
     {
-        Transform origin = transform.root;
+        Transform origin = controller.transform;
         // Direction from a to b
         Vector3 directionToWheelBody = transform.position - origin.position;
-
+        
+        
         // Calculate the dot product with a's right direction
         float dotProduct = Vector3.Dot(directionToWheelBody.normalized, origin.right);
 
+        return 1;
+        //Debug.Log(dotProduct);
+        
         // If the dot product is positive, b is on the right side of a
         return dotProduct > 0 ? 1 : -1;
     }

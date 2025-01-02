@@ -73,8 +73,8 @@ public class MovementController
 
     public void InitializeComponents()
     {
-        _wheelControllers = _transform.GetComponentsInChildren<WheelController>().ToList();
-        _hingeControllers = _transform.GetComponentsInChildren<HingeController>().ToList();
+        _wheelControllers = _transform.root.GetComponentsInChildren<WheelController>().ToList();
+        _hingeControllers = _transform.root.GetComponentsInChildren<HingeController>().ToList();
 
         CalculateComHeight();
         CalculateWheelbase();

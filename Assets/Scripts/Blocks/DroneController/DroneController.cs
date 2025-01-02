@@ -31,7 +31,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     public Queue<WaypointManager.Waypoint> waypoints = new Queue<WaypointManager.Waypoint>();
 
-    
+    [HideInInspector]
+    public PhysBlock physBlock;
     
     
     public Vector3 TargetDestination()
@@ -56,9 +57,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
     
     void Awake()
     {
+        physBlock = GetComponent<PhysBlock>();
 
-        rb = GetComponent<Rigidbody>();
-        movementController.Initialize(rb, transform, this);
     }
 
     void Start()
@@ -68,6 +68,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     void Update()
     {
+        if(!physBlock.IsInCluster())
+            return;
         
         energy.Update(Time.deltaTime);
         
@@ -78,6 +80,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     public void Select(bool select)
     {
+        Debug.Log("Is Selected");
+        return;
         outline.enabled = select;
         foreach (var rangeIndicator in rangeIndicators)
         {
@@ -122,6 +126,16 @@ public class DroneController : NetworkBehaviour, IProgressBar
     public void Deploy()
     {
         instanceID = MachineInstanceManager.Instance.Register(this);
+        
+        FindFirstObjectByType<PhysParent>().Build();
+        
+        
+        rb = physBlock.Cluster().rb;
+        movementController.Initialize(rb, transform, this);
+        
+        movementController.InitializeComponents();
+        
+        return;
         
         GetComponent<DroneBlock>().Init();
         rb.isKinematic = false;

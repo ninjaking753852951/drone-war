@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+
 public abstract class MovingDroneBlockBase : MonoBehaviour
 {
 
@@ -9,9 +9,9 @@ public abstract class MovingDroneBlockBase : MonoBehaviour
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        /*rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
-        rb.useGravity = false;
+        rb.useGravity = false;*/
     }
 
     public virtual void Deploy()

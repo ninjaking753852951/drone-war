@@ -15,21 +15,27 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     float targetSteer;
     float curSteer;
 
+    public float springForce = 1000;
+    
     DroneController controller;
 
+    public PhysJointPhysBlock block;
+    
     bool isDeployed;
     
     public override void Deploy()
     {
-        base.Deploy();
+        //base.Deploy();
         
         isDeployed = true;
 
-        body.transform.parent = transform.parent;
+        //body.transform.parent = transform.parent;
 
-        controller = transform.root.GetComponent<DroneController>();
+        controller = transform.root.GetComponentInChildren<DroneController>();
+        block = GetComponent<PhysJointPhysBlock>();
+        joint = (HingeJoint)block.joint;
         
-        joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
+        //joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
         turnDirection = CalculateTurnDirection();
     }
 
@@ -41,9 +47,12 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
        
 
         curSteer = Mathf.MoveTowards(curSteer, targetSteer * turnDirection, Time.deltaTime * maxTurnSpeed);
+
+        joint.useSpring = true;
         
         JointSpring curSpring = joint.spring;
         curSpring.targetPosition = curSteer;
+        curSpring.spring = springForce;
         joint.spring = curSpring;
     }
     

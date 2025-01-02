@@ -9,13 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2611203027257188279}
-  - component: {fileID: 413524235715824292}
-  - component: {fileID: 705307705198398126}
-  - component: {fileID: 1999660179334152785}
   - component: {fileID: 5231889847655958430}
   - component: {fileID: 630475461580540650}
   - component: {fileID: 6480554552259157177}
-  - component: {fileID: 4416000716965698615}
+  - component: {fileID: 7897920178553114285}
   m_Layer: 0
   m_Name: Wheel
   m_TagString: Untagged
@@ -39,85 +36,6 @@ Transform:
   - {fileID: 8249416352327352621}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &413524235715824292
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 815193987416364843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1826522405
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
---- !u!114 &705307705198398126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 815193987416364843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
-  Interpolate: 1
-  SlerpPosition: 0
---- !u!54 &1999660179334152785
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 815193987416364843}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!114 &5231889847655958430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,8 +48,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e1220c16c9cdc408d0ac74edc7a74b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 1999660179334152785}
-  wheelJoint: {fileID: 4416000716965698615}
+  rb: {fileID: 0}
+  wheelJoint: {fileID: 0}
+  block: {fileID: 0}
 --- !u!114 &630475461580540650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,7 +89,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   controller: {fileID: 0}
-  canOnlyAdoptTurretModules: 0
   meta:
     specialPositions: []
 --- !u!65 &6480554552259157177
@@ -192,47 +110,39 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1, y: 0.5, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!59 &4416000716965698615
-HingeJoint:
+--- !u!114 &7897920178553114285
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 815193987416364843}
-  serializedVersion: 3
-  m_ConnectedBody: {fileID: 0}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: 0, y: -0.5, z: 0}
-  m_Axis: {x: 0, y: 1, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: -0.5, z: 0}
-  m_UseSpring: 0
-  m_Spring:
-    spring: 100000
-    damper: 100000
-    targetPosition: 0
-  m_UseMotor: 1
-  m_Motor:
-    targetVelocity: 0
-    force: 0
-    freeSpin: 0
-  m_UseLimits: 0
-  m_ExtendedLimits: 0
-  m_UseAcceleration: 0
-  m_Limits:
-    min: 0
-    max: 0
-    bounciness: 0
-    bounceMinVelocity: 0.2
-    contactDistance: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daaba066ac243e24cb06acf51c1ffe4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanBoxSize: {x: 1.1, y: 0.5, z: 1.1}
+  scanBoxOffset: {x: 0, y: -1, z: 0}
+  mass: 25
+  onBuildFinalized:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5231889847655958430}
+        m_TargetAssemblyTypeName: WheelController, Assembly-CSharp
+        m_MethodName: Deploy
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  jointBuilder: {fileID: 11400000, guid: 67586466e64001845b3337852f8fa664, type: 2}
 --- !u!1 &1212144967693975949
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,8 +749,63 @@ Transform:
   - {fileID: 7744313546821685391}
   - {fileID: 2974547214318735264}
   - {fileID: 8087816874998370725}
+  - {fileID: 3222115235059390346}
   m_Father: {fileID: 8249416352327352621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+--- !u!1 &6091827051105804338
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3222115235059390346}
+  - component: {fileID: 2767863353185243098}
+  m_Layer: 0
+  m_Name: Cylinder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3222115235059390346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6091827051105804338}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.00000014901, y: 0.00000011898, z: 0.00000018086}
+  m_LocalScale: {x: 1.9961131, y: 0.46334028, z: 1.9961135}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3833495541812226426}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!64 &2767863353185243098
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6091827051105804338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: 0bc10bbf05900492a857c64c7b0f4572, type: 2}
 --- !u!1 &8742406051496779834
 GameObject:
   m_ObjectHideFlags: 0

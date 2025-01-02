@@ -12,7 +12,7 @@ public class MotorBlock : MonoBehaviour
     
     public void Init()
     {
-        controller = transform.root.GetComponent<DroneController>();
+        controller = transform.root.GetComponentInChildren<DroneController>();
         
         controller.movementController.motorTorque += torque;
         controller.movementController.movementEnergyCost += energyCost;

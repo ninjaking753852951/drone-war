@@ -54,7 +54,8 @@ public class PlayerWaypointManager : WaypointManager
             
             for (int i = 0; i < droneCount; i++)
             {
-                CreateWaypointCommand(playerDrones[i], pos + posOffsets[i]);
+                //CreateWaypointCommand(playerDrones[i], pos + posOffsets[i]);
+                CreateWaypointCommand(playerDrones[i], pos);
             }
         }
 
