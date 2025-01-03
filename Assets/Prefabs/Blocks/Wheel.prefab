@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 7685076911174816858}
   - component: {fileID: 6887507913266055322}
   - component: {fileID: 4617527328809492408}
-  m_Layer: 2
+  m_Layer: 8
   m_Name: WheelCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

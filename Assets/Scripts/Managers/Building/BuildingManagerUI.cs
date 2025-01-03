@@ -80,4 +80,9 @@ public class BuildingManagerUI : MonoBehaviour
             categoryButtonClone.GetComponentInChildren<Button>().onClick.AddListener(() => builder.SetNewCurrentBlock(placeable));
         }
     }
+
+    public void SetToolMode(int modeIndex)
+    {
+        builder.curToolMode = (BuildingManager.ToolMode)modeIndex;
+    }
 }

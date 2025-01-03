@@ -8,7 +8,7 @@ public class SuspensionJointBuilder : PhysJointBuilder
     public float springValue;
     public float damperValue;
     
-    public override Joint Build(Vector3 anchorPoint, PhysCluster originCluster, PhysCluster connectedCluster)
+    public override Joint Build(Vector3 anchorPoint, Quaternion rot, PhysCluster originCluster, PhysCluster connectedCluster)
     {
         ConfigurableJoint suspensionJoint = originCluster.gameObject.AddComponent<ConfigurableJoint>();
         suspensionJoint.enableCollision = selfCollision;

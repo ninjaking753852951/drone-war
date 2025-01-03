@@ -10,7 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b770202fbe8845aeb346f772798fe328, type: 3}
-  m_Name: PoweredHingeJoint
+  m_Name: WheelHingeJoint
   m_EditorClassIdentifier: 
   selfCollision: 0
   isPowered: 1
+  axis: {x: 0, y: 1, z: 0}

@@ -13,7 +13,8 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 {
     public Material indicatorMat;
     public Material badIndicatorMat;
-    
+
+    public LayerMask placementMask;
     
     public GameObject buildingBlockIndicator;
     
@@ -24,20 +25,93 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     DroneController droneController;
     
     public Vector3 spawnPoint;
-
+    
     List<IPlaceable> allPlaceables;
     [HideInInspector]
     public float totalCost;
     IPlaceable curPlaceable;
 
     bool isOnCompatibleBlock;
+    public BuildingBlockSelector blockSelector { get; private set; }
+
+    public MoveTool moveTool;
+    [System.Serializable]
+    public class MoveTool
+    {
+        public Transform moveToolGizmo;
+        BuildingManager builder;
+
+        public OperationPoint operationPoint;
+        public enum OperationPoint
+        {
+            Center, Pivot
+        }
+
+        public void Update()
+        {
+            if (builder.blockSelector.selectedComponents.Count > 0)
+            {
+                moveToolGizmo.gameObject.SetActive(true);
+
+            }
+            else
+            {
+                moveToolGizmo.gameObject.SetActive(false);
+            }
+        }
+
+        void OnSelectedBlock(DroneBlock block)
+        {
+            switch (operationPoint)
+            {
+                case OperationPoint.Center:
+                    SetGizmoPosition(ComputeAveragePositionOfSelectedBlocks());
+                    break;
+                case OperationPoint.Pivot:
+                    SetGizmoPosition(builder.blockSelector.lastSelected.transform.position);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        void SetGizmoPosition(Vector3 pos)
+        {
+            moveToolGizmo.transform.position = pos;
+        }
+
+        Vector3 ComputeAveragePositionOfSelectedBlocks()
+        {
+            List<Transform> blockTransforms = Utils.GetTransformsFromComponents(builder.blockSelector.selectedComponents);
+            return Utils.CalculateAveragePosition(blockTransforms);
+        }
+
+        public void Init(BuildingManager builder)
+        {
+            this.builder = builder;
+            builder.blockSelector.onSelected.AddListener(OnSelectedBlock);
+        }
+    }
+    
+    public ToolMode curToolMode;
+    public enum ToolMode
+    {
+        Place, Move, Rotate
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        blockSelector = GetComponent<BuildingBlockSelector>();
+        moveTool.Init((this));
+    }
     
     void Start()
     {
         if(GameManager.Instance.currentGameMode == GameMode.Build)
             EnterBuildMode();
     }
-
+    
     void Update()
     {
         switch (GameManager.Instance.currentGameMode)
@@ -102,6 +176,25 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     
     void BuildUpdate()
     {
+        switch (curToolMode)
+        {
+            case ToolMode.Place:
+                PlacementUpdate();
+                break;
+            case ToolMode.Move:
+                moveTool.Update();
+                if(buildingBlockIndicator != null)
+                    buildingBlockIndicator.SetActive(false);
+                break;
+            case ToolMode.Rotate:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    void PlacementUpdate()
+    {
         Camera cam = Camera.main;
         
         if(cam == null || Utils.IsCursorOutsideCameraFrustum(cam))
@@ -134,7 +227,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         bool hasHitDroneBlock = false;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, 100, placementMask))
         {
             DroneBlock hitDroneBlock = hit.collider.GetComponentInParent<DroneBlock>();
             //DroneBlock hitDroneBlock = hit.collider.GetComponent<DroneBlock>();
@@ -210,6 +303,8 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 
     void EnterBuildMode()
     {
+
+        
         GameManager.Instance.EnterBuildMode();
         
         Utils.DestroyAllDrones();
@@ -231,6 +326,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         MachineSaveLoadManager.Instance.SaveMachine(MachineSaveLoadManager.instance.curSlot);
         GameManager.Instance.ExitBuildMode();
         buildingBlockIndicator.SetActive(false);
+        moveTool.moveToolGizmo.gameObject.SetActive(false);
         DeployMachine();
     }
 

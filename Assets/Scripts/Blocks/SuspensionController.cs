@@ -3,12 +3,19 @@ using UnityEngine;
 public class SuspensionController : MovingDroneBlockBase
 {
 
-    public ConfigurableJoint joint;
-
+    ConfigurableJoint joint;
+    PhysJointPhysBlock block;
+    
+    public float springForce = 20000;
+    
     public override void Deploy()
     {
-        base.Deploy();
-        joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
+        block = GetComponent<PhysJointPhysBlock>();
+        joint = (ConfigurableJoint)block.joint;
+
+        JointDrive jointDrive = joint.yDrive;
+        jointDrive.positionSpring = springForce;
+        joint.yDrive = jointDrive;
     }
 
 }

@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selfCollision: 0
   isPowered: 0
-  axis: {x: 0, y: -1, z: 0}
+  axis: {x: 1, y: 0, z: 0}

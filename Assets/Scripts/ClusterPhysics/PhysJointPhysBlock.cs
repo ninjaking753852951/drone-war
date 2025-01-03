@@ -34,7 +34,7 @@ public class PhysJointPhysBlock : PhysBlock
 
         connectedCluster = connectedBlocks[0].originCluster; 
         
-        joint = jointBuilder.Build(relativeAnchor,originCluster, connectedCluster);
+        joint = jointBuilder.Build(relativeAnchor, transform.rotation,originCluster, connectedCluster);
     }
     
 }

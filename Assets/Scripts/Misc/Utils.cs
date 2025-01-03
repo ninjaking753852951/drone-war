@@ -138,6 +138,23 @@ public static class Utils
 
         return sum / positions.Count;
     }
+    
+    public static Vector3 CalculateAveragePosition(List<Transform> positions)
+    {
+        if (positions == null || positions.Count == 0)
+        {
+            Debug.LogWarning("Position list is empty or null.");
+            return Vector3.zero;
+        }
+
+        Vector3 sum = Vector3.zero;
+        foreach (Transform position in positions)
+        {
+            sum += position.position;
+        }
+
+        return sum / positions.Count;
+    }
 
     public static void SetChildrenToColour(GameObject parentObj, Color colour)
     {

@@ -117,12 +117,12 @@ public class DroneBlock : MonoBehaviour
         
     }
 
-    void OnDrawGizmosSelected()
+    /*void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Vector3 halfExtents = scanBoxSize / 2f;
         Gizmos.DrawWireCube(transform.position+ transform.rotation * scanBoxOffset, halfExtents * 2f);
-    }
+    }*/
 
     public void TakeDamage(float damage)
     {

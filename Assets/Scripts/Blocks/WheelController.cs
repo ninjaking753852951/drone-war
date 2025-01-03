@@ -61,7 +61,7 @@ public class WheelController : MovingDroneBlockBase
         // Calculate the dot product with a's right direction
         float dotProduct = Vector3.Dot(directionToWheelBody.normalized, origin.right);
 
-        return 1;
+        //return 1;
         //Debug.Log(dotProduct);
         
         // If the dot product is positive, b is on the right side of a
