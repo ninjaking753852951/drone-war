@@ -24,10 +24,63 @@ public class BuildingManagerUI : MonoBehaviour
 
     BlockType[] placeableCategories = { BlockType.Basic, BlockType.Structure, BlockType.Power,BlockType.TurretMounts,
         BlockType.TurretBarrels, BlockType.TurretCores, BlockType.SubAssemblies, BlockType.TurretModules };
+
+    public List<BuildToolUI> buildToolUis = new List<BuildToolUI>();
+    
+    [System.Serializable]
+    public class BuildToolUI
+    {
+        public Button mainButton;
+        public Transform optionsMenu;
+        public Transform highlight;
+        public BuildingManager.ToolMode mode;
+        BuildingManagerUI ui;
+
+        public void Init(BuildingManagerUI ui)
+        {
+            this.ui = ui;
+            switch (mode) // TODO replace awkward integration in future
+            {
+                case BuildingManager.ToolMode.Move:
+                    ui.builder.moveTool.ui = this;
+                    break;
+                case BuildingManager.ToolMode.Rotate:
+                    ui.builder.rotateTool.ui = this;
+                    break;
+            }
+            
+            mainButton.onClick.AddListener(ButtonPress);
+            SetClosed();
+        }
+
+        public void ButtonPress()
+        {
+            ui.SetBuildTool(mode);
+        }
+
+        public void SetOpen()
+        {
+            optionsMenu.gameObject.SetActive(true);
+            highlight.gameObject.SetActive(true);
+        }
+        
+        public void SetClosed()
+        {
+            optionsMenu.gameObject.SetActive(false);
+            highlight.gameObject.SetActive(false);
+        }
+    }
     
     void Awake()
     {
         builder = GetComponent<BuildingManager>();
+        
+        foreach (BuildToolUI buildToolUi in buildToolUis)
+        {
+            buildToolUi.Init(this);
+            if(buildToolUi.mode == BuildingManager.ToolMode.Place)
+                buildToolUi.SetOpen();
+        }
     }
     
     
@@ -81,8 +134,21 @@ public class BuildingManagerUI : MonoBehaviour
         }
     }
 
-    public void SetToolMode(int modeIndex)
+    public void SetBuildTool(BuildingManager.ToolMode mode)
     {
-        builder.curToolMode = (BuildingManager.ToolMode)modeIndex;
+        builder.curTool = mode;
+        
+        /*foreach (BuildToolUI buildToolUi in buildToolUis)
+        {
+            if (buildToolUi.mode == mode)
+            {
+                buildToolUi.SetOpen();
+            }
+            else
+            {
+                buildToolUi.SetClosed();
+            }
+        }*/
+        
     }
 }

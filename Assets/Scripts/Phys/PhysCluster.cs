@@ -13,6 +13,8 @@ public class PhysCluster : MonoBehaviour
 
     public List<PhysBlock> Blocks() => blocks;
 
+    Dictionary<PhysBlock, PhysBlock> adjacencyMap = new Dictionary<PhysBlock, PhysBlock>();
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -35,10 +37,11 @@ public class PhysCluster : MonoBehaviour
         physParent = parent;
     }
 
-    public void RegisterBlock(PhysBlock physBlock)
+    public void RegisterBlock(PhysBlock physBlock, PhysBlock neighborBlock)
     {
         blocks.Add(physBlock);
         physBlock.SetOriginCluster(this);
+        //physBlock.AddNeighbors(neighborBlock);
     }
 
     public void MergeCluster(PhysCluster otherCluster)
@@ -57,9 +60,17 @@ public class PhysCluster : MonoBehaviour
     {
         foreach (PhysBlock block in otherCluster.blocks)
         {
-            RegisterBlock(block);
+            RegisterBlock(block, null );
         }
         Destroy(otherCluster.gameObject);
+    }
+
+    public void CalculateBlockAdjacency()
+    {
+        foreach (PhysBlock block in blocks)
+        {
+            block.CalculateAdjacency();
+        }
     }
 
     public void FinalizeBuild()
@@ -69,5 +80,32 @@ public class PhysCluster : MonoBehaviour
             rb.mass += block.mass;
             block.FinalizeBuild();
         }
+        
+        CalculateCOM();
+    }
+    
+    
+    void CalculateCOM()
+    {
+        Vector3 com = Vector3.zero;
+
+        float massSum = 0;
+        
+        foreach (PhysBlock block in blocks)
+        {
+            com += (block.transform.position + block.transform.rotation * block.centerOfMass) * block.mass;
+            massSum += block.mass;
+        }
+
+        com /= massSum;
+        
+        rb.centerOfMass = transform.InverseTransformPoint(com);
+        //TODO CALCULATE COM
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(rb.worldCenterOfMass, 0.5f);
     }
 }

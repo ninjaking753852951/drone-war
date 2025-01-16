@@ -13,6 +13,9 @@ public class SuspensionController : MovingDroneBlockBase
         block = GetComponent<PhysJointPhysBlock>();
         joint = (ConfigurableJoint)block.joint;
 
+        if(joint == null)
+            return;
+        
         JointDrive jointDrive = joint.yDrive;
         jointDrive.positionSpring = springForce;
         joint.yDrive = jointDrive;

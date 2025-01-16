@@ -1,3 +1,4 @@
+    using System.Collections;
     using System.Collections.Generic;
     using Interfaces;
     using Unity.Netcode;
@@ -7,12 +8,15 @@
     {
         public List<MachineSaveLoadManager.BlockSaveData> blocks = new List<MachineSaveLoadManager.BlockSaveData>();
         public float totalCost;
-
-        public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parent = null, int teamID = 0, bool network = true)
+        
+        public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parentParent = null, int teamID = 0, bool network = true, bool deploy = false)
         {
             // parent should be null for drones that are gonna deploy
             DroneController droneController = null;
 
+            GameObject physParent = GameObject.Instantiate(MachineSaveLoadManager.Instance.physParentPrefab, parentParent);
+            Transform parent = physParent.transform;
+            
             foreach (MachineSaveLoadManager.BlockSaveData blockSaveData in blocks)
             {
                 IPlaceable blockData = BlockLibraryManager.Instance.BlockData(blockSaveData.blockID);
@@ -50,15 +54,6 @@
                             networkController.blockCount.Value = blocks.Count;
                             networkController.curTeam.Value = teamID;
                         }
-
-                        /*NetworkObject rootNetObj = curDroneController.transform.gameObject.GetComponent<NetworkObject>();
-                        if (rootNetObj != null)
-                        {
-                            foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
-                            {
-                                rootNetObj.NetworkShow(clientId);   
-                            }
-                        }*/
                     }
                     
                     droneController.curTeam = teamID;
@@ -66,9 +61,13 @@
                 }
             }
 
+            if (deploy && droneController != null)
+            {
+                droneController.Deploy();
+            }
+
             return droneController;
         }
-
 
         public Sprite GenerateThumbnail()
         {

@@ -16,6 +16,9 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
     public string subAssemblyDirectory = "SubAssemblies";
 
+    public GameObject physParentPrefab;
+
+    
     [HideInInspector]
     public int curSlot = 0;
     
@@ -183,7 +186,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         return saveData;
     }
     
-    public void LoadAndSpawnMachine(int slot, Vector3 offset = default)
+    /*public void LoadAndSpawnMachine(int slot, Vector3 offset = default)
     {
         MachineSaveData saveData = LoadMachine(slot);
 
@@ -198,7 +201,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         }
         
         BuildingManager.Instance.FindDroneController();
-    }
+    }*/
     
     string GetMachineSlotPath(int x)
     {
@@ -225,6 +228,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         SaveMachine(curSlot);
         curSlot = targetSlot;
         Utils.DestroyAllDrones();
-        LoadAndSpawnMachine(curSlot);
+        LoadMachine(curSlot).Spawn();
+        //LoadAndSpawnMachine(curSlot);
     }
 }

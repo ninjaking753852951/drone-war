@@ -82,7 +82,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
     public void Select(bool select)
     {
         outline.enabled = select;
-        return;
+        //return;
         foreach (var rangeIndicator in rangeIndicators)
         {
             rangeIndicator.Select(select);
@@ -108,7 +108,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     void InitRangeIndicator()
     {
-        rangeIndicators = transform.GetComponentsInChildren<TurretRangeIndicator>().ToList();
+        rangeIndicators = transform.root.GetComponentsInChildren<TurretRangeIndicator>().ToList();
     }
 
     void SetCoreColour(Color teamColour)
@@ -129,40 +129,43 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
         Instantiate(physParent).GetComponent<PhysParent>().Build();
         
-        
         rb = physBlock.Cluster().rb;
-        movementController.Initialize(rb, transform, this);
-        movementController.mass = physBlock.Cluster().physParent.TotalMass();
-        movementController.InitializeComponents();
         
-        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(physBlock.Cluster().physParent.transform);
+        InitMovement();
         
         InitOutline();
         
-        return;
-        
-        GetComponent<DroneBlock>().Init();
-        rb.isKinematic = false;
-        rb.useGravity = true;
-        //rb.mass = movementController.mass;
-        curHealth *= healthMultiplier;
-        maxHealth = curHealth;
-        //maxHealth.SetValue(curHealth);
+        InitHealth();
         
         energy.Init(this);
         
-        
-
-
         InitRangeIndicator();
         
-        ProgressBarManager.Instance.RegisterHealthBar(this);
-
         SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
-
-        movementController.InitializeComponents();
     }
 
+    void InitHealth()
+    {
+        List<DroneBlock> droneBlocks = transform.root.GetComponentsInChildren<DroneBlock>().ToList();
+        foreach (DroneBlock droneBlock in droneBlocks)
+        {
+            curHealth += droneBlock.health;
+        }
+        
+        curHealth *= healthMultiplier;
+        maxHealth = curHealth;
+        
+        ProgressBarManager.Instance.RegisterHealthBar(this);
+    }
+
+    void InitMovement()
+    {
+        movementController.Initialize(rb, transform, this);
+        movementController.mass = physBlock.Cluster().physParent.TotalMass();
+        movementController.InitializeComponents();
+        boundingSphereRadius = Utils.CalculateBoundingSphereRadius(physBlock.Cluster().physParent.transform);
+    }
+    
     public void ReachedWaypoint()
     {
         if(waypoints.Count == 0)
@@ -179,11 +182,6 @@ public class DroneController : NetworkBehaviour, IProgressBar
         }
         waypoints.Clear();
     }
-
-    /*public void SetDestination(Vector3 destination)
-    {
-        TargetDestination() = destination;
-    }*/
 
     public void AddWaypoint(WaypointManager.Waypoint waypoint)
     {
@@ -211,9 +209,6 @@ public class DroneController : NetworkBehaviour, IProgressBar
     {
         if(rb == null)
             return;
-        
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(rb.worldCenterOfMass, 0.25f);
         
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(rb.worldCenterOfMass, boundingSphereRadius);

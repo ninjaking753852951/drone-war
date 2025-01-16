@@ -6,6 +6,8 @@ public class PhysParent : MonoBehaviour
 {
 
     public GameObject physClusterPrefab;
+    
+    public List<PhysBlock> blocks { get; private set; }
 
     List<PhysCluster> clusters = new List<PhysCluster>();
 
@@ -23,15 +25,25 @@ public class PhysParent : MonoBehaviour
 
     public void Build()
     {
+        SetBlockParent();
         Clusterize();
         PhysicsJointAdoption();
+        CalculateBlockAdjacency();
         FinalizeBuild();
+    }
+
+    void SetBlockParent()
+    {
+        blocks = FindObjectsByType<PhysBlock>(FindObjectsSortMode.None).ToList();
+
+        foreach (PhysBlock block in blocks)
+        {
+            block.SetPhysParent(this);
+        }
     }
 
     void Clusterize()
     {
-        List<PhysBlock> blocks = FindObjectsByType<PhysBlock>(FindObjectsSortMode.None).ToList();
-
         foreach (PhysBlock block in blocks)
         {
             if (!block.IsInCluster())
@@ -40,6 +52,7 @@ public class PhysParent : MonoBehaviour
             }
         }
     }
+
 
     void PhysicsJointAdoption()
     {
@@ -57,15 +70,23 @@ public class PhysParent : MonoBehaviour
         newCluster.transform.name = "Phys_Cluster_" + clusters.Count;
         newCluster.GetComponent<PhysCluster>().RegisterToPhysParent(this);
         clusters.Add(newCluster);
-        startPhysBlock.Init(newCluster);
+        startPhysBlock.Init(newCluster, null);
     }
-
+    
     void FinalizeBuild()
     {
         foreach (PhysCluster cluster in clusters)
         {
             cluster.FinalizeBuild();
             totalMass += cluster.rb.mass;
+        }
+    }
+
+    void CalculateBlockAdjacency()
+    {
+        foreach (PhysCluster cluster in clusters)
+        {
+            cluster.CalculateBlockAdjacency();
         }
     }
 

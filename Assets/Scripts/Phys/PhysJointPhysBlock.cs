@@ -12,18 +12,22 @@ public class PhysJointPhysBlock : PhysBlock
     
     public PhysJointBuilder jointBuilder;
 
+    public Transform anchorPositionOverride;
 
     public Joint joint { get; private set; }
     
     
-    public override void Init(PhysCluster originCluster)
+    public override void Init(PhysCluster originCluster, PhysBlock neighborBlock)
     {
-        originCluster.RegisterBlock(this);
+        originCluster.RegisterBlock(this, neighborBlock);
     }
 
     public void InitPhysJoint()
     {
-        Vector3 relativeAnchor = originCluster.transform.InverseTransformPoint(transform.position);
+        if (anchorPositionOverride == null)
+            anchorPositionOverride = transform;
+        
+        Vector3 relativeAnchor = originCluster.transform.InverseTransformPoint(anchorPositionOverride.position);
 
         List<PhysBlock> connectedBlocks = ScanForNeighboringDroneBlocks().ToList();
         if(connectedBlocks.Count <= 0)

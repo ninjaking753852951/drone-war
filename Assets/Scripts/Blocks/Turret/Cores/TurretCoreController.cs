@@ -23,40 +23,31 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     public Transform target;
     [HideInInspector]
     public TurretBarrelController mainBarrel;
-    List<TurretBarrelController> barrels;
-    
-    List<TurretMountSingleAxis> mountsSingleAxis;
-    Rigidbody highestRb;
-
+    public List<TurretBarrelController> barrels = new List<TurretBarrelController>();
+    public List<TurretMountSingleAxis> mountsSingleAxis = new List<TurretMountSingleAxis>();
+    public Rigidbody eldestMountRb;
     CountdownTimer fireTimer;
     bool isDeployed = false;
-    
     [HideInInspector]
     public DroneController controller;
     [HideInInspector]
-    public Rigidbody rb;
-
+    public Rigidbody clusterRb;
     public float turretUpdateRate;
     CountdownTimer turretUpdateTimer;
-    
     TurretRangeIndicator rangeIndicator;
-
     float maxRange;
-
     public List<TargetTypes> targetTypes;
-
     public float aimTolerance = 1; // How off can the angle be in meters but still permit firing
-    
-
     public ObjectPoolManager.PooledTypes projectileType;
 
     [Header("Projectile Simulation")]
     public int simulationSafetyLimit = 500;
     public float simulationStepSize = 0.1f;
 
-    
+    PhysBlock block;    
     float targetPitchAngle;
     float targetYawAngle;
+    
     
     protected Quaternion YawRotation()
     {
@@ -69,27 +60,47 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         {
             return quaternion.identity;
         }
-    } 
+    }
     
-    public void Deploy(bool deploy)
+    void Awake()
     {
-        isDeployed = deploy;
+        rangeIndicator = GetComponent<TurretRangeIndicator>();
+        block = GetComponent<PhysBlock>();
+        block.onBuildFinalized.AddListener(Deploy);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        fireTimer = new CountdownTimer(1 / fireRate);
+        fireTimer.Start();
+    }
+    
+    public void Deploy()
+    {
+        isDeployed = true;
         
         turretUpdateTimer = new CountdownTimer(1 / turretUpdateRate);
         turretUpdateTimer.Start();
         
-        controller = transform.root.GetComponent<DroneController>();
+        controller = transform.root.GetComponentInChildren<DroneController>();
 
-        rb = Utils.FindParentRigidbody(transform);
+        clusterRb = block.originCluster.rb;
+        //clusterRb = Utils.FindParentRigidbody(transform);
 
-        mountsSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
-        Transform eldestMount = Utils.GetHighestInHierarchy(mountsSingleAxis).transform;
-        highestRb = Utils.FindParentRigidbody(eldestMount, eldestMount.GetComponent<Rigidbody>());
+        //mountsSingleAxis.Add(FindFirstComponentInAdjacencyMap<TurretMountSingleAxis>(block));
+        mountsSingleAxis = FindMountsInAdjacencyMap(block);
+        eldestMountRb = mountsSingleAxis[^1].block.originCluster.rb;
+        
+        //mountsSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
+        //Transform eldestMount = Utils.GetHighestInHierarchy(mountsSingleAxis).transform;
+        //highestRb = Utils.FindParentRigidbody(eldestMount, eldestMount.GetComponent<Rigidbody>());
         
         
         DeployModules();
-        
-        barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
+
+        barrels.Add( FindFirstComponentInAdjacencyMap<TurretBarrelController>(block));
+        //barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
         
         if (barrels != null && barrels.Count > 0)
         {
@@ -105,23 +116,149 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         rangeIndicator.SetRange(maxRange);
     }
 
+    /*void FindMountsInAdjacencyMap()
+    {
+        TurretMountSingleAxis mount = null;
+        
+        Queue<PhysBlock> queue = new Queue<PhysBlock>();
+        HashSet<PhysBlock> visited = new HashSet<PhysBlock>();
+
+        queue.Enqueue(block);
+        visited.Add(block);
+
+        while (queue.Count > 0)
+        {
+            PhysBlock current = queue.Dequeue();
+            
+            if(current == null)
+                continue;
+
+            // Check if this block has the component
+            if (current.GetComponent<TurretMountSingleAxis>() != null)
+            {
+                Debug.Log("Component found in block: " + current.name);
+                mount = current.GetComponent<TurretMountSingleAxis>();
+                break;
+            }
+
+            // Enqueue unvisited neighbors
+            foreach (PhysBlock neighbor in current.neighbors)
+            {
+                if (!visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+        mountsSingleAxis.Add(mount);
+    }*/
+    
+    public static T FindFirstComponentInAdjacencyMap<T>(PhysBlock startBlock) where T : Component
+    {
+        if (startBlock == null)
+            return null;
+        
+        Queue<PhysBlock> queue = new Queue<PhysBlock>();
+        HashSet<PhysBlock> visited = new HashSet<PhysBlock>();
+
+        queue.Enqueue(startBlock);
+        visited.Add(startBlock);
+
+        while (queue.Count > 0)
+        {
+            PhysBlock current = queue.Dequeue();
+        
+            if(current == null)
+                continue;
+
+            // Check if this block has the component
+            T component = current.GetComponent<T>();
+            if (component != null)
+            {
+                Debug.Log($"Component {typeof(T).Name} found in block: {current.name}");
+                return component;
+            }
+
+            // Enqueue unvisited neighbors
+            foreach (PhysBlock neighbor in current.neighbors)
+            {
+                if (!visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+    
+        return null;
+    }
+    
+    public static List<TurretMountSingleAxis> FindMountsInAdjacencyMap(PhysBlock startBlock)
+    {
+        if (startBlock == null)
+            return null;
+        
+        Queue<PhysBlock> queue = new Queue<PhysBlock>();
+        HashSet<PhysBlock> visited = new HashSet<PhysBlock>();
+
+        queue.Enqueue(startBlock);
+        visited.Add(startBlock);
+
+        List<TurretMountSingleAxis> mounts = new List<TurretMountSingleAxis>();
+
+        bool hasYawMount = false;
+        bool hasPitchMount = false;
+        
+        while (queue.Count > 0)
+        {
+            PhysBlock current = queue.Dequeue();
+        
+            if(current == null)
+                continue;
+            
+            // Check if this block has the component
+            TurretMountSingleAxis component = current.GetComponent<TurretMountSingleAxis>();
+            if (component != null)
+            {
+                if (!hasYawMount && component.controlType == TurretMountSingleAxis.ControlType.Yaw)
+                {
+                    mounts.Add(component);
+                    hasYawMount = true;
+                }
+                
+                if (!hasPitchMount && component.controlType == TurretMountSingleAxis.ControlType.Pitch)
+                {
+                    mounts.Add(component);
+                    hasPitchMount = true;
+                }
+
+                if (hasPitchMount && hasYawMount)
+                {
+                    //return mounts;   
+                }
+            }
+
+            // Enqueue unvisited neighbors
+            foreach (PhysBlock neighbor in current.neighbors)
+            {
+                if (!visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+    
+        return mounts;
+    }
+
+    
     void DeployModules()
     {
         List<TurretModule> turretModules = GetComponentsInChildren<TurretModule>().ToList();
         foreach (var turretModule in turretModules)
             turretModule.Deploy(this);
-    }
-    
-    void Awake()
-    {
-        rangeIndicator = GetComponent<TurretRangeIndicator>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        fireTimer = new CountdownTimer(1 / fireRate);
-        fireTimer.Start();
     }
 
     // Update is called once per frame
@@ -163,7 +300,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         //Debug.Log( "Pitch" + targetPitchAngle + " Yaw " + targetYawAngle);
         
-        Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, highestRb.transform.up, highestRb.transform.forward);
+        Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, eldestMountRb.transform.up, eldestMountRb.transform.forward);
         
         foreach (TurretMountSingleAxis turretMountSingleAxis in mountsSingleAxis)
             turretMountSingleAxis.UpdateTurretAngles(transformedPitchYaw.y, transformedPitchYaw.x);
@@ -270,7 +407,8 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         // Calculate the yaw angle (angle around the Y-axis)
         float targetYawAngle = Mathf.Atan2(horizontalDirection.x, horizontalDirection.z) * Mathf.Rad2Deg;
 
-        return (targetYawAngle -  highestRb.rotation.eulerAngles.y) %360;
+        return (targetYawAngle -  eldestMountRb.rotation.eulerAngles.y) %360;
+        //return (targetYawAngle ) %360;
         
         /*
         // account for base rotation

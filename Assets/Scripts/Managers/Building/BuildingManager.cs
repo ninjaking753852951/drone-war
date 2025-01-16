@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BuildTools;
 using Interfaces;
 using Unity.Mathematics;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using BuildTools;
 
 public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 {
@@ -16,13 +18,10 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 
     public LayerMask placementMask;
     
-    public GameObject buildingBlockIndicator;
+    GameObject buildingBlockIndicator;
     
     int indicatorRotDirIndex;
-    
     readonly float[] rotationAngles = { 0, 90, 180, 270 };
-
-    DroneController droneController;
     
     public Vector3 spawnPoint;
     
@@ -34,66 +33,12 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     bool isOnCompatibleBlock;
     public BuildingBlockSelector blockSelector { get; private set; }
 
-    public MoveTool moveTool;
-    [System.Serializable]
-    public class MoveTool
-    {
-        public Transform moveToolGizmo;
-        BuildingManager builder;
-
-        public OperationPoint operationPoint;
-        public enum OperationPoint
-        {
-            Center, Pivot
-        }
-
-        public void Update()
-        {
-            if (builder.blockSelector.selectedComponents.Count > 0)
-            {
-                moveToolGizmo.gameObject.SetActive(true);
-
-            }
-            else
-            {
-                moveToolGizmo.gameObject.SetActive(false);
-            }
-        }
-
-        void OnSelectedBlock(DroneBlock block)
-        {
-            switch (operationPoint)
-            {
-                case OperationPoint.Center:
-                    SetGizmoPosition(ComputeAveragePositionOfSelectedBlocks());
-                    break;
-                case OperationPoint.Pivot:
-                    SetGizmoPosition(builder.blockSelector.lastSelected.transform.position);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        void SetGizmoPosition(Vector3 pos)
-        {
-            moveToolGizmo.transform.position = pos;
-        }
-
-        Vector3 ComputeAveragePositionOfSelectedBlocks()
-        {
-            List<Transform> blockTransforms = Utils.GetTransformsFromComponents(builder.blockSelector.selectedComponents);
-            return Utils.CalculateAveragePosition(blockTransforms);
-        }
-
-        public void Init(BuildingManager builder)
-        {
-            this.builder = builder;
-            builder.blockSelector.onSelected.AddListener(OnSelectedBlock);
-        }
-    }
-    
-    public ToolMode curToolMode;
+    [Header("Build Tools")]
+    public Tool moveTool;
+    public RotateTool rotateTool;
+    public ToolMode curTool;
+    ToolMode oldTool;
+    Camera cam;
     public enum ToolMode
     {
         Place, Move, Rotate
@@ -104,10 +49,12 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         base.Awake();
         blockSelector = GetComponent<BuildingBlockSelector>();
         moveTool.Init((this));
+        rotateTool.Init(this);
     }
     
     void Start()
     {
+        cam = Camera.main;
         if(GameManager.Instance.currentGameMode == GameMode.Build)
             EnterBuildMode();
     }
@@ -168,15 +115,28 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         return targetPlaceables;
     }
     
-    public void FindDroneController()
-    {
-        droneController = FindObjectOfType<DroneController>();
-        totalCost = TotalCost();
-    }
-    
     void BuildUpdate()
     {
-        switch (curToolMode)
+        if (oldTool != curTool)
+        {
+            oldTool = curTool;
+            DisableAllBuildTools();
+            switch (curTool) // enable tool
+            {
+                case ToolMode.Place:
+                    break;
+                case ToolMode.Move:
+                    moveTool.SetActive(true);
+                    break;
+                case ToolMode.Rotate:
+                    rotateTool.SetActive(true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        
+        switch (curTool) // update tool
         {
             case ToolMode.Place:
                 PlacementUpdate();
@@ -187,16 +147,25 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
                     buildingBlockIndicator.SetActive(false);
                 break;
             case ToolMode.Rotate:
+                rotateTool.Update();
+                if(buildingBlockIndicator != null)
+                    buildingBlockIndicator.SetActive(false);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
+    public void DisableAllBuildTools()
+    {
+        SetActivePlacementMode(false);
+        moveTool.SetActive(false);
+        rotateTool.SetActive(false);
+    }
+
     void PlacementUpdate()
     {
-        Camera cam = Camera.main;
-        
+
         if(cam == null || Utils.IsCursorOutsideCameraFrustum(cam))
             return;
         
@@ -311,8 +280,8 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         PhysParent parent = FindFirstObjectByType<PhysParent>();
         if(parent != null)
             DestroyImmediate(parent.gameObject);
-        
-        MachineSaveLoadManager.instance.LoadAndSpawnMachine(MachineSaveLoadManager.instance.curSlot);// corresponds to active game save slot;
+
+        MachineSaveLoadManager.instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn();
         SetNewCurrentBlock(BlockLibraryManager.Instance.blocks[0]);
     }
     
@@ -326,13 +295,12 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         MachineSaveLoadManager.Instance.SaveMachine(MachineSaveLoadManager.instance.curSlot);
         GameManager.Instance.ExitBuildMode();
         buildingBlockIndicator.SetActive(false);
-        moveTool.moveToolGizmo.gameObject.SetActive(false);
-        DeployMachine();
-    }
-
-    void DeployMachine()
-    {
-        droneController.Deploy();
+        moveTool.toolGizmo.gameObject.SetActive(false);
+        rotateTool.toolGizmo.gameObject.SetActive(false);
+        
+        Utils.DestroyAllDrones();
+        
+        MachineSaveLoadManager.Instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn(deploy:true);
     }
 
     void SetIndicatorColour(Material mat)
@@ -345,8 +313,15 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         }
     }
 
+    public void SetActivePlacementMode(bool active)
+    {
+        buildingBlockIndicator.SetActive(active);
+    }
+    
     public void SetNewCurrentBlock(IPlaceable placeable)
     {
+        curTool = ToolMode.Place;
+        
         curPlaceable = placeable;
         
         if(buildingBlockIndicator != null)

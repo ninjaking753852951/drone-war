@@ -56,7 +56,7 @@ public class TurretBarrelController : MonoBehaviour
 
         float projectileMass = projectileClone.GetComponent<Rigidbody>().mass;
         
-        turret.rb.AddForceAtPosition(Vector3.up * projectileMass * turret.shootVelocity * turret.recoilMultiplier, shootPoint.position);
+        turret.clusterRb.AddForceAtPosition(Vector3.up * projectileMass * turret.shootVelocity * turret.recoilMultiplier, shootPoint.position);
         
         rb.AddForce(projectileClone.transform.forward * turret.shootVelocity, ForceMode.VelocityChange);
 

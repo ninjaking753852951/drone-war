@@ -24,14 +24,29 @@ public abstract class CursorSelectionController<T> : MonoBehaviour where T : Com
         
         if (Input.GetMouseButtonDown(0))
         {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+
+            foreach (RaycastHit rayHit in hits)
+            {
+                if(IsSelectionException(rayHit.transform))
+                    return;
+            }
+            
             Transform clickObject = Utils.CursorScan();
 
-            if(IsSelectionException(clickObject))
-                return;
+            /*if(IsSelectionException(clickObject))
+                return;*/
             
             if (clickObject != null)
             {
                 SelectObject(clickObject);
+            }
+
+            if (clickObject == null)
+            {
+                ClearSelectedObjects();
+                return;
             }
             
             T component = clickObject.GetComponent<T>();

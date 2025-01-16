@@ -272,6 +272,7 @@ GameObject:
   - component: {fileID: 8037801357792849474}
   - component: {fileID: 161399211327900245}
   - component: {fileID: 4074943280571985229}
+  - component: {fileID: 1298736547838526370}
   m_Layer: 0
   m_Name: MissileCore
   m_TagString: Untagged
@@ -330,33 +331,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5a0dc556c27724497346fa5c290f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
-  scanBoxOffset: {x: 0, y: 0, z: 0}
   gridSize: {x: 1, y: 1, z: 1}
-  mass: 50
   health: 10
   cost: 200
-  connectionPoint: {fileID: 0}
-  onInit:
-    m_PersistentCalls:
-      m_Calls: []
-  postAdoptionInit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4074943280571985229}
-        m_TargetAssemblyTypeName: TurretCoreController, Assembly-CSharp
-        m_MethodName: Deploy
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
   controller: {fileID: 0}
-  canOnlyAdoptTurretModules: 1
   meta:
     specialPositions: []
 --- !u!65 &8037801357792849474
@@ -414,8 +392,11 @@ MonoBehaviour:
   shootVelocity: 13
   target: {fileID: 0}
   mainBarrel: {fileID: 0}
+  barrels: []
+  mountsSingleAxis: []
+  eldestMountRb: {fileID: 0}
   controller: {fileID: 0}
-  rb: {fileID: 0}
+  clusterRb: {fileID: 0}
   turretUpdateRate: 2.5
   targetTypes: 00000000
   aimTolerance: 180
@@ -425,6 +406,27 @@ MonoBehaviour:
   missileAcceleration: 8
   missileExplosionRadiusMultiplier: 1
   missileDamage: 5000
+--- !u!114 &1298736547838526370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089627516061476954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57554ef51eab4e9cb6601b64d2e91c98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  adjacencyScanBonus: 0.5
+  mass: 25
+  centerOfMass: {x: 0, y: 0, z: 0}
+  onBuildFinalized:
+    m_PersistentCalls:
+      m_Calls: []
+  neighbors: []
 --- !u!1 &1337651016156115548
 GameObject:
   m_ObjectHideFlags: 0

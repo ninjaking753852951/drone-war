@@ -22,8 +22,8 @@ public class BallisticCore : TurretCoreController
 
         float projectileMass = projectileRb.mass;
         
-        rb.AddForceAtPosition(Vector3.up * projectileMass * ShootVelocity() * recoilMultiplier, mainBarrel.shootPoint.position);
-        rb.AddForce(mainBarrel.shootPoint.forward * projectileMass * ShootVelocity() * recoilMultiplier * -1);
+        clusterRb.AddForceAtPosition(Vector3.up * projectileMass * ShootVelocity() * recoilMultiplier, mainBarrel.shootPoint.position);
+        clusterRb.AddForce(mainBarrel.shootPoint.forward * projectileMass * ShootVelocity() * recoilMultiplier * -1);
         
         projectileRb.linearVelocity = Vector3.zero;
         Vector3 devianceForce = Random.insideUnitSphere * (deviance/MaxRange());

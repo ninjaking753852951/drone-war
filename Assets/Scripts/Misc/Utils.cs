@@ -122,11 +122,23 @@ public static class Utils
         return Vector3.zero;
     }
     
+    public static void DrawRotatedWireCube(Vector3 position, Vector3 size, Quaternion rotation, Color color)
+    {
+        Matrix4x4 oldMatrix = Gizmos.matrix;
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(position, rotation, Vector3.one);
+    
+        Gizmos.matrix = rotationMatrix;
+        Gizmos.color = color;
+        Gizmos.DrawWireCube(Vector3.zero, size);
+    
+        Gizmos.matrix = oldMatrix;
+    }
+    
     public static Vector3 CalculateAveragePosition(List<Vector3> positions)
     {
         if (positions == null || positions.Count == 0)
         {
-            Debug.LogWarning("Position list is empty or null.");
+            //Debug.LogWarning("Position list is empty or null.");
             return Vector3.zero;
         }
 

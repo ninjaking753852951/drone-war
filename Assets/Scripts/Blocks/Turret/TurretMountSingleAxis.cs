@@ -21,31 +21,35 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
     [Header("RUNTIME VARIABLES")]
     public float targetAngle = 1;
 
+    public PhysJointPhysBlock block { private set; get; }
+    bool isDeployed = false;
+
+
+    void Awake()
+    {
+        block = GetComponent<PhysJointPhysBlock>();
+        block.onBuildFinalized.AddListener(Deploy);
+    }
     
     void Update()
     {
-        SetYawAngle(targetAngle);
+        if(joint != null)
+            SetYawAngle(targetAngle);
     }
     
     
     public override void Deploy()
     {
-        base.Deploy();
-        
-        
-        
-        body.transform.parent = transform.parent;
-        
-        InitJoint();   
-        return;
-        
-        Rigidbody parentRb = Utils.FindParentRigidbody(transform, rb);
-        if (parentRb != null)
+        joint = (HingeJoint)block.joint;
+        if (joint == null)
         {
-            Debug.Log(parentRb.gameObject.name);
-            //joint.connectedBody = parentRb;
-            InitJoint();   
+            enabled = false;
+            return;
         }
+            
+        JointMotor jointMotor = joint.motor;
+        jointMotor.force = aimForce;
+        joint.motor = jointMotor;
     }
     
     public void UpdateTurretAngles(float yaw, float pitch)
@@ -65,30 +69,42 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
     
     void SetYawAngle(float targetYawAngle)
     {
+        Debug.DrawRay(transform. position, Quaternion.Euler(0,targetYawAngle,0) * transform.forward, Color.green);
+        
         float currentAngle = joint.angle % 360;
+        if (float.IsNaN(joint.angle))
+            currentAngle = 0;
+
+
+        
         float normalizedTargetAngle = targetYawAngle % 360;
         
-        float angleError = Mathf.DeltaAngle(currentAngle, normalizedTargetAngle);
+        float angleError = Mathf.DeltaAngle(currentAngle, -normalizedTargetAngle);
         
         angleError = Mathf.Clamp(angleError / nearTargetSmoothing, -1, 1);
-        
 
         
         JointMotor jointMotor = joint.motor;
         //jointMotor.targetVelocity = angleError * maxTurnSpeed; // Adjust multiplier for speed control
 
         float targetVelocity = angleError * maxTurnSpeed;
-        
-        if(!float.IsNaN(targetVelocity))
-            jointMotor.targetVelocity = targetVelocity;
+
+        if (!float.IsNaN(targetVelocity))
+        {
+            jointMotor.targetVelocity = targetVelocity;   
+
+            //jointMotor.targetVelocity = Mathf.Sin(Time.time/2) * 100;   
+        }
+        else
+        {
+            //Debug.Log("AIM IS NAN");
+        }
 
         joint.motor = jointMotor;
     }
 
-    void InitJoint()
+    /*void InitJoint()
     {
-
-        
         JointMotor jointMotor = joint.motor;
         jointMotor.force = aimForce;
         joint.motor = jointMotor;
@@ -96,7 +112,7 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
         
         Rigidbody parentRb = Utils.FindParentRigidbody(transform, rb);
         joint.connectedBody = parentRb;
-    }
+    }*/
 
     public void ProxyDeploy()
     {

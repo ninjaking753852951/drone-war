@@ -28,7 +28,7 @@ public class SelectionManager : Singleton<SelectionManager>
             if(clickObject == null)
                 return;
             
-            DroneController drone = clickObject.root.GetComponent<DroneController>();
+            DroneController drone = clickObject.root.GetComponentInChildren<DroneController>();
             if (drone != null)
             {
                 SelectObject(clickObject);

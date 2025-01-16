@@ -26,8 +26,6 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     
     public override void Deploy()
     {
-        //base.Deploy();
-        
         isDeployed = true;
 
         //body.transform.parent = transform.parent;
@@ -36,7 +34,6 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
         block = GetComponent<PhysJointPhysBlock>();
         joint = (HingeJoint)block.joint;
         
-        //joint.connectedBody = Utils.FindParentRigidbody(transform.parent, rb);
         turnDirection = CalculateTurnDirection();
     }
 
@@ -71,7 +68,7 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     
     float CalculateTurnDirection()
     {
-        Transform origin = transform.root;
+        Transform origin = transform.root.GetComponentInChildren<DroneController>().transform;
         // Direction from a to b
         Vector3 directionToWheelBody = transform.position - origin.position;
 

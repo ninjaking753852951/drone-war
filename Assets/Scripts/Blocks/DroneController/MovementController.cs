@@ -97,7 +97,7 @@ public class MovementController
         
         float destinationDistance = Vector3.Distance(_transform.position, targetDestination);
 
-        if (destinationDistance < BoundingRadius() * 2)
+        if (destinationDistance < BoundingRadius())
         {
             controller.ReachedWaypoint();
         }

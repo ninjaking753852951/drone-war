@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using BuildTools;
+
 [RequireComponent(typeof(BuildingManager))]
 public class BuildingBlockSelector : CursorSelectionController<DroneBlock>
 {
@@ -44,14 +46,18 @@ public class BuildingBlockSelector : CursorSelectionController<DroneBlock>
 
     protected override bool IsActive()
     {
-        return(builder.curToolMode == BuildingManager.ToolMode.Move || builder.curToolMode == BuildingManager.ToolMode.Rotate) && GameManager.Instance.currentGameMode == GameMode.Build;
+        return(builder.curTool == BuildingManager.ToolMode.Move || builder.curTool == BuildingManager.ToolMode.Rotate) && GameManager.Instance.currentGameMode == GameMode.Build;
     }
     protected override bool IsSelectionException(Transform clickObject)
     {
         if (clickObject == null)
             return false;
         
+        RotateGizmoController rotateGizmoController = clickObject.GetComponentInParent<RotateGizmoController>();
+
+        
         MoveGizmoController gizmoController = clickObject.GetComponentInParent<MoveGizmoController>();
-        return gizmoController != null;
+        return gizmoController != null || rotateGizmoController != null;
+        
     }
 }

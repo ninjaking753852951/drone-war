@@ -53,9 +53,9 @@ public abstract class DroneSpawner : MonoBehaviour
         {
             return;
         }
-        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID);
+        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID, deploy:true);
 
-        StartCoroutine(SpawnMachineCoroutine());
+        //StartCoroutine(SpawnMachineCoroutine());
     }
 
     Vector3 SafeSpawnPosition()
@@ -93,8 +93,7 @@ public abstract class DroneSpawner : MonoBehaviour
 
         yield return new WaitForFixedUpdate();
         
-        //yield return new WaitForEndOfFrame();
         controller.Deploy();
-        //controller.transform.root.position = spawnPoint.position + Vector3.up * 5;
+
     }
 }

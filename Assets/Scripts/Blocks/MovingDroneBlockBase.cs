@@ -4,20 +4,17 @@ using UnityEngine;
 public abstract class MovingDroneBlockBase : MonoBehaviour
 {
 
-    [HideInInspector]
-    public Rigidbody rb;
+    PhysBlock physBlock;
 
     void Awake()
     {
-        /*rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
-        rb.useGravity = false;*/
+        physBlock = GetComponent<PhysBlock>();
+        physBlock.onBuildFinalized.AddListener(Deploy);
     }
 
     public virtual void Deploy()
     {
-        rb.isKinematic = false;
-        rb.useGravity = true;
+        
     }
     
 }
