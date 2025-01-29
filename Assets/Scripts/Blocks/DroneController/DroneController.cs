@@ -20,9 +20,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
     public float healthMultiplier = 10;
     public float curHealth;
     public float maxHealth;
-    //public DynamicLocalNetworkVariable<float> maxHealth;
-    public GameObject physParent;
-    
+
     public List<MeshRenderer> coreBlocks;
     public int curTeam;
     List<TurretRangeIndicator> rangeIndicators;
@@ -59,7 +57,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
     void Awake()
     {
         physBlock = GetComponent<PhysBlock>();
-
+        //physBlock.onBuildFinalized.AddListener(Deploy);
     }
 
     void Start()
@@ -127,7 +125,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
     {
         instanceID = MachineInstanceManager.Instance.Register(this);
 
-        Instantiate(physParent).GetComponent<PhysParent>().Build();
+        //GetComponentInParent<PhysParent>().Build();
         
         rb = physBlock.Cluster().rb;
         

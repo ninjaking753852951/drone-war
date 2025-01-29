@@ -24,7 +24,6 @@ public abstract class DroneSpawner : MonoBehaviour
 
     protected virtual void Start()
     {
-
         teamID = MatchManager.Instance.RegisterTeam(this);
     }
 
@@ -39,7 +38,7 @@ public abstract class DroneSpawner : MonoBehaviour
 
         Vector3 scanPos = SafeSpawnPosition();
         
-        MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(id);
+        MachineSaveData machineData = MachineLibraryManager.Instance.FetchMachine(id);
         if(machineData == null)
             return;
         
@@ -53,7 +52,7 @@ public abstract class DroneSpawner : MonoBehaviour
         {
             return;
         }
-        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID, deploy:true);
+        controller = machineData.Spawn(offset: scanPos, eulerRot: transform.rotation.eulerAngles, teamID:teamID, deploy:true, network:true);
 
         //StartCoroutine(SpawnMachineCoroutine());
     }

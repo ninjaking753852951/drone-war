@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -30,6 +31,18 @@ public class PhysCluster : MonoBehaviour
     void Update()
     {
         
+    }
+    
+    public void ShowToNetworkObserver(ulong id)
+    {
+        foreach (PhysBlock block in blocks)
+        {
+            NetworkObject netObj = block.GetComponent<NetworkObject>();
+            if (!netObj.IsNetworkVisibleTo(id))
+            {
+                netObj.NetworkShow(id);   
+            }
+        }
     }
 
     public void RegisterToPhysParent(PhysParent parent)
@@ -81,12 +94,14 @@ public class PhysCluster : MonoBehaviour
             block.FinalizeBuild();
         }
         
-        CalculateCOM();
+        //CalculateCOM();
     }
     
     
-    void CalculateCOM()
+    public void CalculateCOM()
     {
+        
+        
         Vector3 com = Vector3.zero;
 
         float massSum = 0;
@@ -99,8 +114,10 @@ public class PhysCluster : MonoBehaviour
 
         com /= massSum;
         
+        Utils.MoveParentWithoutAffectingChildren(transform, com);
+        
         rb.centerOfMass = transform.InverseTransformPoint(com);
-        //TODO CALCULATE COM
+
     }
 
     void OnDrawGizmosSelected()

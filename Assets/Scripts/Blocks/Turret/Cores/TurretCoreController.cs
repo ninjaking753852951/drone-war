@@ -38,7 +38,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     float maxRange;
     public List<TargetTypes> targetTypes;
     public float aimTolerance = 1; // How off can the angle be in meters but still permit firing
-    public ObjectPoolManager.PooledTypes projectileType;
+    public ProjectilePoolManager.PooledTypes projectileType;
 
     [Header("Projectile Simulation")]
     public int simulationSafetyLimit = 500;
@@ -333,6 +333,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     List<Transform> FindEnemies()
     {
+        return new List<Transform>();
         int curTeam = controller.curTeam;
 
         List<DroneController> droneControllers = MachineInstanceManager.Instance.FetchAllDrones();
@@ -386,7 +387,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         Vector3 spawnPos = mainBarrel.shootPoint.position;
         
         
-        GameObject projectileClone = ObjectPoolManager.Instance.RequestObject(projectileType, spawnPos).gameObject;
+        GameObject projectileClone = ProjectilePoolManager.Instance.RequestObject(projectileType, spawnPos).gameObject;
 
         projectileClone.transform.position = mainBarrel.shootPoint.position;
         projectileClone.transform.rotation = mainBarrel.shootPoint.rotation;  

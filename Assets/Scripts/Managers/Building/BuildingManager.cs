@@ -281,7 +281,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         if(parent != null)
             DestroyImmediate(parent.gameObject);
 
-        MachineSaveLoadManager.instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn();
+        MachineSaveLoadManager.instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn(network: false);
         SetNewCurrentBlock(BlockLibraryManager.Instance.blocks[0]);
     }
     
@@ -300,7 +300,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         
         Utils.DestroyAllDrones();
         
-        MachineSaveLoadManager.Instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn(deploy:true);
+        MachineSaveLoadManager.Instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn(network: false, deploy:true);
     }
 
     void SetIndicatorColour(Material mat)

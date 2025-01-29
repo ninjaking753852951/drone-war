@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityUtils;
 
-public class ObjectPoolManager : Singleton<ObjectPoolManager>
+public class ProjectilePoolManager : Singleton<ProjectilePoolManager>
 {
     public int InitialPoolSize = 10;
     private readonly Dictionary<PooledTypes, Queue<GameObject>> poolDictionary = new Dictionary<PooledTypes, Queue<GameObject>>();

@@ -22,6 +22,52 @@ public static class Utils
 
         return null; // No Rigidbody found in the hierarchy
     }
+    
+    public static void MoveParentWithoutAffectingChildren(Transform parent, Vector3 newPosition)
+    {
+        if (parent == null) return;
+
+        // Store the world positions of all child objects
+        Transform[] children = new Transform[parent.childCount];
+        Vector3[] childWorldPositions = new Vector3[parent.childCount];
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            children[i] = parent.GetChild(i);
+            childWorldPositions[i] = children[i].position;
+        }
+
+        // Move the parent
+        parent.position = newPosition;
+
+        // Restore the world positions of all child objects
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].position = childWorldPositions[i];
+        }
+    }
+
+    public static void MoveParentWithTempUnparenting(Transform parent, Vector3 newPosition)
+    {
+        if (parent == null) return;
+
+        // Unparent all children temporarily
+        Transform[] children = new Transform[parent.childCount];
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            children[i] = parent.GetChild(i);
+            children[i].SetParent(null, true); // Preserve world position
+        }
+
+        // Move the parent
+        parent.position = newPosition;
+
+        // Reparent the children
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].SetParent(parent, true); // Preserve world position
+        }
+    }
 
     public static SphereCollider FindSphereColliderAtPosition(Vector3 position, float radius = 0.1f, LayerMask layerMask = default)
     {

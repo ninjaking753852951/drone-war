@@ -53,6 +53,7 @@ public class DroneNetworkController : NetworkHelperBase
 
     void ProxyDeploy()
     {
+        Debug.Log("Proxy Deploy");
         hasClientDeployed = true;
         controller.curTeam = curTeam.Value;
         controller.ClientDeploy();

@@ -43,7 +43,7 @@ public class PlayerWaypointManager : WaypointManager
             
             List<DroneController> playerDrones = Utils.DronesFromTeam(SelectionManager.Instance.selectedDrones.ToList(), teamID);
             int droneCount = playerDrones.Count;
-            Debug.Log(droneCount);
+
             if(droneCount == 0)
                 return;
             
@@ -178,20 +178,15 @@ public class PlayerWaypointManager : WaypointManager
     void CreateWaypointCommand(DroneController drone, Vector3 pos)
     {
         ulong droneID = MachineInstanceManager.Instance.FetchID(drone.gameObject);
-        
-        Debug.Log("Drone ID" + droneID);
 
         commandManager = FindObjectOfType<CommandManager>();
         
         if (commandManager != null)
         {
-            Debug.Log("Command manager is present");
-            
             bool queue = Input.GetKey(KeyCode.LeftShift);
 
             if (GameManager.Instance.IsOnlineAndClient())
             {
-                Debug.Log("Sending command to server");
                 commandManager.AddCommandRPC(new CommandManager.Command(NetworkManager.Singleton.LocalClientId, droneID,pos, queue).GenerateData());   
             }
             else

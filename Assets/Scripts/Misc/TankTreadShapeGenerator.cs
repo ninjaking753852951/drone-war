@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CircleOutlineGenerator : MonoBehaviour
+public class TankTreadShapeGenerator : MonoBehaviour
 {
     [SerializeField]
     private GameObject linePrefab;
@@ -14,23 +14,15 @@ public class CircleOutlineGenerator : MonoBehaviour
     private float lineWidth = 0.1f;
     [SerializeField]
     private float moveSpeed = 1f;
-
-    public float speedMultiplier = 1;
-
+    
     private List<Vector2> outlinePoints = new List<Vector2>();
     private List<GameObject> lineObjects = new List<GameObject>();
     private List<float> segmentProgress = new List<float>();
-
-    public SphereCollider mainWheel;
     
     public List<SphereCollider> wheels;
 
-    public TankTrack tankTrack;
-
     void Start()
     {
-
-
         foreach (var wheel in wheels)
         {
             Vector2 wheelPos = new Vector2(wheel.transform.position.x, wheel.transform.position.z);
@@ -40,11 +32,6 @@ public class CircleOutlineGenerator : MonoBehaviour
 
         GenerateUniformOutline(circles);
         SpawnOutlineSegments();
-    }
-
-    void Update()
-    {
-        //UpdateSegmentPositionsAndRotations();
     }
 
     private void GenerateUniformOutline(List<(Vector2 center, float radius)> circles)
@@ -158,43 +145,6 @@ public class CircleOutlineGenerator : MonoBehaviour
 
         lineObjects.Add(line);
         segmentProgress.Add(0f);
-    }
-
-    private void UpdateSegmentPositionsAndRotations()
-    {
-        for (int i = 0; i < lineObjects.Count; i++)
-        {
-            segmentProgress[i] += Time.deltaTime * (tankTrack.linearSpeed * 100 * speedMultiplier) / outlinePoints.Count;
-
-            if (segmentProgress[i] > 1f)
-            {
-                segmentProgress[i] -= 1f;
-            }
-            else if (segmentProgress[i] < 0f)
-            {
-                segmentProgress[i] += 1f;
-            }
-
-            int nextIndex = (i + 1) % outlinePoints.Count;
-            int nextNextIndex = (nextIndex + 1) % outlinePoints.Count;
-            Vector2 currentStart = outlinePoints[i];
-            Vector2 currentEnd = outlinePoints[nextIndex];
-            
-            Vector2 nextStart = outlinePoints[nextNextIndex];
-
-            Vector2 interpolatedPosition = Vector2.Lerp(currentStart, currentEnd, segmentProgress[i]);
-            Vector3 position = new Vector3(interpolatedPosition.x, 0, interpolatedPosition.y);
-
-            Vector3 startDirection = currentStart - currentEnd;
-            Vector3 endDirection = currentEnd - nextStart;
-            
-            //Vector3 direction = new Vector3(currentEnd.x - currentStart.x, 0, currentEnd.y - currentStart.y).normalized;
-            Vector2 rotDir = Vector2.Lerp(startDirection, endDirection, segmentProgress[i]);
-            Quaternion rotation = Quaternion.LookRotation(new Vector3(rotDir.x,0,rotDir.y));
-
-            lineObjects[i].transform.position = position;
-            lineObjects[i].transform.rotation = rotation;
-        }
     }
 
 }

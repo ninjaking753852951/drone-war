@@ -2,15 +2,15 @@ using System;
 using System.Text;
 using Unity.Netcode;
 using UnityEngine;
-[RequireComponent(typeof(MachineLibrary))]
+[RequireComponent(typeof(MachineLibraryManager))]
 public class MachineLibraryNetworkHelper : NetworkBehaviour
 {
 
-    MachineLibrary library;
+    MachineLibraryManager library;
 
     void Awake()
     {
-        library = GetComponent<MachineLibrary>();
+        library = GetComponent<MachineLibraryManager>();
     }
 
     void Start()

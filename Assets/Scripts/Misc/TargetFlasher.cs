@@ -20,7 +20,6 @@ public class TargetFlasher : MonoBehaviour, IDamageable
         {
             originalColor = rend.material.color;
         }
-        
     }
 
     void OnDisable()

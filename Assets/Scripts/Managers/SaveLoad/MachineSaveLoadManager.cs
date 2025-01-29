@@ -95,7 +95,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         {
             Vector3 offset = Vector3.up * 1000 * -1;
             GameObject obj = Spawn(offset, Quaternion.Euler(-35, 35, 0));
-            return ThumbnailGenerator.Instance.GenerateThumbnail(obj);
+            return ThumbnailManager.Instance.GenerateThumbnail(obj);
         }
         public BlockType Category()
         {
@@ -139,8 +139,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
 
         if (!File.Exists(path))
         {
-            //Debug.LogWarning("No save data found in slot " + slot);
-            return null;
+            return new MachineSaveData();
         }
         
         string json = File.ReadAllText(path);
@@ -228,7 +227,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         SaveMachine(curSlot);
         curSlot = targetSlot;
         Utils.DestroyAllDrones();
-        LoadMachine(curSlot).Spawn();
+        LoadMachine(curSlot).Spawn(network:false);
         //LoadAndSpawnMachine(curSlot);
     }
 }

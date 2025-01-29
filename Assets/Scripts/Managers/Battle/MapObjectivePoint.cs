@@ -91,7 +91,7 @@ public class MapObjectivePoint : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, radius, droneLayer);
         foreach (Collider collider in hitColliders)
         {
-            DroneController drone = collider.transform.root.GetComponent<DroneController>();
+            DroneController drone = collider.transform.root.GetComponentInChildren<DroneController>();
             if (drone != null)
             {
                 int team = drone.curTeam;
@@ -144,8 +144,6 @@ public class MapObjectivePoint : MonoBehaviour
             colour = MatchManager.Instance.Team(team).colour;
         }
 
-        //colour.a = transparency;
-        
         rend.material.SetColor("_MainColour", colour);   
     }
 

@@ -90,10 +90,14 @@ public class MovementController
 
         Vector3 directionToTarget = CalculateTargetDirection(targetDestination);
         directionToTarget = GetSteering(directionToTarget);
+        
 
+        
         float yawAngleError = Vector3.SignedAngle(_transform.forward, directionToTarget, Vector3.up);
         currentSteer = Mathf.Clamp(yawAngleError, -45, 45);
         currentSteer *= steerMultiplier;
+        
+
         
         float destinationDistance = Vector3.Distance(_transform.position, targetDestination);
 
@@ -150,6 +154,12 @@ public class MovementController
 
     private void UpdateComponents()
     {
+        UpdateSteeringHinges();
+        UpdateWheels();
+    }
+
+    void UpdateSteeringHinges()
+    {
         if(_hingeControllers == null)
             return;
 
@@ -166,12 +176,13 @@ public class MovementController
                 hingeController.SetSteerRot(currentSteer);
             }
         }
-        
+    }
+
+    void UpdateWheels()
+    {
         float wheelTorque = motorTorque / _wheelControllers.Count;
         float targetVelocity = Mathf.Infinity;
-        
         float energyCost = movementEnergyCost * Time.deltaTime;
-
         float torqueMultiplier = 0;
 
         if (controller.energy.CanAfford(energyCost))
@@ -182,9 +193,7 @@ public class MovementController
         switch (_currentMovementState)
         {
             case MovementState.Accelerating:
-                
                 controller.energy.DeductEnergy(energyCost);
-                
                 foreach (WheelController wheelController in _wheelControllers)
                 {
                     wheelController.SetForwardTorque(wheelTorque * torqueMultiplier);
@@ -213,8 +222,9 @@ public class MovementController
         }
     }
 
-    private Vector3 CalculateTargetDirection(Vector3 destination)
+    Vector3 CalculateTargetDirection(Vector3 destination)
     {
+
         Vector3 origin = _transform.position;
         return (destination - origin).normalized;
     }
@@ -222,8 +232,8 @@ public class MovementController
     private Vector3 GetSteering(Vector3 goalDirection)
     {
         Vector3 avoidanceVector = Vector3.zero;
-
-        foreach (var drone in Object.FindObjectsOfType<DroneController>())
+        
+        foreach (var drone in MachineInstanceManager.Instance.FetchAllDrones())
         {
             if (drone == null || drone.transform == _transform) continue;
 
@@ -325,7 +335,9 @@ public class MovementController
 
     void CalculateComHeight()
     {
-        comHeight = _rb.worldCenterOfMass.y - GetLowerBound();
+        //TODO Make this a real number
+        comHeight = 3;
+        //comHeight = _rb.worldCenterOfMass.y - GetLowerBound();
     }
 
     private float GetLowerBound()

@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityUtils;
-public class ThumbnailGenerator : Singleton<ThumbnailGenerator>
+public class ThumbnailManager : Singleton<ThumbnailManager>
 {
 
     public Camera cam;

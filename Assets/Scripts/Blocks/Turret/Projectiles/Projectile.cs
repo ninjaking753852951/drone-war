@@ -15,7 +15,7 @@ public abstract class Projectile : MonoBehaviour
     
     protected TurretCoreController turret;
 
-    ObjectPoolManager.PooledTypes poolType;
+    ProjectilePoolManager.PooledTypes poolType;
 
     protected virtual void Start()
     {
@@ -52,6 +52,6 @@ public abstract class Projectile : MonoBehaviour
 
     protected void ReturnToPool()
     {
-        ObjectPoolManager.Instance.ReturnObject(gameObject, poolType);
+        ProjectilePoolManager.Instance.ReturnObject(gameObject, poolType);
     }
 }

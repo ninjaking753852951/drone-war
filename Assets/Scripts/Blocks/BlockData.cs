@@ -27,7 +27,7 @@ public class BlockData : IPlaceable
 
             if (netObj != null)
             {
-                //netObj.SpawnWithObservers = false;
+                netObj.SpawnWithObservers = false;
                 netObj.Spawn();   
             }
             
@@ -47,7 +47,7 @@ public class BlockData : IPlaceable
     {
         Vector3 offset = Vector3.up * 1000 * -1;
         GameObject obj = Spawn(offset, Quaternion.Euler(-35, 35, 0));
-        return ThumbnailGenerator.Instance.GenerateThumbnail(obj);
+        return ThumbnailManager.Instance.GenerateThumbnail(obj);
     }
     public BlockType Category()
     {

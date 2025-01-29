@@ -46,6 +46,8 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
 
         curSteer = Mathf.MoveTowards(curSteer, targetSteer * turnDirection, Time.deltaTime * maxTurnSpeed);
 
+
+        
         joint.useSpring = true;
         
         JointSpring curSpring = joint.spring;
@@ -59,6 +61,8 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     {
         float safeTurnAngle = controller.movementController.safeTurnAngle;
 
+        //Debug.Log(safeTurnAngle);
+        
         targetSteer = steer;
         
         targetSteer = Mathf.Clamp(targetSteer, -turnLimit, turnLimit);
@@ -68,6 +72,7 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     
     float CalculateTurnDirection()
     {
+       
         Transform origin = transform.root.GetComponentInChildren<DroneController>().transform;
         // Direction from a to b
         Vector3 directionToWheelBody = transform.position - origin.position;

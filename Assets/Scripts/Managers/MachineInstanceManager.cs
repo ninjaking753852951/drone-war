@@ -9,6 +9,8 @@ public class MachineInstanceManager : RegulatorSingleton<MachineInstanceManager>
     
     Dictionary<ulong, MachineInstance> machines = new Dictionary<ulong, MachineInstance>();
 
+    List<DroneController> drones = new List<DroneController>();
+    
     class MachineInstance
     {
         public DroneController controller;

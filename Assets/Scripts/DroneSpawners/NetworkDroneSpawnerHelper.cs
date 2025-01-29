@@ -14,6 +14,11 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
         
         void Awake()
         {
+                if (!NetworkManager.Singleton.IsListening)
+                {
+                        this.enabled = false;
+                        return;
+                }
                 //teamColour.Value = colour;
                 playerClientID.Initialize(this);
                 teamColour.Initialize(this);

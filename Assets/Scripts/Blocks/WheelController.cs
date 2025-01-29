@@ -17,12 +17,6 @@ public class WheelController : MovingDroneBlockBase
     
     public override void Deploy()
     {
-        //base.Deploy();
-        
-        //wheelJoint.connectedBody = Utils.FindParentRigidbody(transform, rb);
-        
-        Debug.Log("Deploying wheel");
-
         controller = transform.root.GetComponentInChildren<DroneController>();
         
         block = GetComponent<PhysJointPhysBlock>();
@@ -42,8 +36,6 @@ public class WheelController : MovingDroneBlockBase
     
     public void SetTargetVelocity(float velocity)
     {
-        //Debug.Log("Setting wheel velocity " + velocity);
-
         JointMotor motor = wheelJoint.motor;
 
         motor.targetVelocity = velocity * torqueDirection;
@@ -53,6 +45,7 @@ public class WheelController : MovingDroneBlockBase
     
     float CalculateTorqueDirection()
     {
+        
         Transform origin = controller.transform;
         // Direction from a to b
         Vector3 directionToWheelBody = transform.position - origin.position;

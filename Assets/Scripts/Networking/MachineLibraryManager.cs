@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityUtils;
 [RequireComponent(typeof(MachineSaveLoadManager))]
-public class MachineLibrary : Singleton<MachineLibrary>
+public class MachineLibraryManager : Singleton<MachineLibraryManager>
 {
     public Dictionary<int,MachineSaveData> loadedMachines = new Dictionary<int,MachineSaveData>();
 

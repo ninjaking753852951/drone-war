@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityUtils;
 
-public class MessageDisplay : Singleton<MessageDisplay>
+public class ScreenMessageDisplay : Singleton<ScreenMessageDisplay>
 {
     private string messageContent = string.Empty;
     private int messageSize = 12;

@@ -24,6 +24,8 @@ public class PlayerDroneSpawner : DroneSpawner
         
         public MachineSpawnButton(int slot, MachineSaveData machineData, PlayerDroneSpawner spawner, UnityAction call)
         {
+            Debug.Log("New machine spawn button battle");
+            
             obj = Instantiate(spawner.spawnMachineButtonPrefab, spawner.spawnMachineUIParent);
             
             this.slot = slot;
@@ -59,6 +61,9 @@ public class PlayerDroneSpawner : DroneSpawner
         base.Start();
 
         //Init(0, playerID.Value);
+        
+        if(!NetworkManager.Singleton.IsListening)
+            Init();
     }
 
 
@@ -84,7 +89,7 @@ public class PlayerDroneSpawner : DroneSpawner
         for (int i = 0; i < 10; i++)
         {
             int slot = i;
-            MachineSaveData machineData = MachineLibrary.Instance.FetchMachine(slot);/*
+            MachineSaveData machineData = MachineLibraryManager.Instance.FetchMachine(slot);/*
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachine(slot)));*/
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
         }
@@ -95,7 +100,7 @@ public class PlayerDroneSpawner : DroneSpawner
         MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);
         
         if(!teamData.CanAfford(machineData.totalCost))
-            MessageDisplay.Instance.DisplayMessage("INSUFFICIENT FUNDS!");
+            ScreenMessageDisplay.Instance.DisplayMessage("INSUFFICIENT FUNDS!");
         
         CommandManager commandManager = FindObjectOfType<CommandManager>();
         if (commandManager != null)

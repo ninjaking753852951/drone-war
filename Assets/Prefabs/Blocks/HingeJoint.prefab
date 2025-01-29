@@ -409,7 +409,7 @@ MonoBehaviour:
   hitBoxSize: {x: 1, y: 0.5, z: 0.5}
   hitBoxOffset: {x: 0, y: 0.25, z: 0}
   mass: 50
-  centerOfMass: {x: 0, y: 0.44, z: 0}
+  centerOfMass: {x: 0, y: 0.77, z: 0}
   onBuildFinalized:
     m_PersistentCalls:
       m_Calls:
