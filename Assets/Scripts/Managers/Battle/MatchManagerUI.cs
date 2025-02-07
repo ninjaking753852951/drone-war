@@ -1,18 +1,23 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
-using UnityUtils;
-public class MatchManagerUI : Singleton<MatchManagerUI>
+using UnityEngine.UI;
+[System.Serializable]
+public class MatchManagerUI
 {
 
-
-    public TextMeshProUGUI budget;
-
-    public Transform spawnMachineUIParent;
+    MatchManager match;
+ 
     
-    public void SetBudgetUI(float value)
+    public void Init(MatchManager match)
     {
-        budget.text = "$" + MatchManager.Instance.PlayerData().budget;
+
     }
 
+    public void Update()
+    {
+
+            
+    }
 
 }

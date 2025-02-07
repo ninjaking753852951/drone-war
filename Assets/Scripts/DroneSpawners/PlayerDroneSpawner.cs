@@ -24,7 +24,7 @@ public class PlayerDroneSpawner : DroneSpawner
         
         public MachineSpawnButton(int slot, MachineSaveData machineData, PlayerDroneSpawner spawner, UnityAction call)
         {
-            Debug.Log("New machine spawn button battle");
+            //Debug.Log("New machine spawn button battle");
             
             obj = Instantiate(spawner.spawnMachineButtonPrefab, spawner.spawnMachineUIParent);
             
@@ -53,6 +53,7 @@ public class PlayerDroneSpawner : DroneSpawner
     protected override void Awake()
     {
         base.Awake();
+        battleMenu.SetActive(false);
     }
     
     // Start is called before the first frame update
@@ -60,8 +61,6 @@ public class PlayerDroneSpawner : DroneSpawner
     {
         base.Start();
 
-        //Init(0, playerID.Value);
-        
         if(!NetworkManager.Singleton.IsListening)
             Init();
     }
@@ -80,7 +79,10 @@ public class PlayerDroneSpawner : DroneSpawner
     // Update is called once per frame
     void Update()
     {
-        UpdateUI();
+        if (teamID == (int)NetworkManager.Singleton.LocalClientId)
+        {
+            UpdateUI();
+        }
     }
     
     void BuildUI()
@@ -89,8 +91,7 @@ public class PlayerDroneSpawner : DroneSpawner
         for (int i = 0; i < 10; i++)
         {
             int slot = i;
-            MachineSaveData machineData = MachineLibraryManager.Instance.FetchMachine(slot);/*
-            machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachine(slot)));*/
+            MachineSaveData machineData = MachineLibraryManager.Instance.FetchMachine(slot);
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
         }
     }
@@ -121,6 +122,6 @@ public class PlayerDroneSpawner : DroneSpawner
     void UpdateUI()
     {
         if(MatchManager.Instance.PlayerData() != null)
-            playerBudgetText.text = "$" + teamData.budget;
+            playerBudgetText.text = "$" + (int)teamData.budget + " + " + (int)teamData.curIncome + "/s";
     }
 }

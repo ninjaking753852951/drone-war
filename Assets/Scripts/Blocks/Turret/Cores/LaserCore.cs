@@ -3,7 +3,7 @@ public class LaserCore : TurretCoreController
 {
     
     public float laserLifetime = 0.5f;
-    public float laserDamage = 100;
+    //public float laserDamage = 100;
     public float laserRange = 30;
 
 
@@ -19,7 +19,7 @@ public class LaserCore : TurretCoreController
     }
     public override float MaxRange()
     {
-        return laserRange * shootVelocityMultiplier;
+        return laserRange * rangeMultiplier;
     }
     public override float CalculateTargetPitchAngle(Vector3 targetPos, float interceptTime = -1)
     {
@@ -38,6 +38,6 @@ public class LaserCore : TurretCoreController
     }
     public override float DamageCalculation()
     {
-        return laserDamage * damageMultiplier;
+        return baseDamage * damageMultiplier;
     }
 }

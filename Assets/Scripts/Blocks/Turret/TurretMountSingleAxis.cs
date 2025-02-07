@@ -54,6 +54,8 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
     
     public void UpdateTurretAngles(float yaw, float pitch)
     {
+        //Debug.Log("UPDATE MOUNTS TURRET");
+        
         switch (controlType)
         {
             case ControlType.Yaw:

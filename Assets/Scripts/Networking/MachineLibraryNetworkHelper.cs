@@ -37,7 +37,7 @@ public class MachineLibraryNetworkHelper : NetworkBehaviour
         string json = machineData.SerializeToJson();
         byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
 
-        Debug.Log("SENDING MACHINE TO SERVER" );
+        ///Debug.Log("SENDING MACHINE TO SERVER" );
         
         if (!IsSpawned)
         {

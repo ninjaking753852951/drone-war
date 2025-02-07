@@ -11,6 +11,7 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
         public NetworkVariable<ulong> playerClientID;
         public NetworkVariable<Color> teamColour;
         public NetworkVariable<float> budget;
+        public NetworkVariable<float> income;
         
         void Awake()
         {
@@ -41,6 +42,7 @@ public class NetworkDroneSpawnerHelper : NetworkHelperBase
         void Update()
         {
                 SyncValue(budget, ref spawner.teamData.budget);
+                SyncValue(income, ref spawner.teamData.curIncome);
         }
         
         public void Init(ulong clientID)

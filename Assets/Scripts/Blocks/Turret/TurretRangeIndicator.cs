@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,14 +9,21 @@ public class TurretRangeIndicator : MonoBehaviour
 
     // the number of vertices in the indicator
     public float resolution = 15;
-
-    float range;
     
-    // Start is called before the first frame update
-    void Start()
+    float range;
+
+    void Awake()
     {
+        this.enabled = false;
+    }
+
+    // Start is called before the first frame update
+    public void Init(float range)
+    {
+        this.range = range;
         lineRend.gameObject.SetActive(true);
-        Select(false);
+        SetVisible(true);
+        this.enabled = true;
     }
 
     // Update is called once per frame
@@ -24,7 +32,9 @@ public class TurretRangeIndicator : MonoBehaviour
         DrawRange(range);
     }
 
+    /*
     public void SetRange(float range) => this.range = range;
+    */
 
     // using the line rend draw a circle with radius range around the transform
     void DrawRange(float range)
@@ -59,9 +69,9 @@ public class TurretRangeIndicator : MonoBehaviour
         
     }
 
-    public void Select(bool selected)
+    public void SetVisible(bool visible)
     {
-        lineRend.enabled = selected;
+        lineRend.gameObject.SetActive(visible);
     }
 
 }

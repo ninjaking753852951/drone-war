@@ -11,11 +11,17 @@ public class DroneController : NetworkBehaviour, IProgressBar
     [Header("Movement Settings")]
     public MovementController movementController;
     public DistanceTracker distanceTracker;
+    [HideInInspector]
+    public NetworkVariable<bool> isAccelerating;
     
     [Header("Outline Settings")]
     public Outline outline;
     public float selectionWidth = 2;
-
+    
+    [Header("Healthbar Settings")]
+    public ProgressBarSettings healthBarSettings;
+    public Color localPlayerHealthbarColour;
+    
     [Header("Misc Settings")]
     public float healthMultiplier = 10;
     public float curHealth;
@@ -23,7 +29,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     public List<MeshRenderer> coreBlocks;
     public int curTeam;
-    List<TurretRangeIndicator> rangeIndicators;
+    List<TurretRangeIndicator> rangeIndicators = new List<TurretRangeIndicator>();
 
     [Header("Energy Settings")]
     public EnergyController energy;
@@ -67,8 +73,12 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     void Update()
     {
+        if(isNetworkProxy)
+            ProxyUpdate();
+        
         if(!physBlock.IsInCluster())
             return;
+        
         
         energy.Update(Time.deltaTime);
         
@@ -81,33 +91,34 @@ public class DroneController : NetworkBehaviour, IProgressBar
     {
         outline.enabled = select;
         //return;
-        foreach (var rangeIndicator in rangeIndicators)
+        /*foreach (var rangeIndicator in rangeIndicators)
         {
             rangeIndicator.Select(select);
-        }
-    }
-
-    public void ClientDeploy()
-    {
-        isNetworkProxy = true;
-        InitOutline();
-        InitRangeIndicator();
-        energy.Init(this);
-        ProgressBarManager.Instance.RegisterHealthBar(this);
-        SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
+        }*/
     }
 
     void InitOutline()
     {
+        List<TurretRangeIndicator> turretRangeIndicators = transform.root.GetComponentsInChildren<TurretRangeIndicator>().ToList();
+        foreach (TurretRangeIndicator indicator in turretRangeIndicators)
+            indicator.SetVisible(false);
+        
         outline = transform.root.gameObject.AddComponent<Outline>();
         outline.OutlineWidth = selectionWidth;
         outline.enabled = false;
+        
+        foreach (TurretRangeIndicator indicator in turretRangeIndicators)
+            indicator.SetVisible(true);
     }
 
-    void InitRangeIndicator()
+    /*void InitRangeIndicator()
     {
         rangeIndicators = transform.root.GetComponentsInChildren<TurretRangeIndicator>().ToList();
-    }
+        foreach (TurretRangeIndicator rangeIndicator in rangeIndicators)
+        {
+            rangeIndicator.Init();
+        }
+    }*/
 
     void SetCoreColour(Color teamColour)
     {
@@ -121,12 +132,27 @@ public class DroneController : NetworkBehaviour, IProgressBar
         }
     }
 
+    public void ProxyUpdate()
+    {
+        movementController.sound.throttle = isAccelerating.Value;
+    }
+    
+    public void ProxyDeploy()
+    {
+        movementController.sound.mute = false;
+        isNetworkProxy = true;
+        InitOutline();
+        //InitRangeIndicator();
+        energy.Init(this);
+        InitHealth();
+        //ProgressBarManager.Instance.RegisterHealthBar(this);
+        SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
+    }
+    
     public void Deploy()
     {
         instanceID = MachineInstanceManager.Instance.Register(this);
 
-        //GetComponentInParent<PhysParent>().Build();
-        
         rb = physBlock.Cluster().rb;
         
         InitMovement();
@@ -137,7 +163,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
         
         energy.Init(this);
         
-        InitRangeIndicator();
+        //InitRangeIndicator();
         
         SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
     }
@@ -145,14 +171,14 @@ public class DroneController : NetworkBehaviour, IProgressBar
     void InitHealth()
     {
         List<DroneBlock> droneBlocks = transform.root.GetComponentsInChildren<DroneBlock>().ToList();
+        curHealth = 0;
         foreach (DroneBlock droneBlock in droneBlocks)
         {
-            curHealth += droneBlock.health;
+            curHealth += droneBlock.stats.QueryStat(Stat.HitPoints);
         }
-        
+
         curHealth *= healthMultiplier;
         maxHealth = curHealth;
-        
         ProgressBarManager.Instance.RegisterHealthBar(this);
     }
 
@@ -194,7 +220,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
         {
             if (NetworkManager.Singleton.IsListening)
             {
-                Utils.DestroyNetworkObjectWithChildren(GetComponent<NetworkObject>());
+                Utils.DestroyNetworkObjectWithChildren(transform.root.GetComponent<NetworkObject>());
             }
             else
             {
@@ -223,9 +249,13 @@ public class DroneController : NetworkBehaviour, IProgressBar
     {
         return maxHealth;
     }
-    public ProgressBarSettings healthBarSettings;
     public ProgressBarSettings ProgressBarSettings()
     {
+        //TODO find out if we are a local team machine
+
+        if (MatchManager.Instance.IsPlayerOwned(this))
+            healthBarSettings.colour = localPlayerHealthbarColour;
+        
         return healthBarSettings;
     }
     public bool IsDestroyed()

@@ -14,16 +14,17 @@ public class PhysBlock : MonoBehaviour
     public Vector3 hitBoxOffset = Vector3.zero;
     
     [Header("Mass Settings")]
-    public float mass = 25;
     public Vector3 centerOfMass;
     
     public PhysCluster originCluster { get; private set; }
-    [HideInInspector]
-    public UnityEvent onBuildFinalized;
+
+    public UnityEvent onBuildFinalized = new UnityEvent();
 
     public List<PhysBlock> neighbors = new List<PhysBlock>();
 
     PhysParent physParent;
+
+    public float Mass() => GetComponent<DroneBlock>().stats.QueryStat(Stat.Mass);
     
     public virtual void Init(PhysCluster originCluster, PhysBlock connectedBlock)
     {
@@ -63,6 +64,7 @@ public class PhysBlock : MonoBehaviour
     
     public void FinalizeBuild()
     {
+        //Debug.Log("FINALIZE");
         onBuildFinalized.Invoke();
     }
 

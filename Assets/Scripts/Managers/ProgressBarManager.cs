@@ -79,6 +79,7 @@ public class ProgressBarManager : Singleton<ProgressBarManager>
 
     private void UpdateHealthBarPositions()
     {
+        
         foreach (var healthbar in healthBars)
         {
             if (healthbar.controller.IsDestroyed())

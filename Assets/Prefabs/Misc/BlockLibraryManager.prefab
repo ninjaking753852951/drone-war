@@ -1,0 +1,166 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2592864987656341268
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4007800761788950416}
+  - component: {fileID: 9140679369012456156}
+  m_Layer: 0
+  m_Name: BlockLibraryManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4007800761788950416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592864987656341268}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9140679369012456156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2592864987656341268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41801649300f1ba4b9b8ecb132a98f8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  libraries:
+  - {fileID: 11400000, guid: 3ab57d19e4a13a946922fde660304b24, type: 2}
+  - {fileID: 11400000, guid: e82c282ccb2475a4ba5efb5a161b5af5, type: 2}
+  coreBlock:
+    prefab: {fileID: 0}
+    category: 0
+  tankTracks: []
+  blockRules:
+    combinations:
+    - parentBlock: 0
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 0
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 1
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 2
+      childBlock: 2
+      canPlace: 0
+    - parentBlock: 3
+      childBlock: 2
+      canPlace: 1
+    - parentBlock: 3
+      childBlock: 5
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 0
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 3
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 6
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 7
+      canPlace: 1
+    - parentBlock: 3
+      childBlock: 4
+      canPlace: 1
+    - parentBlock: 7
+      childBlock: 9
+      canPlace: 1
+    - parentBlock: 9
+      childBlock: 9
+      canPlace: 1
+    - parentBlock: 6
+      childBlock: 9
+      canPlace: 1
+    - parentBlock: 9
+      childBlock: 1
+      canPlace: 1
+    - parentBlock: 8
+      childBlock: 9
+      canPlace: 1
+    - parentBlock: 9
+      childBlock: 7
+      canPlace: 1

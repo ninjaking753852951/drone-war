@@ -1039,8 +1039,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 1, z: 1}
-  health: 10
-  cost: 100
+  stats:
+    statEntries:
+    - stat: 0
+      value: 100
+    - stat: 1
+      value: 150
+    - stat: 5
+      value: 100
+    - stat: 6
+      value: 5
   controller: {fileID: 0}
   meta:
     specialPositions: []
@@ -1056,8 +1064,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 224a07d30f34466d8a9d207bb6886e90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerCapacity: 5
-  powerRegen: 0
 --- !u!114 &3016147718367485619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1072,7 +1078,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
-  mass: 25
+  adjacencyScanBonus: 0
+  hitBoxSize: {x: 1, y: 1, z: 1}
+  hitBoxOffset: {x: 0, y: 0, z: 0}
   centerOfMass: {x: 0, y: 0, z: 0}
   onBuildFinalized:
     m_PersistentCalls:
@@ -1089,6 +1097,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  neighbors: []
 --- !u!1 &3657321062279198311
 GameObject:
   m_ObjectHideFlags: 0

@@ -161,7 +161,10 @@ public class MapObjectivePoint : MonoBehaviour
 
             if (pointHealth <= 0)
             {
+                if(currentOwner != null)
+                    MatchManager.Instance.Team(currentOwner.Value).curIncome -= income;
                 currentOwner = occupyingTeam;
+                MatchManager.Instance.Team(currentOwner.Value).curIncome += income;
                 pointHealth = pointMaxHealth;
                 UpdatePointState();
             }

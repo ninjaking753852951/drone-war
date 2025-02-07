@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3413179197577540351}
   - component: {fileID: 8930268420589351622}
   - component: {fileID: 108051501396222430}
+  - component: {fileID: 7030537648293874187}
   m_Layer: 0
   m_Name: MassArmourDiagonal
   m_TagString: Untagged
@@ -90,23 +91,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5a0dc556c27724497346fa5c290f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
-  scanBoxOffset: {x: 0, y: 0, z: 0}
   gridSize: {x: 1, y: 1, z: 1}
-  mass: 50
-  health: 50
-  cost: 20
-  connectionPoint: {fileID: 0}
-  onInit:
-    m_PersistentCalls:
-      m_Calls: []
-  postAdoptionInit:
-    m_PersistentCalls:
-      m_Calls: []
+  stats:
+    statEntries:
+    - stat: 0
+      value: 100
+    - stat: 1
+      value: 20
+    - stat: 5
+      value: 50
   controller: {fileID: 0}
-  canOnlyAdoptTurretModules: 0
   meta:
     specialPositions: []
+--- !u!114 &7030537648293874187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130770705048867853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57554ef51eab4e9cb6601b64d2e91c98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
+  scanBoxOffset: {x: 0, y: 0, z: 0}
+  adjacencyScanBonus: 0
+  hitBoxSize: {x: 1, y: 1, z: 1}
+  hitBoxOffset: {x: 0, y: 0, z: 0}
+  centerOfMass: {x: 0, y: 0, z: 0}
+  onBuildFinalized:
+    m_PersistentCalls:
+      m_Calls: []
+  neighbors: []
 --- !u!1 &1204094855090771702
 GameObject:
   m_ObjectHideFlags: 0

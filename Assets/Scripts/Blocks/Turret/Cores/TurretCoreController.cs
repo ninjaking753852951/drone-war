@@ -11,13 +11,15 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityUtils;
 
-public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
+public abstract class TurretCoreController : NetworkBehaviour, IProxyDeploy
 {
     public float fireRate = 10;
     public float recoilMultiplier = 1;
-    public float energyCost;
+    public float energyCost { get; set; }
+    public float baseDamage { get; set; }
     public float damageMultiplier = 1;
-    public float shootVelocityMultiplier = 1;
+    [FormerlySerializedAs("shootVelocityMultiplier")]
+    public float rangeMultiplier = 1;
     public float shootVelocity;
     
     public Transform target;
@@ -33,9 +35,15 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     [HideInInspector]
     public Rigidbody clusterRb;
     public float turretUpdateRate;
+    
+    [Header("Effects Settings")]
+    public VFXData shootVFX;
+    
+    
     CountdownTimer turretUpdateTimer;
     TurretRangeIndicator rangeIndicator;
     float maxRange;
+    NetworkVariable<float> netMaxRange = new NetworkVariable<float>();
     public List<TargetTypes> targetTypes;
     public float aimTolerance = 1; // How off can the angle be in meters but still permit firing
     public ProjectilePoolManager.PooledTypes projectileType;
@@ -64,6 +72,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     
     void Awake()
     {
+        DroneBlock droneBlock = GetComponent<DroneBlock>();
+        baseDamage = droneBlock.stats.QueryStat(Stat.Damage);
+        energyCost = droneBlock.stats.QueryStat(Stat.EnergyCost);
         rangeIndicator = GetComponent<TurretRangeIndicator>();
         block = GetComponent<PhysBlock>();
         block.onBuildFinalized.AddListener(Deploy);
@@ -75,9 +86,20 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         fireTimer = new CountdownTimer(1 / fireRate);
         fireTimer.Start();
     }
+    public void ProxyDeploy()
+    {
+        Debug.Log("turret proxy deploy");
+        //DeployModules();
+        //maxRange = MaxRange();
+        rangeIndicator.Init(netMaxRange.Value);
+    }
+    
     
     public void Deploy()
     {
+        
+        Debug.Log("GUN DEPLOY");
+        
         isDeployed = true;
         
         turretUpdateTimer = new CountdownTimer(1 / turretUpdateRate);
@@ -90,7 +112,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
         //mountsSingleAxis.Add(FindFirstComponentInAdjacencyMap<TurretMountSingleAxis>(block));
         mountsSingleAxis = FindMountsInAdjacencyMap(block);
-        eldestMountRb = mountsSingleAxis[^1].block.originCluster.rb;
+        if(mountsSingleAxis.Count > 0)
+            eldestMountRb = mountsSingleAxis[^1].block.originCluster.rb;
+        
         
         //mountsSingleAxis = GetComponentsInParent<TurretMountSingleAxis>().ToList();
         //Transform eldestMount = Utils.GetHighestInHierarchy(mountsSingleAxis).transform;
@@ -99,11 +123,14 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         
         DeployModules();
 
-        barrels.Add( FindFirstComponentInAdjacencyMap<TurretBarrelController>(block));
+        TurretBarrelController barrel = FindFirstComponentInAdjacencyMap<TurretBarrelController>(block);
+        if(barrel != null)
+            barrels.Add(barrel);
         //barrels = GetComponentsInChildren<TurretBarrelController>().ToList();
         
         if (barrels != null && barrels.Count > 0)
         {
+            Debug.Log("MORE THAN ZERO BARRELS");
             mainBarrel = Utils.FurthestFrom(Utils.GetTransformsFromComponents(barrels), transform.position)
                 .GetComponent<TurretBarrelController>();   
         }
@@ -113,46 +140,10 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         }
 
         maxRange = MaxRange();
-        rangeIndicator.SetRange(maxRange);
+        rangeIndicator.Init(maxRange);
+        if (IsSpawned)
+            netMaxRange.Value = maxRange;
     }
-
-    /*void FindMountsInAdjacencyMap()
-    {
-        TurretMountSingleAxis mount = null;
-        
-        Queue<PhysBlock> queue = new Queue<PhysBlock>();
-        HashSet<PhysBlock> visited = new HashSet<PhysBlock>();
-
-        queue.Enqueue(block);
-        visited.Add(block);
-
-        while (queue.Count > 0)
-        {
-            PhysBlock current = queue.Dequeue();
-            
-            if(current == null)
-                continue;
-
-            // Check if this block has the component
-            if (current.GetComponent<TurretMountSingleAxis>() != null)
-            {
-                Debug.Log("Component found in block: " + current.name);
-                mount = current.GetComponent<TurretMountSingleAxis>();
-                break;
-            }
-
-            // Enqueue unvisited neighbors
-            foreach (PhysBlock neighbor in current.neighbors)
-            {
-                if (!visited.Contains(neighbor))
-                {
-                    visited.Add(neighbor);
-                    queue.Enqueue(neighbor);
-                }
-            }
-        }
-        mountsSingleAxis.Add(mount);
-    }*/
     
     public static T FindFirstComponentInAdjacencyMap<T>(PhysBlock startBlock) where T : Component
     {
@@ -256,19 +247,22 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
     
     void DeployModules()
     {
-        List<TurretModule> turretModules = GetComponentsInChildren<TurretModule>().ToList();
-        foreach (var turretModule in turretModules)
-            turretModule.Deploy(this);
+        foreach (PhysBlock neighbor in block.neighbors)
+        {
+            TurretModule turretModule = neighbor.GetComponent<TurretModule>();
+            if (turretModule != null)
+            {
+                turretModule.Deploy(this);
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
         if(!isDeployed || GameManager.Instance.IsOnlineAndClient())
             return;
 
-        
         AimTurret();
         
         if(target == null)
@@ -284,15 +278,23 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         turretUpdateTimer.Start();
         
         List<Transform> targets = FindEnemies();
+        //Debug.Log("TARGETS  " + targets.Count);
         if (targets == null || targets.Count == 0 )
             return;
         target = Utils.ClosestTo(targets, transform.position);
         
-        Rigidbody targetRb = target.root.GetComponent<Rigidbody>();
-
+        if(mountsSingleAxis.Count <= 0) 
+            return;
+        
         //Estimate position accounting for velocity
-        float interceptTime = EstimateInterceptTime(target.position, targetRb.linearVelocity);
-        Vector3 targetPosEstimate = target.position + targetRb.linearVelocity * interceptTime;
+        Vector3 targetVelocity = Vector3.zero;
+        Rigidbody targetRb = target.GetComponentInParent<Rigidbody>();
+        if (targetRb != null)
+        {
+            targetVelocity = targetRb.linearVelocity;
+        }
+        float interceptTime = EstimateInterceptTime(target.position, targetVelocity);
+        Vector3 targetPosEstimate = target.position + targetVelocity * interceptTime;
         
         // Calculate Angles
         targetPitchAngle = -CalculateTargetPitchAngle(targetPosEstimate, interceptTime);
@@ -301,6 +303,8 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         //Debug.Log( "Pitch" + targetPitchAngle + " Yaw " + targetYawAngle);
         
         Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, eldestMountRb.transform.up, eldestMountRb.transform.forward);
+        
+        //Debug.Log("DEPLOY WITH MOUNTS " + mountsSingleAxis.Count);
         
         foreach (TurretMountSingleAxis turretMountSingleAxis in mountsSingleAxis)
             turretMountSingleAxis.UpdateTurretAngles(transformedPitchYaw.y, transformedPitchYaw.x);
@@ -333,7 +337,7 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     List<Transform> FindEnemies()
     {
-        return new List<Transform>();
+        //return new List<Transform>();
         int curTeam = controller.curTeam;
 
         List<DroneController> droneControllers = MachineInstanceManager.Instance.FetchAllDrones();
@@ -376,6 +380,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         fireTimer.Start();
 
         controller.energy.DeductEnergy(energyCost);
+        
+        if(shootVFX != null)
+            VFXManager.instance.Spawn(shootVFX, mainBarrel.shootPoint.position, Quaternion.identity);
         
         Shoot();
         
@@ -420,6 +427,9 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
 
     protected virtual bool ReadyToFire()
     {
+        Debug.Log("OBSTRUCTED " +mainBarrel.IsObstructed());
+        Debug.Log("AIMED AT TARGET " +IsAimedAtTarget());
+        Debug.Log("IN RANGE " + TargetInRange() );
         return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange() && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
     }
 
@@ -476,19 +486,10 @@ public abstract class TurretCoreController : MonoBehaviour, IProxyDeploy
         return angles;
     }
 
-
-
-    public void ProxyDeploy()
-    {
-        DeployModules();
-        maxRange = MaxRange();
-        rangeIndicator.SetRange(maxRange);
-    }
-
     public abstract float DamageCalculation();
     
     public float ShootVelocity()
     {
-        return shootVelocity * shootVelocityMultiplier;
+        return shootVelocity * rangeMultiplier;
     }
 }

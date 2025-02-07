@@ -5,7 +5,7 @@ public class MissileCore : TurretCoreController
     
     public float missileAcceleration = 1;
     public float missileExplosionRadiusMultiplier = 1;
-    public float missileDamage = 1000;
+    //public float missileDamage = 1000;
     
 
     public override void Shoot()
@@ -59,7 +59,7 @@ public class MissileCore : TurretCoreController
     }
     public override float DamageCalculation()
     {
-        return missileDamage * damageMultiplier;
+        return baseDamage * damageMultiplier;
     }
 
     float CalculateMissileLaunchAngle(float v0, float a, Vector2 targetPos)

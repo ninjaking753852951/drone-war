@@ -65,4 +65,8 @@ public class BraceBlock : IPlaceable, IStepPlaceable
     {
         return BlockType.Basic;
     }
+    public BlockStats Stats()
+    {
+        return null;
+    }
 }

@@ -11,7 +11,8 @@ public class MovementController
     [Header("Steering Settings")]
     public float safeTurnLimitMultiplier = 1f;
     public float steerMultiplier = 1f;
-
+    public float safeTurnSpeedMultiplier = 2;
+    
     [Header("Motor Settings")]
     public float motorTorque;
     public float mass;
@@ -38,6 +39,10 @@ public class MovementController
     [HideInInspector] public float movementEnergyCost;
     [HideInInspector] public float currentSteer;
     [HideInInspector] public float velocity;
+
+    [Header("Misc Settings")]
+    public MotorSoundController sound;
+    
     DroneController controller;
 
     private Transform _transform;
@@ -69,6 +74,7 @@ public class MovementController
         this.controller = controller;
         _rb = rb;
         _transform = transform;
+        sound.mute = false;
     }
 
     public void InitializeComponents()
@@ -87,7 +93,10 @@ public class MovementController
             targetDestination = _transform.position;
         
         velocity = _rb.linearVelocity.magnitude;
-
+        //Debug.Log("SAFE TURN ANGLE " +CalculateMaxSafeSteeringAngle());
+       // Debug.Log("CUR STEER " + currentSteer);
+        
+        
         Vector3 directionToTarget = CalculateTargetDirection(targetDestination);
         directionToTarget = GetSteering(directionToTarget);
         
@@ -108,6 +117,9 @@ public class MovementController
         
         UpdateMovementState(velocity, destinationDistance);
         UpdateComponents();
+
+        controller.isAccelerating.Value = _currentMovementState == MovementState.Accelerating;
+        sound.throttle = _currentMovementState == MovementState.Accelerating;
     }
     
 
@@ -251,7 +263,8 @@ public class MovementController
 
     private void CalculateWheelbase()
     {
-        Vector3 com = _rb.worldCenterOfMass;
+        // CANT USE WORLD CENTER OF MASS BECAUSE IT TAKE A PHYSICS FRAME TO UPDATE
+        Vector3 com = _rb.transform.position;
 
         List<Vector3> frontAxlePositions = new List<Vector3>();
         List<Vector3> rearAxlePositions = new List<Vector3>();
@@ -261,12 +274,15 @@ public class MovementController
             if (wheel.transform.position.z > com.z)
             {
                 frontAxlePositions.Add(wheel.transform.position);
+                //Debug.Log("ADDED FRONT WHEEL");
             }
             else
             {
                 rearAxlePositions.Add(wheel.transform.position);
+                //Debug.Log("ADDED REAR WHEEL");
             }
         }
+        
 
         Vector3 frontAxle = Utils.CalculateAveragePosition(frontAxlePositions);
         Vector3 rearAxle = Utils.CalculateAveragePosition(rearAxlePositions);
@@ -356,7 +372,7 @@ public class MovementController
     {
         float gravity = 9.81f;
         float numerator = wheelBase * trackWidth * gravity;
-        float denomenator = 2 * (comHeight) * (velocity * velocity);
+        float denomenator = 2 * (comHeight) * (velocity * velocity * safeTurnSpeedMultiplier);
 
         //numerator *= 0.5f;
         // Calculate the turn angle in radians

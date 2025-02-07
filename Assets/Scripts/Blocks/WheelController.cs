@@ -17,6 +17,7 @@ public class WheelController : MovingDroneBlockBase
     
     public override void Deploy()
     {
+        //Debug.Log("Wheel deploy");
         controller = transform.root.GetComponentInChildren<DroneController>();
         
         block = GetComponent<PhysJointPhysBlock>();

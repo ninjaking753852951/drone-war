@@ -1,1 +1,1 @@
-public enum BlockType {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power, Structure, Core}
+public enum BlockType {Basic, TurretMounts, TurretBarrels, TurretCores, TurretModules, SubAssemblies, Power, Structure, Core, Movement, Hidden}

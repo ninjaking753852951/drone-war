@@ -50,7 +50,7 @@ public class MapObjectiveNetworkHelper : NetworkHelperBase
     {
         objective.SetIndicatorSize();
         objective.enabled = false;
-        Debug.Log("FILL IS " + fill.Value);
+        //Debug.Log("FILL IS " + fill.Value);
         objective.SetFill(fill.Value);
         objective.SetIndicatorColour(currentOwner.Value);
     }

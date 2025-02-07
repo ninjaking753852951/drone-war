@@ -71,7 +71,7 @@ public abstract class DroneSpawner : MonoBehaviour
 
             foreach (var collider in colliders)
             {
-                DroneBlock block = collider.transform.root.GetComponent<DroneBlock>();
+                PhysParent block = collider.transform.root.GetComponent<PhysParent>();
                 if (block != null)
                 {
                     isClear = false;
@@ -87,12 +87,12 @@ public abstract class DroneSpawner : MonoBehaviour
         return scanPos;
     }
 
-    IEnumerator SpawnMachineCoroutine()
+    /*IEnumerator SpawnMachineCoroutine()
     {
 
         yield return new WaitForFixedUpdate();
         
         controller.Deploy();
 
-    }
+    }*/
 }

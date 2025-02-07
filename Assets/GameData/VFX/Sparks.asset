@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe353f923e742bf8dca5685815f0e14, type: 3}
+  m_Name: Sparks
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 9027947768351067878, guid: cecfb49825374a64eb59e053fb41e7d3, type: 3}
+  lifetime: 1
+  sfx: {fileID: 11400000, guid: 7a3f0f9d1a39792478dddcae71ad0c86, type: 2}

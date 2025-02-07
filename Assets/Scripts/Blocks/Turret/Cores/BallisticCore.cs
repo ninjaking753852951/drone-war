@@ -7,8 +7,7 @@ public class BallisticCore : TurretCoreController
     public float deviance = 1;
 
     public float accuracyTolerance = 0.5f;
-
-    public GameObject shootEffect;
+    
 
     public float drag = 0.3f;         // Unity-style drag coefficient
 
@@ -29,7 +28,7 @@ public class BallisticCore : TurretCoreController
         Vector3 devianceForce = Random.insideUnitSphere * (deviance/MaxRange());
         projectileRb.AddForce(projectileClone.transform.forward * ShootVelocity() + devianceForce, ForceMode.VelocityChange);
 
-        Instantiate(shootEffect, mainBarrel.shootPoint);
+        //Instantiate(shootEffect, mainBarrel.shootPoint);
         
         Bullet projectile = projectileClone.GetComponent<Bullet>();
         if (projectile != null)

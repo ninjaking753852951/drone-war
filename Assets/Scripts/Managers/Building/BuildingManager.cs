@@ -26,13 +26,16 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     public Vector3 spawnPoint;
     
     List<IPlaceable> allPlaceables;
-    [HideInInspector]
-    public float totalCost;
+    public float totalCost { get; private set; }
     IPlaceable curPlaceable;
 
     bool isOnCompatibleBlock;
     public BuildingBlockSelector blockSelector { get; private set; }
 
+    [FormerlySerializedAs("placeBlockSfx")]
+    [Header("Building Effects")]
+    public VFXData placeBlockVfx;
+    
     [Header("Build Tools")]
     public Tool moveTool;
     public RotateTool rotateTool;
@@ -178,7 +181,10 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         //Place the block
         if (Input.GetButtonDown("Fire1") && buildingBlockIndicator.activeSelf && isOnCompatibleBlock)
         {
+            
             Vector3 placePosition = buildingBlockIndicator.transform.position;
+            
+            VFXManager.instance.Spawn(placeBlockVfx,  placePosition, quaternion.identity, false);
             
             if (curPlaceable is IStepPlaceable stepPlaceable)
             {
@@ -187,9 +193,8 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
             else
             {
                 curPlaceable.Spawn(placePosition, buildingBlockIndicator.transform.rotation);
-                totalCost = TotalCost();
             }
-            totalCost = TotalCost();
+            UpdateTotalCost();
         }
 
 
@@ -211,7 +216,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
                 if (Input.GetKeyDown(KeyCode.X))
                 {
                     Destroy(hitDroneBlock.gameObject);
-                    totalCost = TotalCost();
+                    UpdateTotalCost();
                 }
             }
         }
@@ -220,13 +225,18 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
             buildingBlockIndicator.SetActive(hasHitDroneBlock);
     }
 
+    void UpdateTotalCost()
+    {
+        totalCost = TotalCost();
+    }
+
     float TotalCost()
     {
         List<DroneBlock> droneBlocks = FindObjectsOfType<DroneBlock>().ToList();
         float cost = 0;
         foreach (var droneBlock in droneBlocks)
         {
-            cost += droneBlock.cost;
+            cost += droneBlock.stats.QueryStat(Stat.Cost);
         }
 
         return cost;
@@ -282,6 +292,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
             DestroyImmediate(parent.gameObject);
 
         MachineSaveLoadManager.instance.LoadMachine(MachineSaveLoadManager.instance.curSlot).Spawn(network: false);
+        UpdateTotalCost();
         SetNewCurrentBlock(BlockLibraryManager.Instance.blocks[0]);
     }
     

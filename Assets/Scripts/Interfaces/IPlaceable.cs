@@ -14,5 +14,7 @@ namespace Interfaces
 
         public BlockType Category();
 
+        public BlockStats Stats();
+
     }
 }

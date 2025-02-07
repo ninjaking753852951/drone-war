@@ -18,10 +18,12 @@ public class DroneNetworkController : NetworkHelperBase
     public NetworkVariable<float> boundingRadius;
     
     DroneController controller;
+    PhysParent physParent;
 
     void Awake()
     {
         controller = GetComponent<DroneController>();
+        
     }
 
     /*public override void OnNetworkSpawn()
@@ -34,17 +36,23 @@ public class DroneNetworkController : NetworkHelperBase
     
     void Update()
     {
+        if(!NetworkManager.Singleton.IsListening)
+            return;
+        
+        if (physParent == null)
+            physParent = transform.root.GetComponent<PhysParent>();
+        
         SyncValue(health, ref controller.curHealth);
-        SyncValue(maxHealth, ref controller.maxHealth);
+        //SyncValue(maxHealth, ref controller.maxHealth);
         
         SyncValue(energy, ref controller.energy.energy);
         SyncValue(maxEnergy, ref controller.energy.maxEnergy);
         
         SyncValue(boundingRadius, ref controller.boundingSphereRadius);
         
-        if (GameManager.Instance.IsOnlineAndClient())
+        if (GameManager.Instance.IsOnlineAndClient() && physParent != null)
         {
-            if (!hasClientDeployed && blockCount.Value == GetComponentsInChildren<DroneBlock>().Length)
+            if (!hasClientDeployed && physParent.HasBuilt())
             {
                 ProxyDeploy();
             }
@@ -56,9 +64,9 @@ public class DroneNetworkController : NetworkHelperBase
         Debug.Log("Proxy Deploy");
         hasClientDeployed = true;
         controller.curTeam = curTeam.Value;
-        controller.ClientDeploy();
+        controller.ProxyDeploy();
 
-        foreach (IProxyDeploy proxyDeploy in GetComponentsInChildren<IProxyDeploy>())
+        foreach (IProxyDeploy proxyDeploy in transform.root.GetComponentsInChildren<IProxyDeploy>())
         {
             proxyDeploy.ProxyDeploy();
         }

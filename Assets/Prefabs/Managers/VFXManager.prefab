@@ -68,6 +68,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vfxList:
   - {fileID: 11400000, guid: ad620671e0b596042886693943c92f75, type: 2}
-  - {fileID: 11400000, guid: dc33f3a165ec6c94e90563796d9995c4, type: 2}
   - {fileID: 11400000, guid: 6421ad8ba279fca4995861fcf525e00c, type: 2}
   - {fileID: 11400000, guid: 166ddd4aaaf3df44f8c4606cd6f5924e, type: 2}
+  - {fileID: 11400000, guid: f429a8020b29f5e47811a103bc30c191, type: 2}
+  - {fileID: 11400000, guid: 780b9345b4360d84d83f237d53dde7f9, type: 2}
+  - {fileID: 11400000, guid: 6464375d90edb5f40a90eecc3714e44c, type: 2}

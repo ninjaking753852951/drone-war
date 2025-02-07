@@ -5,10 +5,11 @@ using System.Linq;
 using ImprovedTimers;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityUtils;
 using Random = UnityEngine.Random;
 
-public class MatchManager : Singleton<MatchManager>
+public class MatchManager : NetworkSingleton<MatchManager>
 {
 
     public List<DroneSpawner> teams = new List<DroneSpawner>();
@@ -22,15 +23,15 @@ public class MatchManager : Singleton<MatchManager>
     public int winner =-1;
 
     public readonly int playerID = 0;
-
-    public MatchManagerUI ui;
-
+    
     public TeamData defaultTeam;
     
     TeamData playerData;
 
     public MatchState matchState = MatchState.PreMatch;
-
+    
+    public MatchManagerUI matchManagerUI;
+    
     CountdownTimer moneyTick;
     
     public enum MatchState
@@ -44,6 +45,8 @@ public class MatchManager : Singleton<MatchManager>
         public Color colour;
         public bool isAI;
         public float budget;
+
+        public float curIncome;
 
         public float incomeMultiplier = 1;
 
@@ -117,8 +120,26 @@ public class MatchManager : Singleton<MatchManager>
         return curIndex;
     }
 
-    void StartMatch()
+    protected override void Awake()
     {
+        base.Awake();
+        Debug.Log("MATCH MANAGER AWAKE");
+        matchManagerUI.Init(this);
+    }
+
+    public bool IsPlayerOwned(DroneController controller)
+    {
+        return controller.curTeam == (int)NetworkManager.Singleton.LocalClientId;
+    }
+
+    void Update()
+    {
+        matchManagerUI.Update();
+    }
+
+    public void StartMatch()
+    {
+        StartMatchRPC();
         matchState = MatchState.Match;
         ClearTeams();
         winner = -1;
@@ -137,6 +158,13 @@ public class MatchManager : Singleton<MatchManager>
         moneyTick = new CountdownTimer(1);
         moneyTick.OnTimerStop += IncrementMoney;
         moneyTick.Start();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void StartMatchRPC()
+    {
+        Debug.Log("START MATCH");
+        FindFirstObjectByType<LobbyUI>().OpenCloseMenu(false);
     }
 
     void ResetMapObjectives()
@@ -277,22 +305,8 @@ public class MatchManager : Singleton<MatchManager>
             normal = { textColor = Color.white },
             alignment = TextAnchor.UpperLeft
         };
-        GUI.Label(new Rect(10, 10, 300, 30), IsOnlineMatch() ? "Match Type: Online" : "Match Type: Local", matchTypeStyle);
-
-
-
-        if (matchState == MatchState.PreMatch)
-        {
-            if (!GameManager.Instance.IsOnlineAndClient())
-            {
-                // Button to start the match
-                Rect startMatchButtonRect = new Rect(screenWidth / 2 - 100, 40, 200, 30);
-                if (GUI.Button(startMatchButtonRect, "Start Match"))
-                {
-                    StartMatch();
-                }   
-            }
-        }
+        //GUI.Label(new Rect(10, 10, 300, 30), IsOnlineMatch() ? "Match Type: Online" : "Match Type: Local", matchTypeStyle);
+        
 
         if (matchState == MatchState.Match && !NetworkManager.Singleton.IsListening)
         {
@@ -303,49 +317,6 @@ public class MatchManager : Singleton<MatchManager>
                 AddAIPlayer();
             }
         }
-        
-        // Display connected players in the lobby
-        GUIStyle playerListStyle = new GUIStyle
-        {
-            fontSize = 16,
-            normal = { textColor = Color.cyan },
-            alignment = TextAnchor.UpperLeft
-        };
-        
-        GUIStyle localPlayerListStyle = new GUIStyle
-        {
-            fontSize = 18,
-            normal = { textColor = Color.yellow },
-            alignment = TextAnchor.UpperLeft
-        };
-
-        Rect playerListRect = new Rect(10, 50, 300, 400);
-        GUI.Label(playerListRect, "Players in Lobby:", playerListStyle);
-
-        if (IsOnlineMatch())
-        {
-            var connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds.ToList();
-            for (int i = 0; i < connectedClientIds.Count; i++)
-            {
-                Rect clientLabelRect = new Rect(10, 80 + (i * 20), 300, 20);
-                string clientLabel = $"Client ID: {connectedClientIds[i]}";
-
-                GUIStyle style = playerListStyle;
-                
-                if (NetworkManager.Singleton.IsListening && NetworkManager.Singleton.LocalClientId == connectedClientIds[i])
-                {
-                    style = localPlayerListStyle;
-                }
-                
-                GUI.Label(clientLabelRect, clientLabel, style);
-            }
-        }
-        else
-        {
-            GUI.Label(new Rect(10, 80, 300, 20), "Local Player", playerListStyle);
-        }
-
-
 
         // Define the style for the winner text
         GUIStyle winnerStyle = new GUIStyle

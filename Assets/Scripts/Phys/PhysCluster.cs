@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,10 +11,12 @@ public class PhysCluster : MonoBehaviour
     public PhysParent physParent  { get; private set; }
 
     public Rigidbody rb { get; private set; }
-    List<PhysBlock> blocks = new List<PhysBlock>();
+    public HashSet<PhysBlock> blocks = new HashSet<PhysBlock>();
 
-    public List<PhysBlock> Blocks() => blocks;
+    public List<PhysBlock> Blocks() => blocks.ToList();
 
+    public Vector3 com { get; set; }
+    
     Dictionary<PhysBlock, PhysBlock> adjacencyMap = new Dictionary<PhysBlock, PhysBlock>();
 
     void Awake()
@@ -45,6 +48,12 @@ public class PhysCluster : MonoBehaviour
         }
     }
 
+    public void EnablePhysics()
+    {
+        rb.isKinematic = false;
+        rb.useGravity = true;
+    }
+
     public void RegisterToPhysParent(PhysParent parent)
     {
         physParent = parent;
@@ -71,10 +80,18 @@ public class PhysCluster : MonoBehaviour
 
     public void AssimilateCluster(PhysCluster otherCluster)
     {
+        Debug.Log("ASSImilation");
         foreach (PhysBlock block in otherCluster.blocks)
         {
             RegisterBlock(block, null );
         }
+        
+        /*// Incase this was spawned
+        NetworkObject netObj = GetComponent<NetworkObject>();
+        if (netObj != null && netObj.IsSpawned)
+            netObj.Despawn(false);*/
+
+        physParent.clusters.Remove(otherCluster);
         Destroy(otherCluster.gameObject);
     }
 
@@ -88,12 +105,17 @@ public class PhysCluster : MonoBehaviour
 
     public void FinalizeBuild()
     {
+        //Debug.Log( blocks.Count);
         foreach (PhysBlock block in blocks)
         {
-            rb.mass += block.mass;
+            rb.mass += block.Mass();
             block.FinalizeBuild();
         }
         
+        //Debug.Log(massSum);
+        
+        EnablePhysics();
+
         //CalculateCOM();
     }
     
@@ -102,22 +124,23 @@ public class PhysCluster : MonoBehaviour
     {
         
         
-        Vector3 com = Vector3.zero;
+        com = Vector3.zero;
 
         float massSum = 0;
         
         foreach (PhysBlock block in blocks)
         {
-            com += (block.transform.position + block.transform.rotation * block.centerOfMass) * block.mass;
-            massSum += block.mass;
+            float blockMass = block.Mass();
+            com += (block.transform.position + block.transform.rotation * block.centerOfMass) * blockMass;
+            massSum += blockMass;
         }
 
         com /= massSum;
         
         Utils.MoveParentWithoutAffectingChildren(transform, com);
-        
-        rb.centerOfMass = transform.InverseTransformPoint(com);
-
+        com = transform.InverseTransformPoint(com);
+        rb.centerOfMass = com;
+        //Debug.Log(rb.transform.position);
     }
 
     void OnDrawGizmosSelected()

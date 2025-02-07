@@ -109,6 +109,16 @@ public class GameManager : PersistentSingleton<GameManager>
         currentGameMode = newGameMode;
         ReloadScene();
     }
+
+    public void SwitchToBuildMode()
+    {
+        SwapGameMode(GameMode.Build);
+    }
+
+    public void SwitchToBattleMode()
+    {
+        SwapGameMode(GameMode.Battle);
+    }
 }
 
 public enum GameMode

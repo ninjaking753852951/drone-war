@@ -26,6 +26,7 @@ public class HingeController : MovingDroneBlockBase, IProxyDeploy
     
     public override void Deploy()
     {
+        //Debug.Log("Hinge deploy");
         isDeployed = true;
 
         //body.transform.parent = transform.parent;

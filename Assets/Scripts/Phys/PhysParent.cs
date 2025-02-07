@@ -10,69 +10,31 @@ public class PhysParent : NetworkBehaviour
     public GameObject physClusterPrefab;
     
     public List<PhysBlock> blocks { get; private set; }
-    
-    public NetworkVariable<int> childCount;
 
-    List<PhysCluster> clusters = new List<PhysCluster>();
+    public NetworkVariable<int> blockCount;
+
+    public List<PhysCluster> clusters { get; set; }
 
     List<ulong> blockNetIDs;
 
     public bool networked;
     
-    float totalMass;
+    public float totalMass;
 
-    bool hasBuilt = false;
-
-
-    void Update()
+    public bool HasBuilt()
     {
-        if (!hasBuilt && blockNetIDs != null && NetworkManager.Singleton.IsServer)
-        {
-            for (int i = 0; i < blockNetIDs.Count; i++)
-            {
-                ulong blockNetID = blockNetIDs[i];
-                if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(blockNetID))
-                    return;
-
-            }
-
-            Build();
-            hasBuilt = true;
-        }
+        return GetComponentsInChildren<PhysBlock>().Length == blockCount.Value && blockCount.Value != 0;
     }
-
-    public void SetBlockList(ulong[] blockNetIDs)
-    {
-        //Debug.Log("Recieved block list");
-        this.blockNetIDs = blockNetIDs.ToList();
-    }
-    
     
     public void Build()
     {
-        /*if(!Unity.Netcode.NetworkManager.Singleton.IsServer)
-            return;*/
-
-        /*if (networked)
-        {
-            NetGatherAndInitChildrenBlocks();
-        }
-        else
-        {
-            GatherAndInitChildrenBlocks();
-        }*/
-        
         GatherAndInitChildrenBlocks();
         
         Clusterize();
         
-        childCount.Value = transform.childCount;
-        
         SetClusterPositionsToCOM();
         if (networked)
-        {
             ShowToNetworkObservers();   
-        }
         PhysicsJointAdoption();
         CalculateBlockAdjacency();
         FinalizeBuild();
@@ -83,25 +45,6 @@ public class PhysParent : NetworkBehaviour
     {
         GetComponentInChildren<DroneController>().Deploy();
     }
-    
-    void NetGatherAndInitChildrenBlocks()
-    {
-        blocks = new List<PhysBlock>();
-        
-        for (int i = 0; i < blockNetIDs.Count; i++)
-        {
-            ulong blockNetID = blockNetIDs[i];
-            if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(blockNetID))
-            {
-                blocks.Add(NetworkManager.Singleton.SpawnManager.SpawnedObjects[blockNetID].GetComponent<PhysBlock>());
-            }
-        }
-        
-        foreach (PhysBlock block in blocks)
-        {
-            block.SetPhysParent(this);
-        }
-    }
 
     void GatherAndInitChildrenBlocks()
     {
@@ -110,10 +53,14 @@ public class PhysParent : NetworkBehaviour
         {
             block.SetPhysParent(this);
         }
+        
+        if(IsSpawned)
+            blockCount.Value = blocks.Count; //ERROR
     }
 
     void Clusterize()
     {
+        clusters = new List<PhysCluster>();
         foreach (PhysBlock block in blocks)
         {
             if (!block.IsInCluster())
@@ -162,7 +109,6 @@ public class PhysParent : NetworkBehaviour
             cluster.ShowToNetworkObserver(id);
         }
     }
-
     
     void StartNewCluster(PhysBlock startPhysBlock)
     {
@@ -172,6 +118,8 @@ public class PhysParent : NetworkBehaviour
             NetworkObject netObj = newCluster.GetComponent<NetworkObject>();
             netObj.SpawnWithObservers = false;
             netObj.Spawn();
+            /*if(netObj.IsSpawned)
+                Debug.Log("PHYS CLUSTER NOT INSTA SPAWNED");*/
             newCluster.transform.parent = transform;
         }
 
@@ -183,6 +131,7 @@ public class PhysParent : NetworkBehaviour
     
     void FinalizeBuild()
     {
+        //Debug.Log("FINALIZE BUILD");
         foreach (PhysCluster cluster in clusters)
         {
             cluster.FinalizeBuild();

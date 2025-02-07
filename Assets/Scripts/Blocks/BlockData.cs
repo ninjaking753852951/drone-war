@@ -12,10 +12,8 @@ public class BlockData : IPlaceable
     {
         return prefab.name;
     }
-    public float Cost()
-    {
-        return prefab.GetComponent<DroneBlock>().cost;
-    }
+    public float Cost() => Stats().QueryStat(Stat.Cost);
+    
     public GameObject Spawn(Vector3 pos, Quaternion rot, bool network = true)
     {
         GameObject blockClone = GameObject.Instantiate(prefab, pos, rot);
@@ -29,6 +27,8 @@ public class BlockData : IPlaceable
             {
                 netObj.SpawnWithObservers = false;
                 netObj.Spawn();   
+                if(netObj.IsSpawned)
+                    Debug.Log("BLOCK NOT INSTA SPAWNED");
             }
             
             //netObj.SpawnWithObservers()
@@ -37,6 +37,7 @@ public class BlockData : IPlaceable
         {
             List<Type> exceptions = new List<Type>();
             exceptions.Add(typeof(DroneController));
+            exceptions.Add(typeof(TurretCoreController));
             
             Utils.RemoveNetworkComponents(blockClone, exceptions);
         }
@@ -53,4 +54,5 @@ public class BlockData : IPlaceable
     {
         return category;
     }
+    public BlockStats Stats() => prefab.GetComponent<DroneBlock>().stats;
 }

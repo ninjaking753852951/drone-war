@@ -824,8 +824,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 1, z: 1}
-  health: 10
-  cost: 10
+  stats:
+    statEntries:
+    - stat: 0
+      value: 30
+    - stat: 1
+      value: 10
+    - stat: 5
+      value: 10
   controller: {fileID: 0}
   meta:
     specialPositions: []
@@ -843,10 +849,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scanBoxSize: {x: 1.1, y: 1.1, z: 1.1}
   scanBoxOffset: {x: 0, y: 0, z: 0}
-  adjacencyScanBonus: 0
+  adjacencyScanBonus: 0.5
   hitBoxSize: {x: 1, y: 1, z: 1}
   hitBoxOffset: {x: 0, y: 0, z: 0}
-  mass: 10
   centerOfMass: {x: 0, y: 0, z: 0}
   onBuildFinalized:
     m_PersistentCalls:

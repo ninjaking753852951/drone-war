@@ -101,6 +101,10 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         {
             return BlockType.SubAssemblies;
         }
+        public BlockStats Stats()
+        {
+            return null;
+        }
     }
     
 
@@ -108,11 +112,11 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
     {
         List<DroneBlock> machineBlocks = FindObjectsByType<DroneBlock>(FindObjectsSortMode.None).ToList();
         MachineSaveData saveData = new MachineSaveData();
-
+        float totalCost = 0;
         foreach (DroneBlock droneBlock in machineBlocks)
         {
 
-            
+            totalCost += droneBlock.blockIdentity.Cost();
             BlockSaveData blockSaveData = new BlockSaveData(
                 droneBlock.transform.position,
                 droneBlock.transform.rotation.eulerAngles,
@@ -122,7 +126,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
             saveData.blocks.Add(blockSaveData);
         }
 
-        saveData.totalCost = BuildingManager.Instance.totalCost;
+        saveData.totalCost = totalCost;
 
         string json = saveData.SerializeToJson();
         string path = GetMachineSlotPath(slot);

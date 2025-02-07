@@ -22,15 +22,6 @@ public class MachineSaveData
             if (!TrySpawnBlock(blockSaveData, offset, eulerRot, network, parent, out GameObject newBlock, out DroneController curDroneController))
                 continue;
 
-            /*if (network)
-            {
-                HandleNetworkBlock(newBlock, blockNetIDs);
-            }
-            else
-            {
-                newBlock.transform.parent = parent;
-            }*/
-            
             newBlock.transform.parent = parent;
 
             InjectBlockMetadata(newBlock, blockSaveData);
@@ -45,7 +36,7 @@ public class MachineSaveData
 
         if (deploy)
         {
-            HandleDeployment(droneController, physParent, blockNetIDs, network);
+            HandleDeployment(physParent, network);
         }
 
         return droneController;
@@ -64,6 +55,8 @@ public class MachineSaveData
                 physParentNetObj = physParent.GetComponent<NetworkObject>();
                 physParentNetObj.SpawnWithObservers = false;
                 physParentNetObj.Spawn();
+                if(physParentNetObj.IsSpawned)
+                    Debug.Log("PHS PARENT NOT INSTA SPAWNED");
             }
             return physParent.transform;
         }
@@ -111,6 +104,7 @@ public class MachineSaveData
         }
     }
 
+    // TODO Thin this out?
     private DroneController UpdateDroneController(DroneController curDroneController, DroneController droneController, int teamID, int blockCount)
     {
         if (curDroneController != null)
@@ -132,21 +126,11 @@ public class MachineSaveData
         return droneController;
     }
 
-    private void HandleDeployment(DroneController droneController, GameObject physParent, List<ulong> blockNetIDs, bool network)
+    private void HandleDeployment(GameObject physParent, bool network)
     {
-        if (network)
-        {
-            PhysParent physParentController = physParent.GetComponent<PhysParent>();
-            physParentController.networked = true;
-            //physParentController.SetBlockList(blockNetIDs.ToArray());
-            physParentController.Build();
-        }
-        else
-        {
-            PhysParent physParentController = physParent.GetComponent<PhysParent>();
-            physParentController.networked = false;
-            physParentController.Build();
-        }
+        PhysParent physParentController = physParent.GetComponent<PhysParent>();
+        physParentController.networked = network;
+        physParentController.Build();
     }
 
     public Sprite GenerateThumbnail()

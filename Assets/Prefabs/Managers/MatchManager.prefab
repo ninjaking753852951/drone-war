@@ -77,21 +77,25 @@ MonoBehaviour:
   - {fileID: 3163006650920877088}
   - {fileID: 753976001877910399}
   - {fileID: 7217429420305654907}
-  playerSpawner: {fileID: 483045110184047450, guid: 404fc7e825c0da94387bbc786cf38e89,
+  playerSpawner: {fileID: 1062115354071084172, guid: 404fc7e825c0da94387bbc786cf38e89,
     type: 3}
   aiSpawner: {fileID: 6765496157166130176, guid: aa123f2c6c2888940bcb5f6a8809b278,
     type: 3}
-  networkSpawner: {fileID: 1062115354071084172, guid: 67f05243c09423848ac035f9465e3b1d,
-    type: 3}
   winner: -1
-  ui: {fileID: 0}
   defaultTeam:
-    colour: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0}
+    colour: {r: 0.13679248, g: 0.5803714, b: 1, a: 1}
     isAI: 0
     budget: 0
+    curIncome: 0
     incomeMultiplier: 1
     clientID: 0
   matchState: 0
+  matchManagerUI:
+    startMatchButton: {fileID: 0}
+    playerListText: {fileID: 0}
+    startLobbyButton: {fileID: 0}
+    joinLobbyButton: {fileID: 0}
+    ipField: {fileID: 0}
 --- !u!114 &3536633995312197726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,13 +194,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4842047221369329445}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 200}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4910485871524663002}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8568372868917287819
 GameObject:
   m_ObjectHideFlags: 0

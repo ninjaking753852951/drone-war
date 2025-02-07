@@ -12,8 +12,10 @@ public class DroneBlock : MonoBehaviour
 
     public Vector3 gridSize = Vector3.one;
     
-    public float health = 10;
-    public float cost = 25;
+    //public float health = 10;
+    //public float cost = 25;
+
+    public BlockStats stats;
     
     [HideInInspector]
     public IPlaceable blockIdentity;

@@ -2,8 +2,8 @@ using UnityEngine;
 public class PowerModule : MonoBehaviour
 {
 
-    public float powerCapacity = 0;
-    public float powerRegen = 0;
+     float powerCapacity = 0;
+     float powerRegen = 0;
 
     DroneController controller;
     
@@ -11,6 +11,11 @@ public class PowerModule : MonoBehaviour
     {
         controller = transform.root.GetComponentInChildren<DroneController>();
 
+        DroneBlock block = GetComponent<DroneBlock>();
+
+        powerCapacity = block.stats.QueryStat(Stat.EnergyCapacity);
+        powerRegen = block.stats.QueryStat(Stat.EnergyRegen);
+        
         controller.energy.maxEnergy += powerCapacity;
         controller.energy.energyRegenRate += powerRegen;
     }
