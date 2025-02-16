@@ -18,7 +18,7 @@ public class BuildingManagerUI : MonoBehaviour
     public GameObject categoryButtonPrefab;
     public GameObject itemButtonPrefab;
     public Transform placeableParent;
-    public Button goToBattleButton;
+    public Button backButton;
 
     public BlockDescriptionUI blockDescriptionUI;
     
@@ -57,11 +57,12 @@ public class BuildingManagerUI : MonoBehaviour
 
         public void ButtonPress()
         {
-            ui.SetBuildTool(mode);
+            ui.builder.SetBuildTool(mode);
         }
 
         public void SetOpen()
         {
+            Debug.Log("SET Open");
             optionsMenu.gameObject.SetActive(true);
             highlight.gameObject.SetActive(true);
         }
@@ -100,9 +101,9 @@ public class BuildingManagerUI : MonoBehaviour
     void Start()
     {
         BuildUI();
+
+        backButton.onClick.AddListener(GameManager.Instance.GoToMainMenu);
         
-        if(GameManager.Instance != null && goToBattleButton!= null)
-            goToBattleButton.onClick.AddListener(GameManager.Instance.SwitchToBattleMode);
         GameManager.Instance.onEnterBuildMode.AddListener(() => SetActiveBuildMenu(true));
         GameManager.Instance.onExitBuildMode.AddListener(() => SetActiveBuildMenu(false));
         SetActiveBuildMenu(GameManager.Instance.currentGameMode == GameMode.Build);
@@ -151,23 +152,5 @@ public class BuildingManagerUI : MonoBehaviour
     {
         ShowDescription(placeable);
         builder.SetNewCurrentBlock(placeable);
-    }
-
-    public void SetBuildTool(BuildingManager.ToolMode mode)
-    {
-        builder.curTool = mode;
-        
-        /*foreach (BuildToolUI buildToolUi in buildToolUis)
-        {
-            if (buildToolUi.mode == mode)
-            {
-                buildToolUi.SetOpen();
-            }
-            else
-            {
-                buildToolUi.SetClosed();
-            }
-        }*/
-        
     }
 }

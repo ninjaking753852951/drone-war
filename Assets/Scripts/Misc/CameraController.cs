@@ -12,7 +12,8 @@ public class CameraController : Singleton<CameraController>
     public Transform moveTarget;
     
     public float panSpeed = 10f; // Sensitivity of the mouse movement
-
+    public float curPanSpeed { get; set; }
+    
     public float moveSpeed = 10;
     public float moveSpeedZoomMultiplier = 0.8f;
 
@@ -33,6 +34,12 @@ public class CameraController : Singleton<CameraController>
     float yawDelta;
     float pitchDelta;
     float curMoveSpeed;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        curPanSpeed = panSpeed;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -101,8 +108,8 @@ public class CameraController : Singleton<CameraController>
     void HandleRotation()
     {
         // Get mouse input
-        float mouseX = Input.GetAxis("Mouse X") * panSpeed * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * panSpeed * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * curPanSpeed * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * curPanSpeed * Time.deltaTime;
 
         // Adjust yaw and pitch based on mouse input
         yawDelta = mouseX;

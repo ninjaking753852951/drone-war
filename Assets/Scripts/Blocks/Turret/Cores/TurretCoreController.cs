@@ -427,9 +427,9 @@ public abstract class TurretCoreController : NetworkBehaviour, IProxyDeploy
 
     protected virtual bool ReadyToFire()
     {
-        Debug.Log("OBSTRUCTED " +mainBarrel.IsObstructed());
-        Debug.Log("AIMED AT TARGET " +IsAimedAtTarget());
-        Debug.Log("IN RANGE " + TargetInRange() );
+        DebugLogger.Instance.Log("OBSTRUCTED " +mainBarrel.IsObstructed());
+        DebugLogger.Instance.Log("AIMED AT TARGET " +IsAimedAtTarget());
+        DebugLogger.Instance.Log("IN RANGE " + TargetInRange() );
         return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange() && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
     }
 

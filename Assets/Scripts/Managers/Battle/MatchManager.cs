@@ -287,6 +287,12 @@ public class MatchManager : NetworkSingleton<MatchManager>
         }
     }
 
+    void OnDisable()
+    {
+        if(moneyTick != null)
+            moneyTick.Dispose();
+    }
+
     bool IsOnlineMatch() => NetworkManager.Singleton.IsListening;
 
     void OnGUI()

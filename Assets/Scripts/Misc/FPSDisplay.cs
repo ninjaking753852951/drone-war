@@ -10,7 +10,7 @@ public class FPSDisplay : MonoBehaviour
         deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
     }
 
-    void OnGUI()
+    protected virtual void OnGUI()
     {
         // Calculate FPS
         float fps = 1.0f / deltaTime;

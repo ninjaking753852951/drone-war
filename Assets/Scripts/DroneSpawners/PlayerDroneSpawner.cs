@@ -92,6 +92,8 @@ public class PlayerDroneSpawner : DroneSpawner
         {
             int slot = i;
             MachineSaveData machineData = MachineLibraryManager.Instance.FetchMachine(slot);
+            if(machineData == null)
+                continue;
             machineSpawnButtons.Add(new MachineSpawnButton(slot, machineData, this, () => SpawnMachineCommand(slot)));
         }
     }
@@ -99,6 +101,7 @@ public class PlayerDroneSpawner : DroneSpawner
     void SpawnMachineCommand(int slot)
     {
         MachineSaveData machineData = MachineSaveLoadManager.Instance.LoadMachine(slot);
+        
         
         if(!teamData.CanAfford(machineData.totalCost))
             ScreenMessageDisplay.Instance.DisplayMessage("INSUFFICIENT FUNDS!");

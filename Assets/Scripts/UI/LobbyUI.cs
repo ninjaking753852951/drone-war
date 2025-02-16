@@ -2,6 +2,7 @@ using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -11,7 +12,8 @@ public class LobbyUI : MonoBehaviour
     public Button startLobbyButton;
     public Button leaveLobby;
     public Button joinLobbyButton;
-    public Button goToBuildMode;
+    [FormerlySerializedAs("goToBuildMode")]
+    public Button goToMainMenu;
     public GameObject outOfLobbyGroup;
     public GameObject inLobbyGroup;
     public TMP_InputField ipField;
@@ -30,19 +32,20 @@ public class LobbyUI : MonoBehaviour
         joinLobbyButton.onClick.AddListener(StartClient);
         leaveLobby.onClick.AddListener(netMenu.Disconnect);
         ipField.text = netMenu.ipAddress;
-        goToBuildMode.onClick.AddListener(GameManager.Instance.SwitchToBuildMode);
         
     }
 
     void Start()
     {
+        goToMainMenu.onClick.AddListener(GameManager.Instance.GoToMainMenu);
+        
         OpenCloseMenu(GameManager.Instance.currentGameMode == GameMode.Battle);
     }
 
     public void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Tab))
-            OpenCloseMenu(!lobbyMenu.activeSelf);
+        /*if(Input.GetKeyDown(KeyCode.Tab))
+            OpenCloseMenu(!lobbyMenu.activeSelf);*/
         
         if(!lobbyMenu.activeSelf) // lobby isnt open so it doesnt need to be updated
             return;

@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 6054484378182993739, guid: c97c15f19c1cc8e41b74b7276964cc42, type: 3}
   lifetime: 1
+  sfx: {fileID: 11400000, guid: 0425bf731f7dc4e4694760ed07b35f27, type: 2}

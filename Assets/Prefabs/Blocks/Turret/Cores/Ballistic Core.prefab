@@ -243,7 +243,7 @@ MonoBehaviour:
   deviance: 100
   accuracyTolerance: 0.25
   drag: 0.3
-  ballisticDamageMultiplier: 75
+  ballisticDamageMultiplier: 0.75
 --- !u!114 &1298736547838526370
 MonoBehaviour:
   m_ObjectHideFlags: 0

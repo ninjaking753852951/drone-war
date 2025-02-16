@@ -30,7 +30,11 @@ public class MachineSaveData
 
         if (droneController == null)
         {
-            droneController = BlockLibraryManager.Instance.coreBlock.Spawn(BuildingManager.Instance.spawnPoint, Quaternion.Euler(eulerRot), false).GetComponent<DroneController>();
+            Vector3 spawnPos = Vector3.zero;
+            if (BuildingManager.HasInstance)
+                spawnPos = BuildingManager.Instance.spawnPoint;
+                
+            droneController = BlockLibraryManager.Instance.coreBlock.Spawn(spawnPos, Quaternion.Euler(eulerRot), false).GetComponent<DroneController>();
             droneController.transform.parent = parent;
         }
 

@@ -2,15 +2,18 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class SFXManager : NetworkSingleton<SFXManager>
 {
 
-    public float masterVolume = 0.5f;
-    
-    [FormerlySerializedAs("vfxList")]
+    //public float masterVolume = 0.5f;
+    public float sfxVolume = 1;
+
+    public AudioMixer audioMixer;
+
     [SerializeField] private List<SFXData> sfxList = new List<SFXData>();
 
     public GameObject sfxPrefab;
@@ -32,7 +35,7 @@ public class SFXManager : NetworkSingleton<SFXManager>
 
         AudioSource source = sfxClone.GetComponent<AudioSource>();
         source.clip = clip;
-        source.volume = masterVolume * effect.volume;
+        source.volume = effect.volume * sfxVolume;
         source.pitch = effect.basePitch + (Random.value - 0.5f) * effect.pitchVariance;
         source.spatialBlend = effect.spatialBlend;
         source.Play();
@@ -63,5 +66,22 @@ public class SFXManager : NetworkSingleton<SFXManager>
         SFXData effect = sfxList[effectIndex];
         
         Play(effect, position, false);
+    }
+
+    public void SetMasterVolume(float volume)
+    {
+        //masterVolume = volume;
+        
+        float volumeInDecibels = -80;
+        if (volume != 0)
+        {
+            volumeInDecibels = Mathf.Log10(volume) * 20;
+        }
+        audioMixer.SetFloat("MasterVolume", volumeInDecibels);
+    }
+    
+    public void SetSFXVolume(float volume)
+    {
+        sfxVolume = volume;
     }
 }

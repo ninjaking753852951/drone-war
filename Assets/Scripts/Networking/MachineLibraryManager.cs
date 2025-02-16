@@ -22,7 +22,10 @@ public class MachineLibraryManager : Singleton<MachineLibraryManager>
     {
         for (int i = 0; i < 10; i++)
         {
-            loadedMachines.Add(i,saveLoad.LoadMachine(i, true));
+            MachineSaveData machine = saveLoad.LoadMachine(i, true);
+            if(machine == new MachineSaveData())
+                continue;
+            loadedMachines.Add(i,machine);
         }
     }
 

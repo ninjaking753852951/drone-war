@@ -44,7 +44,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     Camera cam;
     public enum ToolMode
     {
-        Place, Move, Rotate
+        Place, Move, Rotate, DeleteMachine
     }
 
     protected override void Awake()
@@ -64,6 +64,9 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     
     void Update()
     {
+        if(UIManager.instance.IsOpen())
+            return;
+        
         switch (GameManager.Instance.currentGameMode)
         {
             case GameMode.Build:
@@ -135,7 +138,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
                     rotateTool.SetActive(true);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    break;
             }
         }
         
@@ -155,7 +158,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
                     buildingBlockIndicator.SetActive(false);
                 break;
             default:
-                throw new ArgumentOutOfRangeException();
+                break;
         }
     }
 
@@ -282,8 +285,6 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 
     void EnterBuildMode()
     {
-
-        
         GameManager.Instance.EnterBuildMode();
         
         Utils.DestroyAllDrones();
@@ -295,10 +296,15 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         UpdateTotalCost();
         SetNewCurrentBlock(BlockLibraryManager.Instance.blocks[0]);
     }
-    
-    public void SpawnDefaultMachine()
+
+    public void DeleteMachineTool(bool delete)
     {
-        BlockLibraryManager.Instance.coreBlock.Spawn(spawnPoint, quaternion.identity);
+        if (delete)
+        {
+            Utils.DestroyAllDrones();
+            new MachineSaveData().Spawn(network: false);   
+        }
+        SetBuildTool(ToolMode.Place);
     }
     
     void ExitBuildMode()
@@ -324,6 +330,16 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         }
     }
 
+    public void SetBuildTool(ToolMode mode)
+    {
+        curTool = mode;
+
+        if (mode == ToolMode.DeleteMachine)
+        {
+            UIManager.Instance.confirmationBox.Create("Delete Machine?").AddListener(DeleteMachineTool);
+        }
+    }
+    
     public void SetActivePlacementMode(bool active)
     {
         buildingBlockIndicator.SetActive(active);

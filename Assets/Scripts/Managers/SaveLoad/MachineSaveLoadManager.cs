@@ -132,7 +132,7 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         string path = GetMachineSlotPath(slot);
         File.WriteAllText(path, json);
 
-        Debug.Log("Machine saved to slot " + slot);
+        DebugLogger.instance.Log("Machine saved to slot " + slot);
     }
     
     public MachineSaveData LoadMachine(int slot, bool dontSetSlot = false)

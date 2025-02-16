@@ -516,5 +516,5 @@ MonoBehaviour:
   increment2: {fileID: 166092371730098193, guid: a77ddd8cf178cd0488544970a7d4005b,
     type: 3}
   totalHealth: 16000
-  incrementSize: 5000
+  incrementSize: 100
   largeIncrementInterval: 10
