@@ -16,6 +16,7 @@ public class MachineLibraryManager : Singleton<MachineLibraryManager>
         base.Awake();
         saveLoad = GetComponent<MachineSaveLoadManager>();
         LoadLocalMachines();
+        LoadAIMachines();
     }
 
     void LoadLocalMachines()
@@ -26,6 +27,17 @@ public class MachineLibraryManager : Singleton<MachineLibraryManager>
             if(machine == new MachineSaveData())
                 continue;
             loadedMachines.Add(i,machine);
+        }
+    }
+    
+    void LoadAIMachines()
+    {
+        for (int i = 0; i < 50; i++)
+        {
+            MachineSaveData machine = saveLoad.LoadAIMachine(i);
+            if(machine == new MachineSaveData())
+                continue;
+            loadedMachines.Add(i - 100,machine);
         }
     }
 

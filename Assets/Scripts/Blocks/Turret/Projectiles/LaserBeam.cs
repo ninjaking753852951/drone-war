@@ -87,15 +87,21 @@ public class LaserBeam : Projectile
         Transform firstHit = Utils.ClosestTo(hitTransforms, transform.position);
         if (firstHit != null)
         {
+            Debug.Log("LASER HIT " + firstHit.transform);
+    
             IDamageable damageable = firstHit.GetComponentInParent<IDamageable>();
             if(damageable != null && damageable.Team() != turret.controller.curTeam)
                 damageable.DealDamage();
             
-            DroneBlock targetDroneBlock = firstHit.gameObject.GetFirstComponentInHierarchy<DroneBlock>();
+            DroneBlock targetDroneBlock = firstHit.gameObject.GetComponentInChildren<DroneBlock>();
             if (targetDroneBlock != null)
             {
-                if(targetDroneBlock.controller != null)
+                
+                if (targetDroneBlock.controller != null)
+                {
                     targetDroneBlock.TakeDamage(core.DamageCalculation());
+                    Debug.Log("LASER DAMAGE " + core.DamageCalculation());
+                }
             }   
         }
         return firstHit;

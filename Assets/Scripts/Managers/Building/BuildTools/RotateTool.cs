@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BuildTools
 {
     [System.Serializable]
-    public class RotateTool : BaseTool
+    public class RotateTool : PositioningTool
     {
 
     }

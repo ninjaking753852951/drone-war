@@ -20,8 +20,10 @@ public class LobbyUI : MonoBehaviour
     public Button startMatchButton;
     public TextMeshProUGUI waitingForMatchMessage;
     public GameObject lobbyMenu;
+    public Button addAiPlayer;
     //MatchManager match;
-    NetworkConnectionMenu netMenu;    
+    NetworkConnectionMenu netMenu;
+    MatchManager matchManager;
     
     public void Awake()
     {
@@ -32,7 +34,8 @@ public class LobbyUI : MonoBehaviour
         joinLobbyButton.onClick.AddListener(StartClient);
         leaveLobby.onClick.AddListener(netMenu.Disconnect);
         ipField.text = netMenu.ipAddress;
-        
+        addAiPlayer.onClick.AddListener(AddAIPlayer);
+        matchManager = FindFirstObjectByType<MatchManager>();
     }
 
     void Start()
@@ -52,16 +55,25 @@ public class LobbyUI : MonoBehaviour
         
         //startMatchButton.gameObject.SetActive(NetworkManager.Singleton.IsServer && match.matchState == MatchManager.MatchState.PreMatch);
 
+        //TODO Separate each player into their own ui group and add support for adding ai with different difficulty
+        
         string playerList = "";
-        foreach (ulong clientsId in  NetworkManager.Singleton.ConnectedClientsIds)
+        foreach (ulong clientsId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             playerList +=  $"Client ID: {clientsId} \n";
         }
+
+        foreach (var aiPlayer in matchManager.AiPlayers)
+        {
+            playerList +=  $"AI {aiPlayer.name} \n";
+        }
+        
         playerListText.text = playerList;
         
         
         outOfLobbyGroup.SetActive(!NetworkManager.Singleton.IsConnectedClient);
         inLobbyGroup.SetActive(NetworkManager.Singleton.IsConnectedClient);
+        addAiPlayer.gameObject.SetActive(NetworkManager.Singleton.IsHost);
         //startLobbyButton.gameObject.SetActive(!NetworkManager.Singleton.IsConnectedClient);
         //leaveLobby.gameObject.SetActive(NetworkManager.Singleton.IsConnectedClient);
         startMatchButton.gameObject.SetActive(NetworkManager.Singleton.IsHost);
@@ -76,11 +88,16 @@ public class LobbyUI : MonoBehaviour
 
     public void StartMatch()
     {
-        FindFirstObjectByType<MatchManager>().StartMatch();
+        matchManager.StartMatch();
     }
 
     public void OpenCloseMenu(bool open)
     {
         lobbyMenu.SetActive(open);
+    }
+
+    public void AddAIPlayer()
+    {
+       matchManager.RegisterAiPlayer();
     }
 }

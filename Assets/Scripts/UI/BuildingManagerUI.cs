@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Interfaces;
 using TMPro;
 using UnityEngine;
@@ -41,7 +42,7 @@ public class BuildingManagerUI : MonoBehaviour
         public void Init(BuildingManagerUI ui)
         {
             this.ui = ui;
-            switch (mode) // TODO replace awkward integration in future
+            /*switch (mode) // TODO replace awkward integration in future
             {
                 case BuildingManager.ToolMode.Move:
                     ui.builder.moveTool.ui = this;
@@ -49,7 +50,7 @@ public class BuildingManagerUI : MonoBehaviour
                 case BuildingManager.ToolMode.Rotate:
                     ui.builder.rotateTool.ui = this;
                     break;
-            }
+            }*/
             
             mainButton.onClick.AddListener(ButtonPress);
             SetClosed();
@@ -81,9 +82,14 @@ public class BuildingManagerUI : MonoBehaviour
         foreach (BuildToolUI buildToolUi in buildToolUis)
         {
             buildToolUi.Init(this);
-            if(buildToolUi.mode == BuildingManager.ToolMode.Place)
-                buildToolUi.SetOpen();
+            /*if(buildToolUi.mode == BuildingManager.ToolMode.Place)
+                buildToolUi.SetOpen();*/
         }
+    }
+
+    public BuildToolUI FetchBuildToolUI(BuildingManager.ToolMode mode)
+    {
+        return buildToolUis.FirstOrDefault(x => x.mode == mode);
     }
     
     

@@ -3837,6 +3837,10 @@ MonoBehaviour:
     optionsMenu: {fileID: 8328315503219969854}
     highlight: {fileID: 280488755888242532}
     mode: 2
+  - mainButton: {fileID: 7301787804661664171}
+    optionsMenu: {fileID: 8830447910641976801}
+    highlight: {fileID: 7686186770999740166}
+    mode: 3
 --- !u!1 &6295433034105476184
 GameObject:
   m_ObjectHideFlags: 0

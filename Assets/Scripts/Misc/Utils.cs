@@ -103,7 +103,8 @@ public static class Utils
         foreach (Transform transform in transforms)
         {
             // Calculate the squared distance between the current transform and the target
-            float distanceSqr = (transform.position - target).sqrMagnitude;
+            //float distanceSqr = (transform.position - target).sqrMagnitude;
+            float distanceSqr = Vector3.Distance(transform.position, target);
 
             // If this transform is closer, update the closestTransform
             if (distanceSqr < closestDistanceSqr)

@@ -15,21 +15,22 @@ public class DroneLogicController : MonoBehaviour
     public float debugOrderCount;
     public List<Transform> targetObjectives2;
 
-    public bool isSatisfied;
-
-    
+    float logicCD;
+        
     void Awake()
     {
         controller = GetComponent<DroneController>();
     }
 
-    void Start()
+    public void Init()
     {
         if (GameManager.Instance.currentGameMode == GameMode.Battle)
         {
             if (MatchManager.Instance.Team(controller.curTeam).isAI)
             {
+                DebugLogger.Instance.Log("AI ORDER APPLIED ", 2);
                 orders.Add(new CaptureNearestObjective());
+                //orders.Add(new WanderAround(50, 3));
                 //orders.Add(new WanderAround(25,5));
             }   
         }
@@ -37,19 +38,31 @@ public class DroneLogicController : MonoBehaviour
 
     void Update()
     {
+
+        logicCD += Time.deltaTime;
+        if (logicCD > 1)
+        {
+            logicCD = 0;
+            LogicUpdate();
+        }
+
+    }
+
+    void LogicUpdate()
+    {
         debugOrderCount = orders.Count;
-        isSatisfied = false;
         foreach (var order in orders)
         {
             if (!order.IsSatisfied(this))
             {
                 order.Execute(this);
-                isSatisfied = true;
                 break;
             }
+            else
+            {
+                DebugLogger.Instance.Log("IM SATISFIED ", 5);
+            }
         }
-
-
     }
     
     void OnDestroy()
@@ -91,9 +104,8 @@ public class GoToLocationOrder : IDroneOrder
 
 public class CaptureNearestObjective : IDroneOrder
 {
-    public Vector3 destination;
+
     
-    const float statisfiedDistance = 10;
 
     List<MapObjectivePoint> objectives;
     List<Transform> targetObjectives = new List<Transform>();
@@ -108,6 +120,7 @@ public class CaptureNearestObjective : IDroneOrder
 
     void UpdateTargetObjectives(DroneLogicController logic)
     {
+        DebugLogger.Instance.Log("OBJECTIVE UPDATE " + targetObjectives.Count, 1);
         targetObjectives.Clear();
         
         foreach (var objective in objectives)
@@ -145,7 +158,11 @@ public class CaptureNearestObjective : IDroneOrder
         }
 
         Transform closestTarget = Utils.ClosestTo(targetObjectives, logicController.transform.position);
+        Vector3 destination = closestTarget.position;
         
+
+        
+       Debug.Log("SETTING WAYPOINT");
         WaypointManager.Instance.CreateAndSetWaypoint(destination, logicController.controller);
     }
 

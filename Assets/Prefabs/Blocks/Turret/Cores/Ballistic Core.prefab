@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 1
-  recoilMultiplier: 35
+  recoilMultiplier: 55
   damageMultiplier: 1
   rangeMultiplier: 1
   shootVelocity: 60

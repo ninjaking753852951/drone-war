@@ -734,7 +734,9 @@ MonoBehaviour:
     - stat: 5
       value: 25
     - stat: 9
-      value: 2
+      value: 3
+    - stat: 12
+      value: 0.75
   controller: {fileID: 0}
   meta:
     specialPositions: []
@@ -771,9 +773,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c66976cb1c6e4c4095cd0ef0bcac7d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rangeMultiplier: 1
-  fireRateMultiplier: 2
-  recoilMultiplier: 0.5
+  rangeMultiplier: 0.75
+  fireRateMultiplier: 3
+  recoilMultiplier: 1
   energyCostMultiplier: 1
   damageMultiplier: 1
 --- !u!114 &568309285967889646

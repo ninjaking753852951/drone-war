@@ -28,6 +28,6 @@ public class AIDroneSpawner : DroneSpawner
 
     void SpawnRandomMachine()
     {
-        SpawnMachine(Random.Range(spawnSlots.x,spawnSlots.y +1));
+        SpawnMachine(Random.Range(spawnSlots.x,spawnSlots.y +1) - 100);
     }
 }

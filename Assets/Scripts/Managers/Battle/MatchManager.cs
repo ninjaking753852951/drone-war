@@ -33,6 +33,18 @@ public class MatchManager : NetworkSingleton<MatchManager>
     public MatchManagerUI matchManagerUI;
     
     CountdownTimer moneyTick;
+
+    public List<AiPlayer> AiPlayers = new List<AiPlayer>();
+    
+    public struct AiPlayer
+    {
+        public string name;
+        // add slot indices
+        public AiPlayer(string name)
+        {
+            this.name = name;
+        }
+    }
     
     public enum MatchState
     {
@@ -104,26 +116,39 @@ public class MatchManager : NetworkSingleton<MatchManager>
 
         int curIndex = teams.Count;
 
+        NetworkDroneSpawnerHelper networkDroneSpawnerHelper = spawner.GetComponent<NetworkDroneSpawnerHelper>();
+        
         teams.Add(spawner);
-        if (GameManager.Instance.IsOnlineAndClient())
-            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
+        
+        if (GameManager.Instance.IsOnlineAndClient() && networkDroneSpawnerHelper != null)
+            return (int)networkDroneSpawnerHelper.playerClientID.Value;
         
         spawner.transform.position = spawnPoints[curIndex].position;
         spawner.transform.rotation = spawnPoints[curIndex].rotation;
         
 
-        if (NetworkManager.Singleton.IsListening)
+        if (NetworkManager.Singleton.IsListening && networkDroneSpawnerHelper != null)
         {
-            return (int)spawner.GetComponent<NetworkDroneSpawnerHelper>().playerClientID.Value;
+            return (int)networkDroneSpawnerHelper.playerClientID.Value;
         }
+
+        /*if (spawner.GetType() == typeof(AIDroneSpawner))
+        {
+            
+        }*/
         
         return curIndex;
     }
 
+    public void RegisterAiPlayer()
+    {
+        AiPlayers.Add(new AiPlayer("Bobby"+Random.Range(0,100)));
+    }
+    
     protected override void Awake()
     {
         base.Awake();
-        Debug.Log("MATCH MANAGER AWAKE");
+        DebugLogger.Instance.Log("MATCH MANAGER AWAKE");
         matchManagerUI.Init(this);
     }
 
@@ -155,6 +180,11 @@ public class MatchManager : NetworkSingleton<MatchManager>
             AddLocalPlayer();
         }
 
+        foreach (AiPlayer aiPlayer in AiPlayers)
+        {
+            AddAIPlayer(aiPlayer);
+        }
+        
         moneyTick = new CountdownTimer(1);
         moneyTick.OnTimerStop += IncrementMoney;
         moneyTick.Start();
@@ -206,9 +236,12 @@ public class MatchManager : NetworkSingleton<MatchManager>
         teams.Clear();
     }
     
-    void AddAIPlayer()
+    void AddAIPlayer(AiPlayer aiPlayer)
     {
-        Instantiate(aiSpawner);
+        int curIndex = 1;
+        
+        
+        GameObject aiSpawnerClone = Instantiate(aiSpawner, spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
     }
 
     void AddLocalPlayer() => Instantiate(playerSpawner);
@@ -313,16 +346,7 @@ public class MatchManager : NetworkSingleton<MatchManager>
         };
         //GUI.Label(new Rect(10, 10, 300, 30), IsOnlineMatch() ? "Match Type: Online" : "Match Type: Local", matchTypeStyle);
         
-
-        if (matchState == MatchState.Match && !NetworkManager.Singleton.IsListening)
-        {
-            // Add a button at the top of the screen to add an AI player
-            Rect addAIButtonRect = new Rect(screenWidth / 2 + 100, 40, 150, 30); // Centered horizontally
-            if (GUI.Button(addAIButtonRect, "Add AI Player"))
-            {
-                AddAIPlayer();
-            }
-        }
+        
 
         // Define the style for the winner text
         GUIStyle winnerStyle = new GUIStyle

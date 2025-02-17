@@ -150,6 +150,24 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         return MachineSaveData.DeserializeFromJson(json);
     }
     
+    public MachineSaveData LoadAIMachine(int slot)
+    {
+
+
+        // Get the path for the machine slot
+        string path = GetAIMachineSlotPath(slot);
+
+        // Handle AI machines (stored in Resources/AIMachines)
+        TextAsset jsonFile = Resources.Load<TextAsset>(path);
+        if (jsonFile == null)
+        {
+            //Debug.LogWarning($"AI machine at slot {slot} not found. Returning a new MachineSaveData.");
+            return new MachineSaveData();
+        }
+
+        return MachineSaveData.DeserializeFromJson(jsonFile.text);
+    }
+    
     public void SaveSubAssembly(int slot)
     {
         SubAssemblySaveData saveData = new SubAssemblySaveData();
@@ -214,6 +232,11 @@ public class MachineSaveLoadManager : Singleton<MachineSaveLoadManager>
         }
         
         return Path.Combine(Application.persistentDataPath, machineDirectory, $"MachineSaveData_Slot{x}.json");
+    }
+    
+    string GetAIMachineSlotPath(int slotNumber)
+    {
+        return $"AIMachines/MachineSaveData_Slot{slotNumber}";
     }
     
     string GetSubAssemblySlotPath(int x)

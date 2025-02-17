@@ -58,6 +58,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -134,15 +137,16 @@ MonoBehaviour:
   scanRadius: 10
   teamID: 0
   teamData:
-    colour: {r: 1, g: 0, b: 0, a: 0}
+    colour: {r: 1, g: 0, b: 0, a: 1}
     isAI: 1
     budget: 6000
-    incomeMultiplier: 3
+    curIncome: 0
+    incomeMultiplier: 1
     clientID: 0
   spawnRate: 10
   spawnSlots:
-    x: 0
-    y: 5
+    x: 30
+    y: 34
 --- !u!114 &9079443613239034203
 MonoBehaviour:
   m_ObjectHideFlags: 0

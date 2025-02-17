@@ -6,7 +6,7 @@ using BuildTools;
 namespace BuildTools
 {
     [System.Serializable]
-    public class Tool : BaseTool
+    public class Tool : PositioningTool
     {
 
     }

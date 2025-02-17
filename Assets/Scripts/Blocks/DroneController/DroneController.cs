@@ -38,7 +38,8 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     [HideInInspector]
     public PhysBlock physBlock;
-    
+
+    DroneLogicController logicController;
     
     public Vector3 TargetDestination()
     {
@@ -166,6 +167,9 @@ public class DroneController : NetworkBehaviour, IProgressBar
         //InitRangeIndicator();
         
         SetCoreColour(MatchManager.Instance.Team(curTeam).colour);
+
+        logicController = GetComponent<DroneLogicController>();
+        logicController.Init();
     }
 
     void InitHealth()

@@ -13,6 +13,8 @@ using BuildTools;
 
 public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 {
+    public BuildingManagerUI ui;
+    
     public Material indicatorMat;
     public Material badIndicatorMat;
 
@@ -39,7 +41,9 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     [Header("Build Tools")]
     public Tool moveTool;
     public RotateTool rotateTool;
-    public ToolMode curTool;
+    public BaseTool deleteMachineTool;
+    public BaseTool placeTool;
+    public ToolMode curTool { get; set; }
     ToolMode oldTool;
     Camera cam;
     public enum ToolMode
@@ -50,9 +54,18 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     protected override void Awake()
     {
         base.Awake();
+        ui = FindFirstObjectByType<BuildingManagerUI>();
         blockSelector = GetComponent<BuildingBlockSelector>();
+        InitTools();
+        SetBuildTool(ToolMode.Place);
+    }
+
+    void InitTools()
+    {
         moveTool.Init((this));
         rotateTool.Init(this);
+        deleteMachineTool.Init(this);
+        placeTool.Init(this);
     }
     
     void Start()
@@ -123,25 +136,7 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     
     void BuildUpdate()
     {
-        if (oldTool != curTool)
-        {
-            oldTool = curTool;
-            DisableAllBuildTools();
-            switch (curTool) // enable tool
-            {
-                case ToolMode.Place:
-                    break;
-                case ToolMode.Move:
-                    moveTool.SetActive(true);
-                    break;
-                case ToolMode.Rotate:
-                    rotateTool.SetActive(true);
-                    break;
-                default:
-                    break;
-            }
-        }
-        
+
         switch (curTool) // update tool
         {
             case ToolMode.Place:
@@ -167,6 +162,8 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
         SetActivePlacementMode(false);
         moveTool.SetActive(false);
         rotateTool.SetActive(false);
+        deleteMachineTool.SetActive(false);
+        placeTool.SetActive(false);
     }
 
     void PlacementUpdate()
@@ -333,16 +330,32 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     public void SetBuildTool(ToolMode mode)
     {
         curTool = mode;
-
-        if (mode == ToolMode.DeleteMachine)
+        DisableAllBuildTools();
+        
+        switch (curTool)
         {
-            UIManager.Instance.confirmationBox.Create("Delete Machine?").AddListener(DeleteMachineTool);
+            case ToolMode.Place:
+                placeTool.SetActive(true);
+                break;
+            case ToolMode.Move:
+                moveTool.SetActive(true);
+                break;
+            case ToolMode.Rotate:
+                rotateTool.SetActive(true);
+                break;
+            case ToolMode.DeleteMachine:
+                deleteMachineTool.SetActive(true);
+                UIManager.Instance.confirmationBox.Create("Delete Machine?").AddListener(DeleteMachineTool);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
     
     public void SetActivePlacementMode(bool active)
     {
-        buildingBlockIndicator.SetActive(active);
+        if(buildingBlockIndicator != null)
+            buildingBlockIndicator.SetActive(active);
     }
     
     public void SetNewCurrentBlock(IPlaceable placeable)
