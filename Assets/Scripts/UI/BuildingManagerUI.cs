@@ -147,6 +147,7 @@ public class BuildingManagerUI : MonoBehaviour
     public void ShowDescription(IPlaceable placeable)
     {
         blockDescriptionUI.SetBlockName(placeable.PlaceableName());
+        blockDescriptionUI.SetDescription(placeable.Stats().desc);
         blockDescriptionUI.DeactivateAllStats();
         foreach (var stat in placeable.Stats().statEntries)
         {

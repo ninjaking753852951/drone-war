@@ -14,7 +14,7 @@ public class HingeJointBuilder : PhysJointBuilder
         hingeJoint.anchor = anchorPoint;
         hingeJoint.connectedBody = connectedCluster.rb;
         hingeJoint.useMotor = isPowered;
-        hingeJoint.axis = rot * axis;
+        hingeJoint.axis = originCluster.transform.rotation * rot * axis;
         return hingeJoint;
     }
 }

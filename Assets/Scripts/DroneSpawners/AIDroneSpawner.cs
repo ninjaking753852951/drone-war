@@ -7,7 +7,9 @@ public class AIDroneSpawner : DroneSpawner
 {
     public float spawnRate;
 
-    public int2 spawnSlots;
+    //public int2 spawnSlots;
+
+    public AIPlayer player { get; set; }
     
     // Start is called before the first frame update
     protected override void Start()
@@ -28,6 +30,6 @@ public class AIDroneSpawner : DroneSpawner
 
     void SpawnRandomMachine()
     {
-        SpawnMachine(Random.Range(spawnSlots.x,spawnSlots.y +1) - 100);
+        SpawnMachine(Random.Range(player.spawnSlots.x,player.spawnSlots.y +1) - 100);
     }
 }

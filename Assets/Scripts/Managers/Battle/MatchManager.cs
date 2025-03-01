@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ImprovedTimers;
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -28,23 +29,18 @@ public class MatchManager : NetworkSingleton<MatchManager>
     
     TeamData playerData;
 
-    public MatchState matchState = MatchState.PreMatch;
+    public NetworkVariable<int> matchState;
     
     public MatchManagerUI matchManagerUI;
     
     CountdownTimer moneyTick;
 
-    public List<AiPlayer> AiPlayers = new List<AiPlayer>();
+    public List<AIPlayer> aiPlayers;
     
-    public struct AiPlayer
-    {
-        public string name;
-        // add slot indices
-        public AiPlayer(string name)
-        {
-            this.name = name;
-        }
-    }
+    [HideInInspector]
+    public List<AIPlayer> AiPlayersToSpawn = new List<AIPlayer>();
+
+    Dictionary<int, DroneSpawner> spawners = new Dictionary<int, DroneSpawner>();
     
     public enum MatchState
     {
@@ -120,6 +116,8 @@ public class MatchManager : NetworkSingleton<MatchManager>
         
         teams.Add(spawner);
         
+        
+        
         if (GameManager.Instance.IsOnlineAndClient() && networkDroneSpawnerHelper != null)
             return (int)networkDroneSpawnerHelper.playerClientID.Value;
         
@@ -127,6 +125,8 @@ public class MatchManager : NetworkSingleton<MatchManager>
         spawner.transform.rotation = spawnPoints[curIndex].rotation;
         
 
+        spawners.Add(curIndex,spawner);
+        
         if (NetworkManager.Singleton.IsListening && networkDroneSpawnerHelper != null)
         {
             return (int)networkDroneSpawnerHelper.playerClientID.Value;
@@ -140,9 +140,9 @@ public class MatchManager : NetworkSingleton<MatchManager>
         return curIndex;
     }
 
-    public void RegisterAiPlayer()
+    public void RegisterAiPlayer(AIPlayer.Difficulty difficulty)
     {
-        AiPlayers.Add(new AiPlayer("Bobby"+Random.Range(0,100)));
+        AiPlayersToSpawn.Add(aiPlayers.FirstOrDefault(x => x.difficulty == difficulty));
     }
     
     protected override void Awake()
@@ -165,7 +165,7 @@ public class MatchManager : NetworkSingleton<MatchManager>
     public void StartMatch()
     {
         StartMatchRPC();
-        matchState = MatchState.Match;
+        matchState.Value = (int)MatchState.Match;
         ClearTeams();
         winner = -1;
         ResetMapObjectives();
@@ -180,7 +180,7 @@ public class MatchManager : NetworkSingleton<MatchManager>
             AddLocalPlayer();
         }
 
-        foreach (AiPlayer aiPlayer in AiPlayers)
+        foreach (AIPlayer aiPlayer in AiPlayersToSpawn)
         {
             AddAIPlayer(aiPlayer);
         }
@@ -210,7 +210,7 @@ public class MatchManager : NetworkSingleton<MatchManager>
     void EndMatch()
     {
         //TODO
-        matchState = MatchState.PreMatch;
+        matchState.Value = (int)MatchState.PreMatch;
         moneyTick.Dispose();
         ClearTeams();
         Utils.DestroyAllDrones();
@@ -236,12 +236,15 @@ public class MatchManager : NetworkSingleton<MatchManager>
         teams.Clear();
     }
     
-    void AddAIPlayer(AiPlayer aiPlayer)
+    void AddAIPlayer(AIPlayer aiPlayer)
     {
         int curIndex = 1;
         
         
         GameObject aiSpawnerClone = Instantiate(aiSpawner, spawnPoints[curIndex].position, spawnPoints[curIndex].rotation);
+
+        AIDroneSpawner spawner = aiSpawnerClone.GetComponent<AIDroneSpawner>();
+        spawner.player = aiPlayer;
     }
 
     void AddLocalPlayer() => Instantiate(playerSpawner);
@@ -281,12 +284,21 @@ public class MatchManager : NetworkSingleton<MatchManager>
 
         int[] heldObjectives = new int[teams.Count];
         
+        
         foreach (var objective in objectives)
         {
             if (objective.currentOwner.HasValue)
             {
+                float incomeMultiplier = 1;
+
+                if (spawners[objective.currentOwner.Value] is AIDroneSpawner aiDroneSpawner)
+                {
+                    incomeMultiplier = aiDroneSpawner.player.incomeMultiplier;
+                }
+
+                
                 heldObjectives[objective.currentOwner.Value]++;
-                Team(objective.currentOwner.Value).AddMoney(objective.income * Team(objective.currentOwner.Value).incomeMultiplier);
+                Team(objective.currentOwner.Value).AddMoney(objective.income * incomeMultiplier);
             }
         }
 

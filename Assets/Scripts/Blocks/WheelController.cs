@@ -8,7 +8,7 @@ public class WheelController : MovingDroneBlockBase
     [Header("References")]
     public HingeJoint wheelJoint;
     
-    float torqueDirection;
+    public float torqueDirection;
     float targetSteerRot;
 
     public PhysJointPhysBlock block;

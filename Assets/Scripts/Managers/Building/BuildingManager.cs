@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using BuildTools;
+using UnityEngine.EventSystems;
 
 public class BuildingManager : UnityUtils.Singleton<BuildingManager>
 {
@@ -22,8 +23,10 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     
     GameObject buildingBlockIndicator;
     
-    int indicatorRotDirIndex;
+    int indicatorRotDirIndex = 3;
     readonly float[] rotationAngles = { 0, 90, 180, 270 };
+    readonly Vector3[] rotationDirections = { new Vector3(1,0,0), new Vector3(0,1,0),  new Vector3(0,0,1),  new Vector3(0,-1,0),  new Vector3(-1,0,0), new Vector3(0,0,-1)};
+    List<Vector3> curRotationDirections = new List<Vector3>();
     
     public Vector3 spawnPoint;
     
@@ -46,6 +49,17 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
     public ToolMode curTool { get; set; }
     ToolMode oldTool;
     Camera cam;
+
+    DroneController core;
+    DroneController Core()
+    {
+        if (core == null || core.gameObject.IsDestroyed())
+        {
+            core = FindFirstObjectByType<DroneController>();
+        }
+        return core;
+    }
+    
     public enum ToolMode
     {
         Place, Move, Rotate, DeleteMachine
@@ -178,6 +192,11 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
             indicatorRotDirIndex = (int)Mathf.Repeat(indicatorRotDirIndex + 1, 4);
         }
         
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        
         //Place the block
         if (Input.GetButtonDown("Fire1") && buildingBlockIndicator.activeSelf && isOnCompatibleBlock)
         {
@@ -272,12 +291,75 @@ public class BuildingManager : UnityUtils.Singleton<BuildingManager>
             forward = Vector3.Cross(hit.normal, hit.collider.transform.right);
         }
 
+
+        Vector3 relativeToCorePos = (Core().transform.position + new Vector3(0.001f,0.001f,0.001f)) - placePoint;
+        forward = EvaluateRotation(hit.normal, SnapVector(relativeToCorePos));
+
+        Debug.DrawRay(placePoint,hit.normal );
+        Debug.DrawRay(placePoint,forward );
+        
         Quaternion alignToNormal = Quaternion.LookRotation(forward, hit.normal);
+        //Quaternion alignToNormal = Quaternion.LookRotation( hit.normal);
 
-        float localYRotation = rotationAngles[indicatorRotDirIndex];
-        Quaternion localRotation = Quaternion.Euler(0, localYRotation, 0);
+        //float localYRotation = rotationAngles[indicatorRotDirIndex];
+        //Quaternion localRotation = Quaternion.Euler(0, localYRotation, 0);
 
-        buildingBlockIndicator.transform.rotation = alignToNormal * localRotation;
+        //buildingBlockIndicator.transform.rotation = alignToNormal * localRotation;
+        buildingBlockIndicator.transform.rotation = alignToNormal;
+    }
+
+    Vector3 SnapVector(Vector3 input)
+    {
+        return new Vector3(
+            Mathf.Sign(input.x),
+            Mathf.Sign(input.y),
+            Mathf.Sign(input.z)
+        );
+    }
+    
+    Vector3 EvaluateRotation(Vector3 normal, Vector3 relativeDir)
+    {
+        Debug.Log(relativeDir);
+        
+        //relativeDir.x = 1;
+        //relativeDir.y = 1;
+       // relativeDir.z = 1;
+        Vector3 dir = rotationDirections[indicatorRotDirIndex];
+        
+        int dif = 0;
+
+        curRotationDirections.Clear();
+        
+        foreach (Vector3 rotationDirection in rotationDirections)
+        {
+            Vector3 modDir = rotationDirection;
+
+            modDir = new Vector3(modDir.x , modDir.y, modDir.z  * relativeDir.x);
+            
+            if (Mathf.Abs(Vector3.Dot(modDir, normal)) < 0.5f)
+            {
+                curRotationDirections.Add(modDir);
+            }
+            
+        }
+
+        return curRotationDirections[indicatorRotDirIndex];
+        
+        for (int i = 0; i < 10; i++)
+        {
+            dir = rotationDirections[(indicatorRotDirIndex + dif) % rotationDirections.Length];
+            
+            if (Mathf.Abs(Vector3.Dot(dir, normal)) > 0.5f)
+            {
+                dif += 1;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        return dir;
     }
 
     void EnterBuildMode()

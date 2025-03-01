@@ -14,6 +14,8 @@ public class BlockDescriptionUI : MonoBehaviour
     public Transform statListParent;
     public GameObject statEntryUIPrefab;
 
+    public TextMeshProUGUI blockDescription;
+
     public TextMeshProUGUI blockNameText;
     
     [System.Serializable]
@@ -81,6 +83,11 @@ public class BlockDescriptionUI : MonoBehaviour
     public void SetBlockName(string name)
     {
         blockNameText.text = name;
+    }
+
+    public void SetDescription(string desc)
+    {
+        blockDescription.text = desc;
     }
         
         

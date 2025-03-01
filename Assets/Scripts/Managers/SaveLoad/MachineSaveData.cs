@@ -13,7 +13,7 @@ public class MachineSaveData
 
     public DroneController Spawn(Vector3 offset = default, Vector3 eulerRot = default, Transform parentParent = null, int teamID = 0, bool network = true, bool deploy = false)
     {
-        Transform parent = GetParentTransform(parentParent, deploy, network, out GameObject physParent, out NetworkObject physParentNetObj);
+        Transform parent = GetParentTransform(parentParent, deploy, network, eulerRot, out GameObject physParent, out NetworkObject physParentNetObj);
         DroneController droneController = null;
         List<ulong> blockNetIDs = new List<ulong>();
 
@@ -46,7 +46,7 @@ public class MachineSaveData
         return droneController;
     }
 
-    private Transform GetParentTransform(Transform parentParent, bool deploy, bool network, out GameObject physParent, out NetworkObject physParentNetObj)
+    private Transform GetParentTransform(Transform parentParent, bool deploy, bool network, Vector3 euler, out GameObject physParent, out NetworkObject physParentNetObj)
     {
         physParent = null;
         physParentNetObj = null;
@@ -54,6 +54,7 @@ public class MachineSaveData
         if (deploy)
         {
             physParent = GameObject.Instantiate(MachineSaveLoadManager.Instance.physParentPrefab, parentParent);
+            physParent.transform.rotation = Quaternion.Euler(euler);
             if (network)
             {
                 physParentNetObj = physParent.GetComponent<NetworkObject>();

@@ -11,6 +11,8 @@ public class BlockStats
         public float value;
     }
 
+    public string desc = "This is a block";
+    
     [SerializeField]
     public List<StatEntry> statEntries;
 

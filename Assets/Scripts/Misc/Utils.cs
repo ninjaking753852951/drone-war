@@ -154,6 +154,20 @@ public static class Utils
         }
         return null;
     }
+
+    public static Transform CursorScan(float radius, LayerMask mask)
+    {
+        // Cast a ray from the cursor to the world
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        
+        // Check if the ray hits something
+        if (Physics.SphereCast(ray, radius, out hit, 9999,mask))
+        {
+            return hit.transform; // Return the transform of the hit object
+        }
+        return null;
+    }
     
     public static Vector3 CursorScanPos()
     {

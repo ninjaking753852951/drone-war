@@ -482,6 +482,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 1, z: 1}
   stats:
+    desc: Increases turret range
     statEntries:
     - stat: 0
       value: 25

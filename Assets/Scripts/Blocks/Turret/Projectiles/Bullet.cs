@@ -26,13 +26,15 @@ public class Bullet : Projectile
     
     protected override void Hit(Collider other)
     {
-        
+        Debug.Log( "DAMAGE " + rb.linearVelocity.magnitude* rb.mass * bulletTurret.DamageCalculation());
         //SpawnImpactEffect(transform.position, Quaternion.LookRotation(rb.velocity * -1));
         VFXManager.instance.Spawn(vfxImpactEffect, transform.position, Quaternion.LookRotation(rb.linearVelocity * -1), true);
         
         DroneBlock droneBlock = other.gameObject.GetFirstComponentInHierarchy<DroneBlock>();
         if (droneBlock != null)
         {
+
+            
             if(droneBlock.controller != null && droneBlock.controller.curTeam != originTeam)
                 droneBlock.TakeDamage(rb.linearVelocity.magnitude* rb.mass * bulletTurret.DamageCalculation());
         }

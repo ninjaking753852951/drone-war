@@ -20,6 +20,8 @@ public class MovementController
     public float wheelBase;
     public float comHeight;
 
+    public WorldUIIconFactory noEnginePowerIcon;
+    
     [Header("Avoidance Settings")]
     public float avoidanceRange = 10f;
     public float baseAvoidanceWeight = 1f;
@@ -75,6 +77,8 @@ public class MovementController
         _rb = rb;
         _transform = transform;
         sound.mute = false;
+        if (motorTorque == 0)
+            WorldUIManager.Instance.iconManager.RegisterIcon(transform, noEnginePowerIcon);
     }
 
     public void InitializeComponents()
@@ -102,7 +106,7 @@ public class MovementController
         
 
         
-        float yawAngleError = Vector3.SignedAngle(_transform.forward, directionToTarget, Vector3.up);
+        float yawAngleError = Vector3.SignedAngle(controller.rb.transform.forward, directionToTarget, Vector3.up);
         currentSteer = Mathf.Clamp(yawAngleError, -45, 45);
         currentSteer *= steerMultiplier;
         

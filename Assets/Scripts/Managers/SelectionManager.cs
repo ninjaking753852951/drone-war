@@ -8,7 +8,13 @@ public class SelectionManager : Singleton<SelectionManager>
 {
     public List<DroneController> selectedDrones = new List<DroneController>();
 
-    public float selectionThreshold = 5;
+    public float selectionThreshold = 5; // Minimum drag distance to trigger rectangle selection
+    public float clickScanRadius = 5; // Radius for single-click selection
+    public LayerMask scanMask; // Layer mask for selectable objects
+
+    private Vector2 startMousePosition;
+    private Vector2 endMousePosition;
+    private bool isDragging = false;
 
     void Start()
     {
@@ -18,121 +24,18 @@ public class SelectionManager : Singleton<SelectionManager>
 
     void Update()
     {
-        if(GameManager.Instance.currentGameMode == GameMode.Build)
+        if (GameManager.Instance.currentGameMode == GameMode.Build)
             return;
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            Transform clickObject = Utils.CursorScan();
-            
-            if(clickObject == null)
-                return;
-            
-            DroneController drone = clickObject.root.GetComponentInChildren<DroneController>();
-            if (drone != null)
-            {
-                SelectObject(clickObject);
-            }
-            else
-            {
-                ClearSelectedDrones();
-            }
-        }
+        HandleMouseInput();
 
+        // Clean up null references in the selectedDrones list
         for (int i = selectedDrones.Count - 1; i >= 0; i--)
         {
-            if(selectedDrones[i] == null)
+            if (selectedDrones[i] == null)
                 selectedDrones.RemoveAt(i);
         }
-        
-        HandleMouseInput();
     }
-
-    void SelectObjects(List<Transform> hits)
-    {
-        ClearSelectedDrones();
-        foreach (var hit in hits)
-        {
-            if(hit == null)
-                continue;
-            SelectObject(hit);
-        }
-    }
-    
-    void SelectObject(Transform hitTransform)
-    {
-        if (hitTransform != null)
-        {
-            // Check if the root object has a DroneController component
-            DroneController drone = hitTransform.root.GetComponentInChildren<DroneController>();
-
-            if (drone != null)
-            {
-                // If it has a DroneController, add it to the list if it's not already selected
-                if (!selectedDrones.Contains(drone))
-                {
-                    drone.Select(true);
-                    selectedDrones.Add(drone);
-                }
-            }
-        }
-    }
-
-    void ClearSelectedDrones()
-    {
-        foreach (DroneController drone in selectedDrones)
-        {
-            if(drone == null)
-                continue;
-            
-            drone.Select(false);
-        }
-        selectedDrones.Clear();
-    }
-
-    void OnGUI()
-    {
-        
-        if(GameManager.Instance.currentGameMode == GameMode.Build)
-            return;
-        
-        /*GUI.Label(new Rect(Screen.width - 200, 10, 190, 30), "Selected Drones: ");
-        
-        if (selectedDrones.Count > 0)
-        {
-
-            float yPos = 0;
-
-            for (int i = 0; i < selectedDrones.Count; i++)
-            {
-                yPos += 30;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Drone " + i);
-                yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "HP: " + selectedDrones[i].curHealth);
-                yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Mass: " + selectedDrones[i].movementController.mass);
-                yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Torque: " + selectedDrones[i].movementController.motorTorque);
-                yPos += 15;
-                GUI.Label(new Rect(Screen.width - 200, yPos, 190, 30), "Velocity: " + Mathf.Round(selectedDrones[i].movementController.velocity *10)/10 + " m/s");
-            }
-        }*/
-        
-        if (isDragging)
-        {
-            // Draw the selection rectangle
-            var rect = GetScreenRect(startMousePosition, endMousePosition);
-            DrawScreenRect(rect, new Color(0.8f, 0.8f, 1f, 0.25f));
-            DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 1f));
-        }
-    }
-    
-    public List<Transform> selectedTransforms = new List<Transform>();
-    private Vector2 startMousePosition;
-    private Vector2 endMousePosition;
-    private bool isDragging = false;
-
-
 
     void HandleMouseInput()
     {
@@ -140,12 +43,26 @@ public class SelectionManager : Singleton<SelectionManager>
         {
             startMousePosition = Input.mousePosition;
             isDragging = true;
+
+            // Single-click selection (if not dragging)
+            if (!Input.GetKey(KeyCode.LeftShift))
+                ClearSelectedDrones();
+
+            Transform clickObject = Utils.CursorScan(clickScanRadius, scanMask);
+            if (clickObject != null)
+            {
+                DroneController drone = clickObject.root.GetComponentInChildren<DroneController>();
+                if (drone != null)
+                    SelectObject(clickObject);
+            }
         }
 
         if (Input.GetMouseButtonUp(0)) // Left mouse button released
         {
             isDragging = false;
-            if((startMousePosition - endMousePosition).magnitude > selectionThreshold)
+
+            // Check if the drag distance exceeds the threshold
+            if ((startMousePosition - endMousePosition).magnitude > selectionThreshold)
                 SelectObjectsInRectangle();
         }
 
@@ -155,11 +72,9 @@ public class SelectionManager : Singleton<SelectionManager>
         }
     }
 
-
-
     void SelectObjectsInRectangle()
     {
-        selectedTransforms.Clear();
+        List<Transform> selectedTransforms = new List<Transform>();
 
         // Convert screen positions to viewport points
         Vector3 viewportStart = Camera.main.ScreenToViewportPoint(startMousePosition);
@@ -170,6 +85,7 @@ public class SelectionManager : Singleton<SelectionManager>
         Vector3 max = Vector3.Max(viewportStart, viewportEnd);
         Rect viewportRect = new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 
+        // Find all objects within the selection rectangle
         foreach (var obj in FindObjectsOfType<Transform>())
         {
             // Convert object world position to viewport position
@@ -178,11 +94,65 @@ public class SelectionManager : Singleton<SelectionManager>
             // Check if the object is within the viewport rectangle and in front of the camera
             if (viewportPosition.z > 0 && viewportRect.Contains(new Vector2(viewportPosition.x, viewportPosition.y)))
             {
-                selectedTransforms.Add(obj);
+                if(!obj.gameObject.CompareTag("IgnoreSelection"))
+                    selectedTransforms.Add(obj);
             }
         }
-        
+
+        // Select the objects
         SelectObjects(selectedTransforms);
+    }
+
+    void SelectObjects(List<Transform> hits)
+    {
+        foreach (var hit in hits)
+        {
+            if (hit == null)
+                continue;
+
+            SelectObject(hit);
+        }
+    }
+
+    void SelectObject(Transform hitTransform)
+    {
+        if (hitTransform != null)
+        {
+            // Check if the root object has a DroneController component
+            DroneController drone = hitTransform.root.GetComponentInChildren<DroneController>();
+
+            if (drone != null && !selectedDrones.Contains(drone))
+            {
+                drone.Select(true);
+                selectedDrones.Add(drone);
+            }
+        }
+    }
+
+    void ClearSelectedDrones()
+    {
+        foreach (DroneController drone in selectedDrones)
+        {
+            if (drone == null)
+                continue;
+
+            drone.Select(false);
+        }
+        selectedDrones.Clear();
+    }
+
+    void OnGUI()
+    {
+        if (GameManager.Instance.currentGameMode == GameMode.Build)
+            return;
+
+        // Draw the selection rectangle
+        if (isDragging)
+        {
+            var rect = GetScreenRect(startMousePosition, endMousePosition);
+            DrawScreenRect(rect, new Color(0.8f, 0.8f, 1f, 0.25f));
+            DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 1f));
+        }
     }
 
     // Helper method to get a screen rectangle
@@ -211,15 +181,5 @@ public class SelectionManager : Singleton<SelectionManager>
         DrawScreenRect(new Rect(rect.xMin, rect.yMax - thickness, rect.width, thickness), color); // Bottom
         DrawScreenRect(new Rect(rect.xMin, rect.yMin, thickness, rect.height), color); // Left
         DrawScreenRect(new Rect(rect.xMax - thickness, rect.yMin, thickness, rect.height), color); // Right
-    }
-
-    // Helper method to get viewport bounds
-    Bounds GetViewportBounds(Camera camera, Vector3 screenPosition1, Vector3 screenPosition2)
-    {
-        var v1 = camera.ScreenToViewportPoint(screenPosition1);
-        var v2 = camera.ScreenToViewportPoint(screenPosition2);
-        var min = Vector3.Min(v1, v2);
-        var max = Vector3.Max(v1, v2);
-        return new Bounds((min + max) * 0.5f, max - min);
     }
 }

@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 5435385135274052475}
   - component: {fileID: 4296374956703788323}
   - component: {fileID: 3823196385197196306}
+  - component: {fileID: 4153022603150044859}
+  - component: {fileID: 8692516113478642754}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -84,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ProtocolType: 0
+  m_ProtocolType: 1
   m_UseWebSockets: 0
   m_UseEncryption: 0
   m_MaxPacketQueueSize: 128
@@ -115,3 +117,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ipAddress: 127.0.0.1
   showOverride: 0
+--- !u!114 &4153022603150044859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336703529961854264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b822ef8716bdb434fbf42b13b55a761d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8692516113478642754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336703529961854264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a2dcc0b47440a349b830aff06a2574b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

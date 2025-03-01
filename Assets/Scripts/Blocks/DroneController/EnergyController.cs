@@ -1,3 +1,4 @@
+using ImprovedTimers;
 using UnityEngine;
 [System.Serializable]
 public class EnergyController : IProgressBar
@@ -7,6 +8,11 @@ public class EnergyController : IProgressBar
     public float maxEnergy;
     public float energyRegenRate;
 
+    public WorldUIIconFactory lowPowerIcon;
+    WorldUIManager.WorldUIIcon curLowPowerIcon;
+    Timer outOfPowerCooldown = new CountdownTimer(0);
+    
+    
     public ProgressBarSettings energyBarSettings;
         
     DroneController controller;
@@ -15,12 +21,19 @@ public class EnergyController : IProgressBar
     {
         this.controller = controller;
         energy = maxEnergy;
-        ProgressBarManager.Instance.RegisterHealthBar(this);
+        WorldUIManager.Instance.healthBarManager.RegisterHealthBar(this);
     }
 
     public void Update(float timeDelta)
     {
         energy = Mathf.MoveTowards(energy, maxEnergy, energyRegenRate * timeDelta);
+    
+        
+        if (outOfPowerCooldown.IsFinished && curLowPowerIcon != null)
+        {
+            WorldUIManager.Instance.iconManager.UnregisterIcon(curLowPowerIcon);
+            curLowPowerIcon = null;
+        }
     }
     public Transform ProgressBarWorldTarget()
     {
@@ -52,6 +65,14 @@ public class EnergyController : IProgressBar
         }
         else
         {
+            Debug.Log("out of power");
+            outOfPowerCooldown = new CountdownTimer(0.5f);
+            outOfPowerCooldown.Start();
+            
+            if (curLowPowerIcon == null)
+            {
+                curLowPowerIcon = WorldUIManager.Instance.iconManager.RegisterIcon(this.controller.transform, lowPowerIcon);   
+            }
             return false;
         }
     }

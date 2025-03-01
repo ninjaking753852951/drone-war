@@ -408,7 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 612666028
+  GlobalObjectIdHash: 521058174
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -462,6 +462,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 0.5, z: 1}
   stats:
+    desc: 'Place a turret core above this to allow horizontal aiming \nNote: turret
+      mounts can be combined'
     statEntries:
     - stat: 0
       value: 25
@@ -490,6 +492,7 @@ MonoBehaviour:
   aimForce: 2000
   maxTurnSpeed: 180
   nearTargetSmoothing: 5
+  intersectingIcon: {fileID: 11400000, guid: 03f788c64ddd30840adbe5812fbeeb94, type: 2}
   targetAngle: 0
 --- !u!114 &8319448671858385813
 MonoBehaviour:

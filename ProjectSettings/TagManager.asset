@@ -8,6 +8,7 @@ TagManager:
   - UISelection
   - UIIcon
   - IgnoreMaterialOverride
+  - IgnoreSelection
   layers:
   - Default
   - TransparentFX

@@ -145,7 +145,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2362564599
+  GlobalObjectIdHash: 1126454336
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -206,6 +206,8 @@ MonoBehaviour:
     trackWidth: 0
     wheelBase: 0
     comHeight: 0
+    noEnginePowerIcon: {fileID: 11400000, guid: 054426651e9a1834283c14881a8e961f,
+      type: 2}
     avoidanceRange: 30
     baseAvoidanceWeight: 1
     bonusAvoidanceWeight: 0.5
@@ -248,9 +250,10 @@ MonoBehaviour:
     energy: 2.5
     maxEnergy: 0.5
     energyRegenRate: 0.1
+    lowPowerIcon: {fileID: 11400000, guid: ee832ed7302a9e94b9a7d026a98dbe58, type: 2}
     energyBarSettings:
       worldOffsetHeight: 5
-      screenOffsetHeight: -10
+      screenOffsetHeight: -5
       colour: {r: 0.28773582, g: 0.8273331, b: 1, a: 1}
   physBlock: {fileID: 0}
   rb: {fileID: 0}
@@ -273,6 +276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 1, z: 1}
   stats:
+    desc: This is a block
     statEntries:
     - stat: 0
       value: 25
@@ -298,7 +302,6 @@ MonoBehaviour:
   controller: {fileID: 0}
   debugOrderCount: 0
   targetObjectives2: []
-  isSatisfied: 0
 --- !u!114 &8163985959737980395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -921,12 +924,12 @@ PrefabInstance:
     - target: {fileID: 5821797995830266331, guid: f859b17b1e0dd65449aceb32cec85ce6,
         type: 3}
       propertyPath: volume
-      value: 0.5
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 5821797995830266331, guid: f859b17b1e0dd65449aceb32cec85ce6,
         type: 3}
       propertyPath: volumeMax
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 6945186443445620329, guid: f859b17b1e0dd65449aceb32cec85ce6,
         type: 3}

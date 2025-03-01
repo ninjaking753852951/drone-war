@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8982863458930543065}
   m_Layer: 0
   m_Name: PhysParent
-  m_TagString: Untagged
+  m_TagString: IgnoreSelection
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -69,7 +69,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   physClusterPrefab: {fileID: 7965844959339248093, guid: 1c2f7eb90935e6b47a1fc0389cf8349a,
     type: 3}
-  deployOnStart: 0
+  blockCount:
+    m_InternalValue: 0
+  networked: 0
+  totalMass: 0
 --- !u!114 &8982863458930543065
 MonoBehaviour:
   m_ObjectHideFlags: 0

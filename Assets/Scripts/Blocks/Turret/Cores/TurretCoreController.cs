@@ -301,7 +301,11 @@ public abstract class TurretCoreController : NetworkBehaviour, IProxyDeploy
         targetYawAngle = CalculateTargetYawAngle(targetPosEstimate);
 
         //Debug.Log( "Pitch" + targetPitchAngle + " Yaw " + targetYawAngle);
+
         
+        
+        //Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, eldestMountRb.transform.up, eldestMountRb.transform.forward);
+       
         Vector2 transformedPitchYaw = TransformAngles(targetPitchAngle, targetYawAngle, eldestMountRb.transform.up, eldestMountRb.transform.forward);
         
         //Debug.Log("DEPLOY WITH MOUNTS " + mountsSingleAxis.Count);
@@ -376,10 +380,11 @@ public abstract class TurretCoreController : NetworkBehaviour, IProxyDeploy
         if (NetworkManager.Singleton.IsListening && !NetworkManager.Singleton.IsServer)
             return;
         
+        if(!controller.energy.DeductEnergy(energyCost))
+            return;
+        
         fireTimer.Reset(1/fireRate);
         fireTimer.Start();
-
-        controller.energy.DeductEnergy(energyCost);
         
         if(shootVFX != null)
             VFXManager.instance.Spawn(shootVFX, mainBarrel.shootPoint.position, Quaternion.identity);
@@ -430,7 +435,7 @@ public abstract class TurretCoreController : NetworkBehaviour, IProxyDeploy
         DebugLogger.Instance.Log("OBSTRUCTED " +mainBarrel.IsObstructed());
         DebugLogger.Instance.Log("AIMED AT TARGET " +IsAimedAtTarget());
         DebugLogger.Instance.Log("IN RANGE " + TargetInRange() );
-        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange() && controller.energy.CanAfford(energyCost) && IsAimedAtTarget();
+        return fireTimer.IsFinished && !mainBarrel.IsObstructed() && TargetInRange()  && IsAimedAtTarget();
     }
 
     protected bool TargetInRange()

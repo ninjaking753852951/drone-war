@@ -17,6 +17,8 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
     public float aimForce = 100;
     public float maxTurnSpeed = 10;
     public float nearTargetSmoothing = 1;
+
+    public WorldUIIconFactory intersectingIcon;
     
     [Header("RUNTIME VARIABLES")]
     public float targetAngle = 1;
@@ -43,6 +45,8 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
         joint = (HingeJoint)block.joint;
         if (joint == null)
         {
+            WorldUIManager.Instance.iconManager.RegisterIcon(transform, intersectingIcon);
+            
             enabled = false;
             return;
         }
@@ -54,7 +58,7 @@ public class TurretMountSingleAxis : MovingDroneBlockBase, IProxyDeploy
     
     public void UpdateTurretAngles(float yaw, float pitch)
     {
-        //Debug.Log("UPDATE MOUNTS TURRET");
+        
         
         switch (controlType)
         {

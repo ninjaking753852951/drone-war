@@ -162,6 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: {x: 1, y: 1, z: 1}
   stats:
+    desc: Damage scales with range
     statEntries:
     - stat: 0
       value: 25
@@ -171,6 +172,8 @@ MonoBehaviour:
       value: 25
     - stat: 4
       value: 0.5
+    - stat: 2
+      value: 40
   controller: {fileID: 0}
   meta:
     specialPositions: []

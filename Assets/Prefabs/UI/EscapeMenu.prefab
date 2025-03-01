@@ -424,6 +424,7 @@ MonoBehaviour:
   openSettingsButton: {fileID: 379041679964523007}
   backButton: {fileID: 2970904213504721962}
   mainMenuButton: {fileID: 2727678799824542897}
+  quitButton: {fileID: 3719856079848875100}
 --- !u!1 &5012455869832250322
 GameObject:
   m_ObjectHideFlags: 0

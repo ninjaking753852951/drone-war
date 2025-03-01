@@ -33,7 +33,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
     [Header("Energy Settings")]
     public EnergyController energy;
-
+    
     public Queue<WaypointManager.Waypoint> waypoints = new Queue<WaypointManager.Waypoint>();
 
     [HideInInspector]
@@ -92,10 +92,10 @@ public class DroneController : NetworkBehaviour, IProgressBar
     {
         outline.enabled = select;
         //return;
-        /*foreach (var rangeIndicator in rangeIndicators)
+        foreach (var rangeIndicator in rangeIndicators)
         {
-            rangeIndicator.Select(select);
-        }*/
+            rangeIndicator.SetVisible(select);
+        }
     }
 
     void InitOutline()
@@ -109,7 +109,9 @@ public class DroneController : NetworkBehaviour, IProgressBar
         outline.enabled = false;
         
         foreach (TurretRangeIndicator indicator in turretRangeIndicators)
-            indicator.SetVisible(true);
+            indicator.SetVisible(false);
+
+        rangeIndicators = turretRangeIndicators;
     }
 
     /*void InitRangeIndicator()
@@ -183,7 +185,7 @@ public class DroneController : NetworkBehaviour, IProgressBar
 
         curHealth *= healthMultiplier;
         maxHealth = curHealth;
-        ProgressBarManager.Instance.RegisterHealthBar(this);
+        WorldUIManager.Instance.healthBarManager.RegisterHealthBar(this);
     }
 
     void InitMovement()

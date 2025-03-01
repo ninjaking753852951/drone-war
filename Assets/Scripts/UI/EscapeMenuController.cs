@@ -10,6 +10,7 @@ public class EscapeMenuController : MonoBehaviour
     public Button openSettingsButton;
     public Button backButton;
     public Button mainMenuButton;
+    public Button quitButton;
 
     SettingsMenuController settingsMenu;
     
@@ -22,6 +23,7 @@ public class EscapeMenuController : MonoBehaviour
         openSettingsButton.onClick.AddListener(settingsMenu.OpenMenu);
         openSettingsButton.onClick.AddListener(CloseMenu);
         mainMenuButton.onClick.AddListener(GoToMainMenu);
+        quitButton.onClick.AddListener(Application.Quit);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
